@@ -1,0 +1,36 @@
+#ifndef node_syslog_h
+#define node_syslog_h
+
+#include <node.h>
+#include <node_object_wrap.h>
+#include <v8.h>
+#include <syslog.h>
+
+namespace node {
+
+
+class Syslog : ObjectWrap {
+    public:
+	static void Initialize ( v8::Handle<v8::Object> target);
+	    
+    protected:
+	static v8::Persistent<v8::FunctionTemplate> constructor_template;
+	static v8::Handle<v8::Value> init   (const v8::Arguments& args);
+	static v8::Handle<v8::Value> log (const v8::Arguments& args);
+	static v8::Handle<v8::Value> destroy (const v8::Arguments& args);
+	
+	Syslog () : ObjectWrap() {
+	};
+	
+	~Syslog (){};
+
+
+    private:
+	static void open();
+	static void close();
+	static bool connected_;
+	static char name[1024];
+};
+
+}  // namespace node
+#endif // node_syslog_h
