@@ -5,6 +5,8 @@
 #include <node_object_wrap.h>
 #include <v8.h>
 #include <syslog.h>
+#include <stdlib.h>
+#include <string.h>
 
 namespace node {
 
@@ -26,7 +28,7 @@ class Syslog : ObjectWrap {
 
 
     private:
-	static void open();
+	static void open(int, int);
 	static void close();
 	static bool connected_;
 	static char name[1024];
