@@ -1,4 +1,4 @@
-#!/usr/bin/node
+#!/bin/env node
 
 	var Syslog = require('./nodesyslog').Syslog;
 
