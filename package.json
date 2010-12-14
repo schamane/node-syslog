@@ -4,7 +4,7 @@
     "directories": {
         "lib": "./lib"
     },
-    "main": "./lib/node-syslog",
+    "main": "./node-syslog",
     "engines": {
         "node" : ">=0.2.0"
     },
