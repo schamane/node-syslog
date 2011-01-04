@@ -2,6 +2,8 @@
 var node_syslog = require('./node-syslog'),
 	Syslog = node_syslog.Syslog;
 
+Syslog.version = '0.6.0';
+
 /*
  * facilities
  */
