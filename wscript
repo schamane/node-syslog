@@ -4,7 +4,7 @@ from os.path import exists
 
 srcdir = '.'
 blddir = 'build'
-VERSION = '0.5.0'
+VERSION = '0.6.2'
 
 def set_options(opt):
     opt.tool_options('compiler_cxx')
