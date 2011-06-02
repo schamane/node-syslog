@@ -22,7 +22,7 @@ Usage
      
      var Syslog = require('node-syslog').Syslog;
      
-     Syslog.init("node-syslog", Syslog.LOG_PID | Syslog.LOG_ODELAY, Syslog.LOG_INFO);
+     Syslog.init("node-syslog", Syslog.LOG_PID | Syslog.LOG_ODELAY, Syslog.LOG_LOCAL0);
      Syslog.log(Syslog.LOG_INFO, "Node Syslog Module output" + new Date());
      
 Check your /var/log/messages (syslog, syslog-ng), or /var/log/everything/current (metalog) file for any test entry.
