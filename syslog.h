@@ -1,5 +1,5 @@
-#ifndef node_syslog_h
-#define node_syslog_h
+#ifndef syslog_h
+#define syslog_h
 
 #include <node.h>
 #include <node_object_wrap.h>
@@ -35,4 +35,4 @@ class Syslog : ObjectWrap {
 };
 
 }  // namespace node
-#endif // node_syslog_h
+#endif // syslog_h

@@ -1,8 +1,7 @@
 (function(){
-var node_syslog = require('./node-syslog'),
-	Syslog = node_syslog.Syslog;
+var Syslog = require('./syslog').Syslog;
 
-Syslog.version = '0.6.2';
+Syslog.version = '1.0.0';
 
 /*
  * facilities
@@ -55,6 +54,6 @@ process.on('exit', function() {
 /*
  * export Syslog as module
  */
-exports.Syslog = Syslog;
+module.exports = Syslog;
 
 })();

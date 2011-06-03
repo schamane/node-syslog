@@ -1,4 +1,4 @@
-#include "node-syslog.h"
+#include "syslog.h"
 
 using namespace v8;
 using namespace node;

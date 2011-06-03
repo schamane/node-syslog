@@ -1,6 +1,6 @@
 Node-Syslog
 
-v0.6.1
+v1.0.0
 
 This is an node module (add-on) to work with system log daemon on unix systems.
 Module is tested with node.js v0.3.3 and metalog, syslog-ng 3.1.1.
@@ -20,7 +20,7 @@ Usage
 
      #!/bin/env node
      
-     var Syslog = require('node-syslog').Syslog;
+     var Syslog = require('node-syslog');
      
      Syslog.init("node-syslog", Syslog.LOG_PID | Syslog.LOG_ODELAY, Syslog.LOG_LOCAL0);
      Syslog.log(Syslog.LOG_INFO, "Node Syslog Module output" + new Date());

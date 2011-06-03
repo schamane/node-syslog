@@ -4,7 +4,7 @@ from os.path import exists
 
 srcdir = '.'
 blddir = 'build'
-VERSION = '0.6.2'
+VERSION = '1.0.0'
 
 def set_options(opt):
     opt.tool_options('compiler_cxx')
@@ -15,14 +15,14 @@ def configure(conf):
 
 def build(bld):
     obj = bld.new_task_gen('cxx', 'shlib', 'node_addon')
-    obj.target = 'node-syslog'
-    obj.source = 'node-syslog.cc'
+    obj.target = 'syslog'
+    obj.source = 'syslog.cc'
 
 def shutdown():
-    # HACK to get node-syslog.node out of build directory.
+    # HACK to get syslog.node out of build directory.
     # better way to do this?
     if Options.commands['clean']:
-	if exists('node-syslog.node'): unlink('node-syslog.node')
+	if exists('node-syslog.node'): unlink('syslog.node')
     else:
-	if exists('build/default/node-syslog.node') and not exists('node-syslog.node'):
-	    symlink('build/default/node-syslog.node', 'node-syslog.node')
+	if exists('build/default/syslog.node') and not exists('syslog.node'):
+	    symlink('build/default/syslog.node', 'syslog.node')
