@@ -24,5 +24,5 @@
       "type": "Simplified BSD License",
       "url": "http://en.wikipedia.org/wiki/BSD_licenses"
     }],
-    "tags": ["syslog", "system", "log"]
+    "tags": ["syslog", "system", "log", "logging"]
 }
