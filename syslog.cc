@@ -20,6 +20,7 @@ Syslog::Initialize ( Handle<Object> target)
 	
 	NODE_SET_METHOD(constructor_template, "init", Syslog::init);
 	NODE_SET_METHOD(constructor_template, "log", Syslog::log);
+	NODE_SET_METHOD(constructor_template, "setmask", Syslog::setmask);
 	NODE_SET_METHOD(constructor_template, "close", Syslog::destroy);
 	
 	target->Set(String::NewSymbol("Syslog"), constructor_template->GetFunction());
@@ -123,9 +124,21 @@ Syslog::destroy ( const Arguments& args)
 void
 Syslog::open ( int option, int facility)
 {
-	//openlog( name, LOG_PID, LOG_DAEMON);
 	openlog( name, option, facility );
 	connected_ = true;
+}
+
+Handle<Value>
+Syslog::setmask ( const Arguments& args)
+{
+  if (args.Length() < 1) {
+      return ThrowException(Exception::Error(String::New("You must provide an mask")));
+  }
+  if (!args[0]->IsNumber()) {
+      return ThrowException(Exception::Error(String::New("Mask must be numeric")));
+  }
+
+  setlogmask(args[0]->Int32Value());
 }
 
 void
