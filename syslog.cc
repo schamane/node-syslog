@@ -131,14 +131,33 @@ Syslog::open ( int option, int facility)
 Handle<Value>
 Syslog::setMask ( const Arguments& args)
 {
-  if (args.Length() < 1) {
-      return ThrowException(Exception::Error(String::New("You must provide an mask")));
-  }
-  if (!args[0]->IsNumber()) {
-      return ThrowException(Exception::Error(String::New("Mask must be numeric")));
-  }
-
-  setlogmask(args[0]->Int32Value());
+	bool upTo = false;
+	int mask, value;
+	
+	if (args.Length() < 1) {
+		return ThrowException(Exception::Error(String::New("You must provide an mask")));
+	}
+	
+	if (!args[0]->IsNumber()) {
+		return ThrowException(Exception::Error(String::New("First parameter (mask) should be numeric")));
+	}
+	
+	if (args.Length() == 2 && !args[1]->IsBoolean()) {
+		return ThrowException(Exception::Error(String::New("Second parameter (upTo) should be boolean")));
+	}
+	
+	if (args.Length() == 2 && args[1]->IsBoolean()) {
+		upTo = true;
+	}
+	
+	value = args[0]->Int32Value();
+	if(upTo) {
+		mask = LOG_UPTO(value);
+	} else {
+		mask = LOG_MASK(value);
+	}
+	
+	return Integer::New( setlogmask(mask) );
 }
 
 void
