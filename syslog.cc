@@ -20,7 +20,7 @@ Syslog::Initialize ( Handle<Object> target)
 	
 	NODE_SET_METHOD(constructor_template, "init", Syslog::init);
 	NODE_SET_METHOD(constructor_template, "log", Syslog::log);
-	NODE_SET_METHOD(constructor_template, "setmask", Syslog::setmask);
+	NODE_SET_METHOD(constructor_template, "setMask", Syslog::setMask);
 	NODE_SET_METHOD(constructor_template, "close", Syslog::destroy);
 	
 	target->Set(String::NewSymbol("Syslog"), constructor_template->GetFunction());
@@ -129,7 +129,7 @@ Syslog::open ( int option, int facility)
 }
 
 Handle<Value>
-Syslog::setmask ( const Arguments& args)
+Syslog::setMask ( const Arguments& args)
 {
   if (args.Length() < 1) {
       return ThrowException(Exception::Error(String::New("You must provide an mask")));

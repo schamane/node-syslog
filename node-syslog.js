@@ -1,7 +1,7 @@
 (function(){
 var Syslog = require('./syslog').Syslog;
 
-Syslog.version = '1.0.0';
+Syslog.version = '1.0.1';
 
 /*
  * facilities

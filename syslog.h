@@ -19,7 +19,7 @@ class Syslog : ObjectWrap {
 	static v8::Persistent<v8::FunctionTemplate> constructor_template;
 	static v8::Handle<v8::Value> init   (const v8::Arguments& args);
 	static v8::Handle<v8::Value> log (const v8::Arguments& args);
-	static v8::Handle<v8::Value> setmask (const v8::Arguments& args);
+	static v8::Handle<v8::Value> setMask (const v8::Arguments& args);
 	static v8::Handle<v8::Value> destroy (const v8::Arguments& args);
 	
 	Syslog () : ObjectWrap() {
