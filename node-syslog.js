@@ -1,5 +1,13 @@
 (function(){
-var Syslog = require('./syslog').Syslog;
+
+var sl = require('./syslog').Syslog;
+
+var Syslog = {};
+
+Syslog.init = sl.init;
+Syslog.log = sl.log;
+Syslog.setMask = sl.setMask;
+Syslog.close = sl.close;
 
 Syslog.version = '1.0.1';
 
