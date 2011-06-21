@@ -1,4 +1,4 @@
-Node-Syslog
+# Node-Syslog
 
 v1.0.1
 
@@ -7,28 +7,31 @@ Module is tested with node.js v0.3.3 and metalog, syslog-ng 3.1.1.
 
 Read Wiki "setMask" page for more information about how to use "setMask" functionality.
 
-Authors
-Nazar Kulyk
-Jeremy Childs
+## Authors
 
-Installation
+*Nazar Kulyk
+*Jeremy Childs
+
+## Installation
+
+### npm
 
       npm install node-syslog
 
-or manualy
+### manual
 
       git clone
       node-waf configure build
 
-For more inforamtion about how to use module check test.js
+## Usage
 
-Usage
+For more inforamtion about how to use module check test.js
 
      #!/bin/env node
      
      var Syslog = require('node-syslog');
      
      Syslog.init("node-syslog", Syslog.LOG_PID | Syslog.LOG_ODELAY, Syslog.LOG_LOCAL0);
-     Syslog.log(Syslog.LOG_INFO, "Node Syslog Module output" + new Date());
+     Syslog.log(Syslog.LOG_INFO, "Node Syslog Module output " + new Date());
      
 Check your /var/log/messages (syslog, syslog-ng), or /var/log/everything/current (metalog) file for any test entry.
