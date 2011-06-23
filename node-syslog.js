@@ -1,67 +1,66 @@
 (function(){
 
-var sl = require('./syslog').Syslog;
+var SyslogWrapper = require('./syslog').Syslog;
 
-var Syslog = {};
+/*
+ * export Syslog as module
+ */
+module.exports = {
 
-Syslog.init = sl.init;
-Syslog.log = sl.log;
-Syslog.setMask = sl.setMask;
-Syslog.close = sl.close;
-
-Syslog.version = '1.0.1';
+init: SyslogWrapper.init,
+log: SyslogWrapper.log,
+setMask: SyslogWrapper.setMask,
+close: SyslogWrapper.close,
+version: '1.0.1',
 
 /*
  * facilities
  */
-Syslog.LOG_KERN		= (0<<3);
-Syslog.LOG_USER		= (1<<3);
-Syslog.LOG_MAIL		= (5<<3);
-Syslog.LOG_DAEMON	= (3<<3);
-Syslog.LOG_AUTH		= (4<<3);
-Syslog.LOG_SYSLOG	= (5<<3);
-Syslog.LOG_LPR		= (6<<3);
-Syslog.LOG_NEWS		= (7<<3);
-Syslog.LOG_UUCP		= (8<<3);
-Syslog.LOG_LOCAL0	= (16<<3);
-Syslog.LOG_LOCAL1	= (17<<3);
-Syslog.LOG_LOCAL2	= (18<<3);
-Syslog.LOG_LOCAL3	= (19<<3);
-Syslog.LOG_LOCAL4	= (20<<3);
-Syslog.LOG_LOCAL5	= (21<<3);
-Syslog.LOG_LOCAL6	= (22<<3);
-Syslog.LOG_LOCAL7	= (23<<3);
+LOG_KERN		: (0<<3),
+LOG_USER		: (1<<3),
+LOG_MAIL		: (5<<3),
+LOG_DAEMON		: (3<<3),
+LOG_AUTH		: (4<<3),
+LOG_SYSLOG		: (5<<3),
+LOG_LPR			: (6<<3),
+LOG_NEWS		: (7<<3),
+LOG_UUCP		: (8<<3),
+LOG_LOCAL0		: (16<<3),
+LOG_LOCAL1		: (17<<3),
+LOG_LOCAL2		: (18<<3),
+LOG_LOCAL3		: (19<<3),
+LOG_LOCAL4		: (20<<3),
+LOG_LOCAL5		: (21<<3),
+LOG_LOCAL6		: (22<<3),
+LOG_LOCAL7		: (23<<3),
 
 /*
  * option flag for openlog
  */
-Syslog.LOG_PID		= 0x01;
-Syslog.LOG_CONS		= 0x02;
-Syslog.LOG_ODELAY	= 0x04;
-Syslog.LOG_NDELAY	= 0x08;
-Syslog.LOG_NOWAIT	= 0x10;
+LOG_PID			: 0x01,
+LOG_CONS		: 0x02,
+LOG_ODELAY		: 0x04,
+LOG_NDELAY		: 0x08,
+LOG_NOWAIT		: 0x10,
 /*
  * priorities
  */
-Syslog.LOG_EMERG	= 0;
-Syslog.LOG_ALERT	= 1;
-Syslog.LOG_CRIT		= 2;
-Syslog.LOG_ERR		= 3;
-Syslog.LOG_WARNING	= 4;
-Syslog.LOG_NOTICE	= 5;
-Syslog.LOG_INFO		= 6;
-Syslog.LOG_DEBUG	= 7;
+LOG_EMERG		: 0,
+LOG_ALERT		: 1,
+LOG_CRIT		: 2,
+LOG_ERR			: 3,
+LOG_WARNING		: 4,
+LOG_NOTICE		: 5,
+LOG_INFO		: 6,
+LOG_DEBUG		: 7
+};
 
 /*
  * Attach destroy handling
  */
 process.on('exit', function() {
-	Syslog.close();
+	SyslogWrapper.close();
 });
 
-/*
- * export Syslog as module
- */
-module.exports = Syslog;
 
 })();
