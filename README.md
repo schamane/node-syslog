@@ -9,8 +9,8 @@ Read Wiki "setMask" page for more information about how to use "setMask" functio
 
 ## Authors
 
-*Nazar Kulyk
-*Jeremy Childs
+*   Nazar Kulyk
+*   Jeremy Childs
 
 ## Installation
 
