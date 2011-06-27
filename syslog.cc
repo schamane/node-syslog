@@ -63,7 +63,9 @@ static int EIO_AfterLog( eio_req *req) {
 	HandleScope scope;
 	
 	struct log_request *log_req = (struct log_request *)(req->data);
-	
+
+        log_req->cb.Dispose(); // is this necessary?
+        free(log_req->msg);
 	free(log_req);
 	return 0;
 }
