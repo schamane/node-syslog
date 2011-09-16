@@ -1,6 +1,6 @@
 # Node-Syslog
 
-v1.0.1
+v1.0.2
 
 This is an node module (add-on) to work with system log daemon on unix systems.
 Module is tested with node.js v0.3.3 and metalog, syslog-ng 3.1.1.

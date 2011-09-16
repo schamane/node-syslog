@@ -1,5 +1,6 @@
-## next
+## 1.0.2
 
+* Fixed MAIL log facility
 * Removed leaking Syslog underlying function object from top-level library.
 
 ## 1.0.1
