@@ -11,14 +11,14 @@ init: SyslogWrapper.init,
 log: SyslogWrapper.log,
 setMask: SyslogWrapper.setMask,
 close: SyslogWrapper.close,
-version: '1.0.1',
+version: '1.0.2',
 
 /*
  * facilities
  */
 LOG_KERN		: (0<<3),
 LOG_USER		: (1<<3),
-LOG_MAIL		: (5<<3),
+LOG_MAIL		: (2<<3),
 LOG_DAEMON		: (3<<3),
 LOG_AUTH		: (4<<3),
 LOG_SYSLOG		: (5<<3),
