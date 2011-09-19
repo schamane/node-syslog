@@ -1,3 +1,7 @@
+## 1.1.0
+
+* Port to 0.5.7 Node version
+
 ## 1.0.2
 
 * Fixed MAIL log facility

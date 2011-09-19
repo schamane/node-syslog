@@ -1,11 +1,14 @@
 # Node-Syslog
 
-v1.0.2
+v1.1.0
 
 This is an node module (add-on) to work with system log daemon on unix systems.
 Module is tested with node.js v0.3.3 and metalog, syslog-ng 3.1.1.
 
 Read Wiki "setMask" page for more information about how to use "setMask" functionality.
+
+
+Current version is compatible to node 0.5.7 and higher version. For stable or older releases please use node-syslog v1.0.2
 
 ## Authors
 

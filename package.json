@@ -1,12 +1,12 @@
 {
     "name": "node-syslog",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "directories": {
         "lib": "./lib"
     },
     "main": "./node-syslog",
     "engines": {
-        "node" : ">=0.4.0"
+        "node" : ">=0.5.7"
     },
     "description": "Node module to support sending messages to syslog daemon",
     "author": "Nazar Kulyk <nasar.kulyk@googlemail.com>",

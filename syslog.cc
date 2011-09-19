@@ -64,20 +64,20 @@ static int EIO_AfterLog( eio_req *req) {
 	
 	struct log_request *log_req = (struct log_request *)(req->data);
 
-        log_req->cb.Dispose(); // is this necessary?
-        free(log_req->msg);
+	log_req->cb.Dispose(); // is this necessary?
+	free(log_req->msg);
 	free(log_req);
 	return 0;
 }
 
-static int EIO_Log(eio_req *req) {
+static void EIO_Log(eio_req *req) {
 	struct log_request *log_req = (struct log_request *)(req->data);
 	char *msg = log_req->msg;
 	
 	syslog(log_req->log_level, "%s", msg);
 	
 	req->result = 0;
-	return 0;
+	return;
 }
 
 Handle<Value>
