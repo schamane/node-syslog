@@ -26,3 +26,6 @@ def shutdown():
     else:
 	if exists('build/default/syslog.node') and not exists('syslog.node'):
 	    symlink('build/default/syslog.node', 'syslog.node')
+	else:
+	    if exists('build/Release/syslog.node') and not exists('syslog.node'):
+		symlink('build/Release/syslog.node', 'syslog.node')
