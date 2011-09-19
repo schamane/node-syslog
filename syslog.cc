@@ -3,6 +3,8 @@
 using namespace v8;
 using namespace node;
 
+#define NODE_LESS_THAN_5 (!(NODE_VERSION_AT_LEAST(0, 5, 0)))
+
 Persistent<FunctionTemplate> Syslog::constructor_template;
 bool Syslog::connected_ = false;
 char Syslog::name[1024];
@@ -70,14 +72,22 @@ static int EIO_AfterLog( eio_req *req) {
 	return 0;
 }
 
+#if NODE_LESS_THAN_5
+static int EIO_Log(eio_req *req) {
+#else
 static void EIO_Log(eio_req *req) {
+#endif
 	struct log_request *log_req = (struct log_request *)(req->data);
 	char *msg = log_req->msg;
 	
 	syslog(log_req->log_level, "%s", msg);
 	
 	req->result = 0;
+#if NODE_LESS_THAN_5
+	return 0;
+#else
 	return;
+#endif
 }
 
 Handle<Value>
