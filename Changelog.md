@@ -1,3 +1,7 @@
+## 1.1.1
+
+* Minor change to package to support 0.4 version
+
 ## 1.1.0
 
 * Port to 0.5.7 Node version
