@@ -8,7 +8,9 @@ Module is tested with node.js v0.3.3 and metalog, syslog-ng 3.1.1.
 Read Wiki "setMask" page for more information about how to use "setMask" functionality.
 
 
-Current version is compatible to node 0.5.7 and higher(0.6.x) version. For stable or older releases please use node-syslog v1.0.2
+Current version is compatible to node 0.6.x and higher versions. For older nodejs versions please use node-syslog v1.0.2
+
+Node-syslog doesn't support Darwin OS and MS Windows.
 
 ## Authors
 
