@@ -1,3 +1,7 @@
+## 1.1.2
+
+* Fix compiling on Darwin and Windows. Thanks to Vinay Pulim https://github.com/milewise
+
 ## 1.1.1
 
 * Minor change to package to support 0.4 version
