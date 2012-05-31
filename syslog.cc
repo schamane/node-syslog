@@ -3,7 +3,8 @@
 using namespace v8;
 using namespace node;
 
-#define NODE_LESS_THAN_5 (!(NODE_VERSION_AT_LEAST(0, 5, 0)))
+#define NODE_LESS_THAN_5 (!(NODE_VERSION_AT_LEAST(0, 5, 4)))
+#define NODE_LESS_THAN_6 (!(NODE_VERSION_AT_LEAST(0, 6, 0)))
 
 Persistent<FunctionTemplate> Syslog::constructor_template;
 bool Syslog::connected_ = false;
@@ -60,8 +61,11 @@ struct log_request {
 	uint32_t log_level;
 };
 
+#if !NODE_LESS_THAN_6
+static void UV_AfterLog(uv_work_t *req) {
+#else
 static int EIO_AfterLog( eio_req *req) {
-	ev_unref(EV_DEFAULT_UC);
+#endif
 	HandleScope scope;
 	
 	struct log_request *log_req = (struct log_request *)(req->data);
@@ -69,20 +73,29 @@ static int EIO_AfterLog( eio_req *req) {
 	log_req->cb.Dispose(); // is this necessary?
 	free(log_req->msg);
 	free(log_req);
+	delete req;
+#if NODE_LESS_THAN_6
+	ev_unref(EV_DEFAULT_UC);
+#endif
+#if NODE_LESS_THAN_5
 	return 0;
+#endif
 }
 
-#if NODE_LESS_THAN_5
-static int EIO_Log(eio_req *req) {
-#else
+#if !NODE_LESS_THAN_6
+static void UV_Log(uv_work_t *req) {
+#elif !NODE_LESS_THAN_5
 static void EIO_Log(eio_req *req) {
+#else
+static int EIO_Log(eio_req *req) {
 #endif
 	struct log_request *log_req = (struct log_request *)(req->data);
 	char *msg = log_req->msg;
 	
 	syslog(log_req->log_level, "%s", msg);
-	
+#if NODE_LESS_THAN_6
 	req->result = 0;
+#endif
 #if NODE_LESS_THAN_5
 	return 0;
 #else
@@ -115,11 +128,14 @@ Syslog::log ( const Arguments& args)
 	log_req->cb = Persistent<Function>::New(cb);
 	log_req->msg = strdup(*msg);
 	log_req->log_level = log_level;
-	
+#if NODE_LESS_THAN_6
 	eio_custom(EIO_Log, EIO_PRI_DEFAULT, EIO_AfterLog, log_req);
-	
 	ev_ref(EV_DEFAULT_UC);
-	
+#else
+	uv_work_t *work_req = new uv_work_t();
+	work_req->data = log_req;
+	uv_queue_work(uv_default_loop(), work_req, UV_Log, UV_AfterLog);
+#endif
 	return Undefined();
 }
 

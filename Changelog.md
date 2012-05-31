@@ -1,3 +1,7 @@
+## 1.1.3
+
+* Added node 0.7.x support
+
 ## 1.1.2
 
 * Fix compiling on Darwin and Windows. Thanks to Vinay Pulim https://github.com/milewise
