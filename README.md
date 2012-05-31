@@ -27,7 +27,7 @@ Read Wiki "setMask" page for more information about how to use "setMask" functio
 
 For more inforamtion about how to use module check test.js
 
-     #!/bin/env node
+     #!/usr/bin/env node
      
      var Syslog = require('node-syslog');
      
