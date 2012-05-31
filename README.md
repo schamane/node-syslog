@@ -32,7 +32,7 @@ Node-syslog doesn't support Darwin OS and MS Windows, but should work fine with 
 
 For more inforamtion about how to use module check test.js
 
-     #!/bin/env node
+     #!/usr/bin/env node
      
      var Syslog = require('node-syslog');
      
