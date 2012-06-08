@@ -22,7 +22,7 @@ def shutdown():
     # HACK to get syslog.node out of build directory.
     # better way to do this?
     if Options.commands['clean']:
-	if exists('node-syslog.node'): unlink('syslog.node')
+	if exists('syslog.node'): unlink('syslog.node')
     else:
 	if exists('build/default/syslog.node') and not exists('syslog.node'):
 	    symlink('build/default/syslog.node', 'syslog.node')
