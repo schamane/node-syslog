@@ -1,3 +1,8 @@
+## 1.1.4
+
+* Cleaned all opened and not closed ScopeHandlers
+* Added new node-gyp build file. Next release will not support node-waf and node version < 0.8.x
+
 ## 1.1.3
 
 * Added node 0.7.x support
