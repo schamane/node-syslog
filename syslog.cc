@@ -13,8 +13,6 @@ char Syslog::name[1024];
 void
 Syslog::Initialize ( Handle<Object> target)
 {
-	HandleScope scope;
-	
 	Local<FunctionTemplate> t = FunctionTemplate::New();
 	constructor_template = Persistent<FunctionTemplate>::New(t);
 	constructor_template->InstanceTemplate()->SetInternalFieldCount(1);
@@ -33,7 +31,7 @@ Handle<Value>
 Syslog::init ( const Arguments& args)
 {
 	HandleScope scope;
-	
+
 	if (args.Length() == 0 || !args[0]->IsString()) {
 		return ThrowException(Exception::Error(
 			String::New("Must give daemonname string as argument")));
@@ -66,8 +64,6 @@ static void UV_AfterLog(uv_work_t *req) {
 #else
 static int EIO_AfterLog( eio_req *req) {
 #endif
-	HandleScope scope;
-	
 	struct log_request *log_req = (struct log_request *)(req->data);
 
 	log_req->cb.Dispose(); // is this necessary?
@@ -142,11 +138,8 @@ Syslog::log ( const Arguments& args)
 Handle<Value>
 Syslog::destroy ( const Arguments& args)
 {
-	HandleScope scope;
-	
 	close();
-	
-	return scope.Close(Undefined());
+	return Undefined();
 }
 
 void
@@ -202,6 +195,5 @@ Syslog::close ()
 extern "C" void
 init (Handle<Object> target)
 {
-	HandleScope scope;
 	Syslog::Initialize(target);
 }
