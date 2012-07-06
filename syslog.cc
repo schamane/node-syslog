@@ -52,7 +52,7 @@ Syslog::init ( const Arguments& args)
 	int facility = args[2]->ToInt32()->Value();
 	open( options , facility );
 	
-	return Undefined();
+	return scope.Close(Undefined());
 }
 
 struct log_request {
@@ -136,7 +136,7 @@ Syslog::log ( const Arguments& args)
 	work_req->data = log_req;
 	uv_queue_work(uv_default_loop(), work_req, UV_Log, UV_AfterLog);
 #endif
-	return Undefined();
+	return scope.Close(Undefined());
 }
 
 Handle<Value>
@@ -146,7 +146,7 @@ Syslog::destroy ( const Arguments& args)
 	
 	close();
 	
-	return Undefined();
+	return scope.Close(Undefined());
 }
 
 void
@@ -161,6 +161,7 @@ Syslog::setMask ( const Arguments& args)
 {
 	bool upTo = false;
 	int mask, value;
+	HandleScope scope;
 	
 	if (args.Length() < 1) {
 		return ThrowException(Exception::Error(String::New("You must provide an mask")));
@@ -185,7 +186,7 @@ Syslog::setMask ( const Arguments& args)
 		mask = LOG_MASK(value);
 	}
 	
-	return Integer::New( setlogmask(mask) );
+	return scope.Close(Integer::New( setlogmask(mask) ));
 }
 
 void
