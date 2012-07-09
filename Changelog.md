@@ -1,23 +1,8 @@
-## 1.1.4
+## 1.0.3
 
+* This will be last version with node 0.2, 0.4 and 0.6 support
 * Cleaned all opened and not closed ScopeHandlers
-* Added new node-gyp build file. Next release will not support node-waf and node version < 0.8.x
-
-## 1.1.3
-
-* Added node 0.7.x support
-
-## 1.1.2
-
 * Fix compiling on Darwin and Windows. Thanks to Vinay Pulim https://github.com/milewise
-
-## 1.1.1
-
-* Minor change to package to support 0.4 version
-
-## 1.1.0
-
-* Port to 0.5.7 Node version
 
 ## 1.0.2
 
