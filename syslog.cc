@@ -162,9 +162,4 @@ Syslog::close ()
 	}
 }
 
-
-extern "C" void
-init (Handle<Object> target)
-{
-	Syslog::Initialize(target);
-}
+NODE_MODULE(syslog, Syslog::Initialize);
