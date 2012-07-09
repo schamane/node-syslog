@@ -1,3 +1,8 @@
+##1.1.5
+
+* remove old nodejs version support prior to 0.8.0
+* fix building
+
 ## 1.1.4
 
 * Cleaned all opened and not closed ScopeHandlers

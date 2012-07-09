@@ -1,6 +1,6 @@
 (function(){
 
-var SyslogWrapper = require('./syslog').Syslog;
+var SyslogWrapper = require('./build/Release/syslog').Syslog;
 
 /*
  * export Syslog as module
@@ -11,7 +11,7 @@ init: SyslogWrapper.init,
 log: SyslogWrapper.log,
 setMask: SyslogWrapper.setMask,
 close: SyslogWrapper.close,
-version: '1.1.4',
+version: '1.1.5',
 
 /*
  * facilities

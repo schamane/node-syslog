@@ -1,8 +1,6 @@
 #ifndef syslog_h
 #define syslog_h
 
-#define NODE_AT_LEAST_6 (NODE_VERSION_AT_LEAST(0, 6, 0))
-
 #include <node.h>
 #include <node_object_wrap.h>
 #include <node_version.h>
@@ -10,10 +8,7 @@
 #include <syslog.h>
 #include <stdlib.h>
 #include <string.h>
-
-#if NODE_AT_LEAST_6
 #include <uv.h>
-#endif
 
 namespace node {
 

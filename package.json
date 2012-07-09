@@ -1,12 +1,9 @@
 {
     "name": "node-syslog",
-    "version": "1.1.4",
-    "directories": {
-        "lib": "./lib"
-    },
+    "version": "1.1.5",
     "main": "./node-syslog",
     "engines": {
-        "node" : ">=0.4.0"
+        "node" : ">=0.8.0"
     },
     "description": "Node module to support sending messages to syslog daemon",
     "author": "Nazar Kulyk <nasar.kulyk@googlemail.com>",
@@ -17,12 +14,12 @@
         "url" : "git@github.com:schamane/node-syslog.git"
     },
     "bugs": {
-    	"url": "https://github.com/schamane/node-syslog/issues"
-  	},
+        "url": "https://github.com/schamane/node-syslog/issues"
+    },
     "licenses": [
     {
-      "type": "Simplified BSD License",
-      "url": "http://en.wikipedia.org/wiki/BSD_licenses"
+        "type": "Simplified BSD License",
+        "url": "http://en.wikipedia.org/wiki/BSD_licenses"
     }],
     "tags": ["syslog", "system", "log", "logging"]
 }
