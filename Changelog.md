@@ -1,3 +1,8 @@
+##1.1.6
+
+* remove compilation flags from binding.gyp that cause build failure with older gcc versions
+* cleanups
+
 ##1.1.5
 
 * remove old nodejs version support prior to 0.8.0

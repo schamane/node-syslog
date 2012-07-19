@@ -11,7 +11,7 @@ init: SyslogWrapper.init,
 log: SyslogWrapper.log,
 setMask: SyslogWrapper.setMask,
 close: SyslogWrapper.close,
-version: '1.1.5',
+version: '1.1.6',
 
 /*
  * facilities
