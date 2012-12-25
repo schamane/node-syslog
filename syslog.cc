@@ -56,7 +56,7 @@ struct log_request {
 	uint32_t log_level;
 };
 
-static void UV_AfterLog(uv_work_t *req) {
+static void UV_AfterLog(uv_work_t *req, int status) {
 	struct log_request *log_req = (struct log_request *)(req->data);
 
 	log_req->cb.Dispose(); // is this necessary?
