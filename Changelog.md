@@ -1,3 +1,7 @@
+##1.1.7
+
+* fix compatibility to feature node 0.9.x versions
+
 ##1.1.6
 
 * remove compilation flags from binding.gyp that cause build failure with older gcc versions

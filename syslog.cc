@@ -101,7 +101,8 @@ Syslog::log ( const Arguments& args)
 
 	uv_work_t *work_req = new uv_work_t();
 	work_req->data = log_req;
-	uv_queue_work(uv_default_loop(), work_req, UV_Log, UV_AfterLog);
+	int status = uv_queue_work(uv_default_loop(), work_req, UV_Log,(uv_after_work_cb) UV_AfterLog);
+	assert(status == 0);
 
 	return scope.Close(Undefined());
 }
