@@ -42,6 +42,7 @@ LOG_CONS		: 0x02,
 LOG_ODELAY		: 0x04,
 LOG_NDELAY		: 0x08,
 LOG_NOWAIT		: 0x10,
+LOG_PERROR		: 0x20,
 /*
  * priorities
  */
