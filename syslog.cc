@@ -92,7 +92,7 @@ Syslog::log ( const Arguments& args)
 		return ThrowException(Exception::Error(
 			String::New("init method has to be called befor syslog")));
 	
-	String::AsciiValue msg(args[1]);
+	String::Utf8Value msg(args[1]);
 	uint32_t log_level = args[0]->Int32Value();
 	
 	log_req->cb = Persistent<Function>::New(cb);
