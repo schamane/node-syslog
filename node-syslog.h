@@ -10,10 +10,8 @@
 #include <string.h>
 #include <uv.h>
 
-namespace node {
 
-
-class Syslog : ObjectWrap {
+class Syslog {
     public:
 	static void Initialize ( v8::Handle<v8::Object> target);
 	    
@@ -23,12 +21,6 @@ class Syslog : ObjectWrap {
 	static v8::Handle<v8::Value> setMask (const v8::Arguments& args);
 	static v8::Handle<v8::Value> destroy (const v8::Arguments& args);
 	
-	Syslog () : ObjectWrap() {
-	};
-	
-	~Syslog (){};
-
-
     private:
 	static void open(int, int);
 	static void close();
@@ -36,5 +28,4 @@ class Syslog : ObjectWrap {
 	static char name[1024];
 };
 
-}  // namespace node
 #endif // syslog_h
