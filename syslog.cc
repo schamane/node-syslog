@@ -42,7 +42,6 @@ Syslog::init ( const Arguments& args)
 }
 
 struct log_request {
-	Persistent<Function> cb;
 	char *msg;
 	uint32_t log_level;
 };
@@ -50,7 +49,6 @@ struct log_request {
 static void UV_AfterLog(uv_work_t *req) {
 	struct log_request *log_req = (struct log_request *)(req->data);
 
-	log_req->cb.Dispose(); // is this necessary?
 	free(log_req->msg);
 	free(log_req);
 	delete req;
@@ -68,7 +66,6 @@ Handle<Value>
 Syslog::log ( const Arguments& args)
 {
 	HandleScope scope;
-	Local<Function> cb = Local<Function>::Cast(args[3]);
 	
 	struct log_request * log_req = (struct log_request *)
 		calloc(1, sizeof(struct log_request));
@@ -86,7 +83,6 @@ Syslog::log ( const Arguments& args)
 	String::AsciiValue msg(args[1]);
 	uint32_t log_level = args[0]->Int32Value();
 	
-	log_req->cb = Persistent<Function>::New(cb);
 	log_req->msg = strdup(*msg);
 	log_req->log_level = log_level;
 
