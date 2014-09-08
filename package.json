@@ -5,6 +5,9 @@
     "engines": {
         "node" : ">=0.8.0"
     },
+    "scripts": {
+        "test": "node test.js"
+    },
     "description": "Node module to support sending messages to syslog daemon",
     "author": "Nazar Kulyk <nasar.kulyk@googlemail.com>",
     "homepage": "http://github.com/schamane/node-syslog",

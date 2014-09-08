@@ -6,3 +6,4 @@ Syslog.log(Syslog.LOG_ERR, "news log error test");
 Syslog.log(Syslog.LOG_DEBUG, "Last log message as debug: " + new Date());
 Syslog.close();
 
+console.log('PASS');
