@@ -18,7 +18,6 @@ class Syslog : ObjectWrap {
 	static void Initialize ( v8::Handle<v8::Object> target);
 	    
     protected:
-	static v8::Persistent<v8::FunctionTemplate> constructor_template;
 	static v8::Handle<v8::Value> init   (const v8::Arguments& args);
 	static v8::Handle<v8::Value> log (const v8::Arguments& args);
 	static v8::Handle<v8::Value> setMask (const v8::Arguments& args);

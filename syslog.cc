@@ -3,25 +3,16 @@
 using namespace v8;
 using namespace node;
 
-Persistent<FunctionTemplate> Syslog::constructor_template;
 bool Syslog::connected_ = false;
 char Syslog::name[1024];
 
 void
 Syslog::Initialize ( Handle<Object> target)
 {
-	Local<FunctionTemplate> t = FunctionTemplate::New();
-	constructor_template = Persistent<FunctionTemplate>::New(t);
-	constructor_template->InstanceTemplate()->SetInternalFieldCount(1);
-	constructor_template->SetClassName(String::NewSymbol("Syslog"));
-	
-	
-	NODE_SET_METHOD(constructor_template, "init", Syslog::init);
-	NODE_SET_METHOD(constructor_template, "log", Syslog::log);
-	NODE_SET_METHOD(constructor_template, "setMask", Syslog::setMask);
-	NODE_SET_METHOD(constructor_template, "close", Syslog::destroy);
-	
-	target->Set(String::NewSymbol("Syslog"), constructor_template->GetFunction());
+	NODE_SET_METHOD(target, "init", Syslog::init);
+	NODE_SET_METHOD(target, "log", Syslog::log);
+	NODE_SET_METHOD(target, "setMask", Syslog::setMask);
+	NODE_SET_METHOD(target, "close", Syslog::destroy);
 }
 
 Handle<Value>
