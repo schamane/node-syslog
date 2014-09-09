@@ -1,6 +1,12 @@
 var assert = require('assert');
 var Syslog = require('./node-syslog');
 
+if (process.platform == "win32") {
+  assert(Syslog.init === undefined);
+  console.log('PASS');
+  return;
+}
+
 assert.throws(function() {
   Syslog.init();
 }, Error);

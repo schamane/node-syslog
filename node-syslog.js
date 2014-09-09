@@ -59,6 +59,8 @@ LOG_DEBUG		: 7
  *
  * XXX(sam) consider using AtExit: joyent/node#e4a8d261
  */
-process.on('exit', function() {
-	SyslogWrapper.close();
-});
+if (SyslogWrapper.close) {
+	process.on('exit', function() {
+		SyslogWrapper.close();
+	});
+}

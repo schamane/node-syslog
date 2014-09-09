@@ -2,7 +2,13 @@
     "targets": [
 	{
 	    "target_name": "syslog",
-	    "sources": [ "syslog.cc" ],
+            "conditions": [
+                ['OS=="win"', {
+                    "sources": ["syslog-win.cc"],
+                }, {
+                    "sources": ["syslog.cc"],
+                }]
+            ],
 	    "cflags": [
 		"-fPIC"
 	    ]
