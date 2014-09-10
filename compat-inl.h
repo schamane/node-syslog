@@ -124,6 +124,10 @@ ReturnType ReturnableHandleScope::Return(intptr_t value) {
   return Return(Integer::New(isolate(), value));
 }
 
+ReturnType ReturnableHandleScope::Return(int value) {
+  return Return(Integer::New(isolate(), value));
+}
+
 ReturnType ReturnableHandleScope::Return(double value) {
   return Return(Number::New(isolate(), value));
 }

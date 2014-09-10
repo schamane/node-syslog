@@ -148,7 +148,7 @@ Syslog::setMask ( const ArgumentType& args)
 		mask = LOG_MASK(value);
 	}
 
-	return scope.Return((double)setlogmask(mask));
+	return scope.Return(setlogmask(mask));
 }
 
 void

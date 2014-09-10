@@ -124,6 +124,7 @@ class ReturnableHandleScope {
   inline ReturnType Return();
   inline ReturnType Return(bool value);
   inline ReturnType Return(intptr_t value);
+  inline ReturnType Return(int value);
   inline ReturnType Return(double value);
   inline ReturnType Return(const char* value);
   inline ReturnType Return(v8::Local<v8::Value> value);
