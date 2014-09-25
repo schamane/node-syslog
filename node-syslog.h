@@ -10,32 +10,26 @@
 #include <string.h>
 #include <uv.h>
 
-namespace node {
+#include "compat.h"
 
+namespace C = ::compat;
 
-class Syslog : ObjectWrap {
+class Syslog {
+
     public:
 	static void Initialize ( v8::Handle<v8::Object> target);
 	    
     protected:
-	static v8::Persistent<v8::FunctionTemplate> constructor_template;
-	static v8::Handle<v8::Value> init   (const v8::Arguments& args);
-	static v8::Handle<v8::Value> log (const v8::Arguments& args);
-	static v8::Handle<v8::Value> setMask (const v8::Arguments& args);
-	static v8::Handle<v8::Value> destroy (const v8::Arguments& args);
+	static C::ReturnType init   (const C::ArgumentType& args);
+	static C::ReturnType log (const C::ArgumentType& args);
+	static C::ReturnType setMask (const C::ArgumentType& args);
+	static C::ReturnType destroy (const C::ArgumentType& args);
 	
-	Syslog () : ObjectWrap() {
-	};
-	
-	~Syslog (){};
-
-
     private:
 	static void open(int, int);
 	static void close();
 	static bool connected_;
-	static char name[1024];
+        static char name[1024];
 };
 
-}  // namespace node
 #endif // syslog_h

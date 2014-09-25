@@ -1,6 +1,4 @@
-(function(){
-
-var SyslogWrapper = require('./build/Release/syslog').Syslog;
+var SyslogWrapper = require('./build/Release/syslog');
 
 /*
  * export Syslog as module
@@ -58,10 +56,9 @@ LOG_DEBUG		: 7
 
 /*
  * Attach destroy handling
+ *
+ * XXX(sam) consider using AtExit: joyent/node#e4a8d261
  */
 process.on('exit', function() {
 	SyslogWrapper.close();
 });
-
-
-})();
