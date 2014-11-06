@@ -16,6 +16,8 @@ Node-syslog doesn't support Darwin OS and MS Windows, but should work fine with 
 
 *   Nazar Kulyk
 *   Jeremy Childs
+*   Sam Roberts
+*   Ben Noordhuis
 
 ## Installation
 
