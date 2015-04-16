@@ -17,6 +17,7 @@ static ReturnType ThrowException(const ArgumentType& args, const char* m) {
     args.GetIsolate()->ThrowException(v8::Exception::Error(
 		v8::String::NewFromUtf8(args.GetIsolate(), m)
 		));
+}
 #endif
 
 bool Syslog::connected_ = false;

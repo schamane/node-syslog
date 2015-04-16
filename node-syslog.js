@@ -9,7 +9,7 @@ init: SyslogWrapper.init,
 log: SyslogWrapper.log,
 setMask: SyslogWrapper.setMask,
 close: SyslogWrapper.close,
-version: '1.1.7',
+version: '1.2.0',
 
 /*
  * facilities

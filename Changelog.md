@@ -1,3 +1,7 @@
+## 1.2.0
+
+* bump version for new npm package compatible to nodejs v0.12
+
 ##1.1.7
 
 * fix compatibility to feature node 0.9.x versions
