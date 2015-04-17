@@ -1,3 +1,5 @@
+ [![Build Status](https://travis-ci.org/schamane/node-syslog.png)](https://travis-ci.org/schamane/node-syslog)
+
 # Node-Syslog
 
 v1.2.0
