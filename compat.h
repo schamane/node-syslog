@@ -19,10 +19,14 @@
 #include "v8.h"
 #include "v8-profiler.h"
 
+#define COMPAT_IOJS_1_x 42
+
 #if NODE_MAJOR_VERSION == 0 && NODE_MINOR_VERSION >= 11
 #define COMPAT_NODE_VERSION 12  // v0.12
 #elif NODE_MAJOR_VERSION == 0 && NODE_MINOR_VERSION == 10
 #define COMPAT_NODE_VERSION 10  // v0.10
+#elif NODE_MODULE_VERSION >= COMPAT_IOJS_1_x // io.js semver 1.0.x
+#define COMPAT_NODE_VERSION COMPAT_IOJS_1_x
 #else
 #error "Unsupported node.js version."
 #endif
@@ -33,7 +37,7 @@ namespace compat {
 typedef v8::Arguments ArgumentType;
 typedef v8::Handle<v8::Value> ReturnType;
 typedef v8::InvocationCallback FunctionCallback;
-#elif COMPAT_NODE_VERSION == 12
+#elif COMPAT_NODE_VERSION == 12 || COMPAT_NODE_VERSION == COMPAT_IOJS_1_x
 typedef v8::FunctionCallbackInfo<v8::Value> ArgumentType;
 typedef void ReturnType;
 typedef v8::FunctionCallback FunctionCallback;
