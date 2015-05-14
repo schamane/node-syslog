@@ -194,7 +194,7 @@ ReturnType ReturnableHandleScope::Return(v8::Local<v8::Value> value) {
   return handle_scope_.Close(value);
 }
 
-#elif COMPAT_NODE_VERSION == 12
+#elif COMPAT_NODE_VERSION == 12 || COMPAT_NODE_VERSION == COMPAT_IOJS_1_x
 
 const v8::HeapSnapshot* HeapProfiler::TakeHeapSnapshot(
     v8::Isolate* isolate, v8::Local<v8::String> title) {
