@@ -1,59 +1,44 @@
 #include "node-syslog.h"
-#include "compat-inl.h"
 
 using namespace v8;
-using compat::ReturnType;
-using compat::ArgumentType;
-using compat::ReturnableHandleScope;
-
-#if COMPAT_NODE_VERSION < 12
-static ReturnType ThrowException(const ArgumentType& args, const char* m) {
-    return v8::ThrowException(v8::Exception::Error(
-		v8::String::New(m)
-		));
-}
-#else
-static ReturnType ThrowException(const ArgumentType& args, const char* m) {
-    args.GetIsolate()->ThrowException(v8::Exception::Error(
-		v8::String::NewFromUtf8(args.GetIsolate(), m)
-		));
-}
-#endif
 
 bool Syslog::connected_ = false;
 char Syslog::name[1024];
 
 void
-Syslog::Initialize ( Handle<Object> target)
+Syslog::Initialize (Handle<Object> target)
 {
-	NODE_SET_METHOD(target, "init", Syslog::init);
-	NODE_SET_METHOD(target, "log", Syslog::log);
-	NODE_SET_METHOD(target, "setMask", Syslog::setMask);
-	NODE_SET_METHOD(target, "close", Syslog::destroy);
+	target->Set(NanNew<String>("init"),
+		NanNew<FunctionTemplate>(Syslog::init)->GetFunction());
+	target->Set(NanNew<String>("log"),
+		NanNew<FunctionTemplate>(Syslog::log)->GetFunction());
+	target->Set(NanNew<String>("setMask"),
+		NanNew<FunctionTemplate>(Syslog::setMask)->GetFunction());
+	target->Set(NanNew<String>("close"),
+		NanNew<FunctionTemplate>(Syslog::destroy)->GetFunction());
 }
 
-ReturnType
-Syslog::init ( const ArgumentType& args)
+NAN_METHOD(Syslog::init)
 {
-	ReturnableHandleScope scope(args);
+	NanScope();
 
 	if (args.Length() == 0 || !args[0]->IsString()) {
-		return ThrowException(args, "Must give daemonname string as argument");
+		return NanThrowError("Must give daemonname string as argument");
 	}
-	
+
 	if (args.Length() < 3 ) {
-		return ThrowException(args, "Must have at least 3 params as argument");
+		return NanThrowError("Must have at least 3 params as argument");
 	}
 	if(connected_)
 		close();
-	
+
 	//open syslog
-        args[0]->ToString()->WriteUtf8(name);
+	args[0]->ToString()->WriteUtf8(name);
 	int options = args[1]->ToInt32()->Value();
 	int facility = args[2]->ToInt32()->Value();
-	open( options , facility );
+	open(options, facility);
 
-	return scope.Return();
+	NanReturnUndefined();
 }
 
 struct log_request {
@@ -72,25 +57,25 @@ static void UV_Log(uv_work_t *req) {
 	return;
 }
 
-ReturnType
-Syslog::log ( const ArgumentType& args)
+NAN_METHOD(Syslog::log)
 {
-	ReturnableHandleScope scope(args);
+	NanScope();
+
 	uint32_t log_level = args[0]->Int32Value();
 	String::Utf8Value msg(args[1]);
 
 	if(!connected_)
-		return ThrowException(args, "Init method has to be called before syslog");
-	
+		return NanThrowError("Init method has to be called before syslog");
+
 	if(!args[1]->IsString()) {
-		return ThrowException(args, "Log message must be a string");
+		return NanThrowError("Log message must be a string");
 	}
 
 	struct log_request * log_req = (struct log_request *) malloc(
 		sizeof(*log_req) + msg.length());
 
 	if(!log_req) {
-		return ThrowException(args, "Could not allocate enough memory");
+		return NanThrowError("Could not allocate enough memory");
 	}
 
 	log_req->work.data = log_req;
@@ -101,15 +86,14 @@ Syslog::log ( const ArgumentType& args)
 		UV_Log, UV_AfterLog);
 	assert(status == 0);
 
-	return scope.Return();
+	NanReturnUndefined();
 }
 
-ReturnType
-Syslog::destroy ( const ArgumentType& args)
+NAN_METHOD(Syslog::destroy)
 {
-	ReturnableHandleScope scope(args);
+	NanScope();
 	close();
-	return scope.Return();
+	NanReturnUndefined();
 }
 
 void
@@ -119,29 +103,29 @@ Syslog::open ( int option, int facility)
 	connected_ = true;
 }
 
-ReturnType
-Syslog::setMask ( const ArgumentType& args)
+NAN_METHOD(Syslog::setMask)
 {
+	NanScope();
+
 	bool upTo = false;
 	int mask, value;
-	ReturnableHandleScope scope(args);
-	
+
 	if (args.Length() < 1) {
-		return ThrowException(args, "You must provide an mask");
+		return NanThrowError("You must provide an mask");
 	}
-	
+
 	if (!args[0]->IsNumber()) {
-		return ThrowException(args, "First parameter (mask) should be numeric");
+		return NanThrowError("First parameter (mask) should be numeric");
 	}
-	
+
 	if (args.Length() == 2 && !args[1]->IsBoolean()) {
-		return ThrowException(args, "Second parameter (upTo) should be boolean");
+		return NanThrowError("Second parameter (upTo) should be boolean");
 	}
-	
+
 	if (args.Length() == 2 && args[1]->IsBoolean()) {
 		upTo = true;
 	}
-	
+
 	value = args[0]->Int32Value();
 	if(upTo) {
 		mask = LOG_UPTO(value);
@@ -149,7 +133,7 @@ Syslog::setMask ( const ArgumentType& args)
 		mask = LOG_MASK(value);
 	}
 
-	return scope.Return(setlogmask(mask));
+	NanReturnValue(NanNew<Number>(setlogmask(mask)));
 }
 
 void
