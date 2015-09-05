@@ -19,25 +19,13 @@
 #include "v8.h"
 #include "v8-profiler.h"
 
-#define COMPAT_IOJS_1_x 42
-
-#if NODE_MAJOR_VERSION == 0 && NODE_MINOR_VERSION >= 11
-#define COMPAT_NODE_VERSION 12  // v0.12
-#elif NODE_MAJOR_VERSION == 0 && NODE_MINOR_VERSION == 10
-#define COMPAT_NODE_VERSION 10  // v0.10
-#elif NODE_MODULE_VERSION >= COMPAT_IOJS_1_x // io.js semver 1.0.x
-#define COMPAT_NODE_VERSION COMPAT_IOJS_1_x
-#else
-#error "Unsupported node.js version."
-#endif
-
 namespace compat {
 
-#if COMPAT_NODE_VERSION == 10
+#if !NODE_VERSION_AT_LEAST(0, 11, 0)
 typedef v8::Arguments ArgumentType;
 typedef v8::Handle<v8::Value> ReturnType;
 typedef v8::InvocationCallback FunctionCallback;
-#elif COMPAT_NODE_VERSION == 12 || COMPAT_NODE_VERSION == COMPAT_IOJS_1_x
+#else
 typedef v8::FunctionCallbackInfo<v8::Value> ArgumentType;
 typedef void ReturnType;
 typedef v8::FunctionCallback FunctionCallback;
@@ -57,20 +45,26 @@ struct Array : public AllStatic {
   inline static v8::Local<v8::Array> New(v8::Isolate* isolate, int length = 0);
 };
 
+struct CpuProfiler : public AllStatic {
+  inline static void StartCpuProfiling(
+      v8::Isolate* isolate,
+      v8::Local<v8::String> title = v8::Local<v8::String>());
+  inline static const v8::CpuProfile* StopCpuProfiling(
+      v8::Isolate* isolate,
+      v8::Local<v8::String> title = v8::Local<v8::String>());
+};
+
 struct Boolean : public AllStatic {
   inline static v8::Local<v8::Boolean> New(v8::Isolate* isolate, bool value);
 };
 
 struct FunctionTemplate : public AllStatic {
-  inline static v8::Local<v8::FunctionTemplate> New(v8::Isolate* isolate,
-                                                    FunctionCallback callback =
-                                                        0);
+  inline static v8::Local<v8::FunctionTemplate> New(
+      v8::Isolate* isolate, FunctionCallback callback = 0);
 };
 
 struct HeapProfiler : public AllStatic {
-  inline static const v8::HeapSnapshot* TakeHeapSnapshot(
-      v8::Isolate* isolate,
-      v8::Local<v8::String> title = v8::Local<v8::String>());
+  inline static const v8::HeapSnapshot* TakeHeapSnapshot(v8::Isolate* isolate);
   inline static void DeleteAllHeapSnapshots(v8::Isolate* isolate);
 };
 
@@ -78,6 +72,20 @@ struct Integer : public AllStatic {
   inline static v8::Local<v8::Integer> New(v8::Isolate* isolate, int32_t value);
   inline static v8::Local<v8::Integer> NewFromUnsigned(v8::Isolate* isolate,
                                                        uint32_t value);
+};
+
+struct Isolate : public AllStatic {
+  inline static void GetHeapStatistics(v8::Isolate* isolate,
+                                       v8::HeapStatistics* stats);
+  inline static void SetAddHistogramSampleFunction(
+      v8::Isolate* isolate, v8::AddHistogramSampleCallback callback);
+  inline static void SetCreateHistogramFunction(
+      v8::Isolate* isolate, v8::CreateHistogramCallback callback);
+  inline static void SetJitCodeEventHandler(v8::Isolate* isolate,
+                                            v8::JitCodeEventOptions options,
+                                            v8::JitCodeEventHandler handler);
+  inline static v8::Local<v8::Value> ThrowException(
+      v8::Isolate* isolate, v8::Local<v8::Value> exception);
 };
 
 struct Number : public AllStatic {
@@ -94,11 +102,9 @@ struct String : public AllStatic {
     kInternalizedString,
     kUndetectableString
   };
-  inline static v8::Local<v8::String> NewFromUtf8(v8::Isolate* isolate,
-                                                  const char* data,
-                                                  NewStringType type =
-                                                      kNormalString,
-                                                  int length = -1);
+  inline static v8::Local<v8::String> NewFromUtf8(
+      v8::Isolate* isolate, const char* data,
+      NewStringType type = kNormalString, int length = -1);
 };
 
 class HandleScope {
@@ -112,7 +118,6 @@ class HandleScope {
 template <typename T>
 class Persistent {
  public:
-  inline ~Persistent();
   inline v8::Local<T> ToLocal(v8::Isolate* isolate) const;
   inline void Reset();
   inline void Reset(v8::Isolate* isolate, v8::Local<T> value);
@@ -127,10 +132,22 @@ class ReturnableHandleScope {
   inline explicit ReturnableHandleScope(const ArgumentType& args);
   inline ReturnType Return();
   inline ReturnType Return(bool value);
-  inline ReturnType Return(int value);
+  inline ReturnType Return(int32_t value);
+  inline ReturnType Return(uint32_t value);
   inline ReturnType Return(double value);
   inline ReturnType Return(const char* value);
   inline ReturnType Return(v8::Local<v8::Value> value);
+  inline ReturnType Throw(v8::Local<v8::Value> exception);
+  inline ReturnType ThrowError(const char* exception);
+  inline ReturnType ThrowError(v8::Local<v8::String> exception);
+  inline ReturnType ThrowRangeError(const char* exception);
+  inline ReturnType ThrowRangeError(v8::Local<v8::String> exception);
+  inline ReturnType ThrowReferenceError(const char* exception);
+  inline ReturnType ThrowReferenceError(v8::Local<v8::String> exception);
+  inline ReturnType ThrowSyntaxError(const char* exception);
+  inline ReturnType ThrowSyntaxError(v8::Local<v8::String> exception);
+  inline ReturnType ThrowTypeError(const char* exception);
+  inline ReturnType ThrowTypeError(v8::Local<v8::String> exception);
 
  private:
   inline v8::Isolate* isolate() const;
