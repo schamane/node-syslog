@@ -1,3 +1,4 @@
 build
 .lock-wscript
 syslog.node
+node_modules
