@@ -1,5 +1,5 @@
 var assert = require('assert');
-var Syslog = require('./node-syslog');
+var Syslog = require('../');
 
 assert.throws(function() {
   Syslog.init();
