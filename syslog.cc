@@ -6,19 +6,12 @@ using compat::ReturnType;
 using compat::ArgumentType;
 using compat::ReturnableHandleScope;
 
-#if COMPAT_NODE_VERSION < 12
 static ReturnType ThrowException(const ArgumentType& args, const char* m) {
-    return v8::ThrowException(v8::Exception::Error(
-		v8::String::New(m)
-		));
+  Isolate* const isolate = args.GetIsolate();
+  Local<String> message = compat::String::NewFromUtf8(isolate, m);
+  return static_cast<ReturnType>(
+      compat::Isolate::ThrowException(isolate, Exception::Error(message)));
 }
-#else
-static ReturnType ThrowException(const ArgumentType& args, const char* m) {
-    args.GetIsolate()->ThrowException(v8::Exception::Error(
-		v8::String::NewFromUtf8(args.GetIsolate(), m)
-		));
-}
-#endif
 
 bool Syslog::connected_ = false;
 char Syslog::name[1024];
