@@ -1,3 +1,5 @@
-build
+node_modules/
 .lock-wscript
-syslog.node
+node-syslog.node
+target
+index.d.ts

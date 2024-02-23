@@ -6,7 +6,7 @@
 Node-Syslog is no more supported and do not work with current Node version.
 You can use other modules like: https://github.com/strongloop/modern-syslog or https://github.com/strongloop/modern-syslog
 
-v1.2.0
+v2.0.0
 
 This is a node module (add-on) to work with syslog (system log) daemon on unix systems.
 This module has been tested with:

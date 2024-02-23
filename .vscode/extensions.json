@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "christian-kohler.npm-intellisense",
+        "samverschueren.final-newline",
+        "dmitrydorofeev.empty-indent",
+        "dbaeumer.vscode-eslint",
+        "eamodio.gitlens",
+        "vscode-icons-team.vscode-icons",
+        "rust-lang.rust-analyzer"
+    ]
+}

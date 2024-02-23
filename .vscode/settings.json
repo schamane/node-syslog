@@ -1,0 +1,24 @@
+{
+    "editor.formatOnSave": false,
+    "files.exclude": {
+        "**/.DS_Store": true,
+        "**/node_modules/": true
+    },
+    "search.exclude": {
+        "build": true,
+        "node_modules": true
+    },
+    "eslint.validate": [
+        "javascript",
+        "typescript"
+    ],
+    "[json]": {
+        "editor.formatOnSave": true,
+    },
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit",
+        "source.fixAll.tslint": "never"
+    },
+    "typescript.inlayHints.parameterNames.enabled": "none",
+    "rust-analyzer.procMacro.ignored": { "napi-derive": ["napi"] }
+}

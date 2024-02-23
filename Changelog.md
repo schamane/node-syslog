@@ -1,17 +1,24 @@
+# Changelog
+
+## 2.0.0
+
+* update node bindings to current and lts
+* move implementation to rust and neon
+
 ## 1.2.0
 
 * bump version for new npm package compatible to nodejs v0.12
 
-##1.1.7
+## .1.7
 
 * fix compatibility to feature node 0.9.x versions
 
-##1.1.6
+## 1.1.6
 
 * remove compilation flags from binding.gyp that cause build failure with older gcc versions
 * cleanups
 
-##1.1.5
+## 1.1.5
 
 * remove old nodejs version support prior to 0.8.0
 * fix building

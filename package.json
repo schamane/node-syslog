@@ -1,31 +1,56 @@
 {
     "name": "node-syslog",
-    "version": "1.2.0",
+    "version": "2.0.0",
+    "type": "module",
     "main": "./node-syslog",
+    "types": "./index.d.ts",
     "engines": {
-        "node" : ">=0.8.0"
+        "node": ">=20.10.0"
     },
     "os": [
         "!win32"
     ],
+    "cpu": [
+        "x64",
+        "arm64"
+    ],
+    "napi": {
+        "name": "node-syslog",
+        "triples": {
+            "defaults": false,
+            "additional": [
+                "aarch64-apple-darwin"
+            ]
+        }
+    },
     "scripts": {
-        "test": "node test.js"
+        "build": "napi build --release",
+        "build:debug": "napi build",
+        "test": "node tests/test.js"
+    },
+    "devDependencies": {
+        "@napi-rs/cli": "^2.18.0"
     },
     "description": "Node module to support sending messages to syslog daemon",
     "author": "Nazar Kulyk <nasar.kulyk@googlemail.com>",
     "homepage": "http://github.com/schamane/node-syslog",
-    "repository" :
-    {
-        "type" : "git",
-        "url" : "git@github.com:schamane/node-syslog.git"
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:schamane/node-syslog.git"
     },
     "bugs": {
         "url": "https://github.com/schamane/node-syslog/issues"
     },
     "licenses": [
-    {
-        "type": "Simplified BSD License",
-        "url": "http://en.wikipedia.org/wiki/BSD_licenses"
-    }],
-    "tags": ["syslog", "system", "log", "logging" ]
+        {
+            "type": "MIT",
+            "url": "http://en.wikipedia.org/wiki/MIT_License"
+        }
+    ],
+    "tags": [
+        "syslog",
+        "system",
+        "log",
+        "logging"
+    ]
 }
