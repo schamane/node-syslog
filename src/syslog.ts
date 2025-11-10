@@ -8,6 +8,18 @@ declare const require: (id: string) => any;
 declare const __dirname: string;
 
 function loadNativeModule() {
+  // Check if we're in a test environment and mock is available
+  if (typeof process !== 'undefined' && (process.env.NODE_ENV === 'test' || process.env.VITEST === 'true')) {
+    try {
+      // Try to load the mock from the global test setup
+      if ((globalThis as any).__MOCK_SYSLOG__) {
+        return (globalThis as any).__MOCK_SYSLOG__;
+      }
+    } catch {
+      // Continue with normal loading if mock not available
+    }
+  }
+
   try {
     // Try to load the precompiled binary first
     return require('../lib/binding/syslog_native.node');

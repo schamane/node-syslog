@@ -1,19 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { Syslog, createSyslog, Facilities, Levels, Options } from '../src/syslog';
 import mockSyslog from './mocks/native';
 
-// Mock the native module loading
-vi.mock('../src/syslog', () => {
-  const actual = vi.importActual('../src/syslog');
-  return {
-    ...actual,
-    default: mockSyslog,
-  };
-});
-
-// Mock require for native module
-vi.mock('../lib/binding/syslog_native.node', () => mockSyslog, { virtual: true });
-vi.mock('node-gyp-build', () => () => mockSyslog);
+// Import after mocking (setup is handled in setup.ts)
+import { Syslog, createSyslog, Facilities, Levels, Options } from '../src/syslog';
 
 describe('Syslog', () => {
   beforeEach(() => {

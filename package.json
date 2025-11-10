@@ -45,15 +45,16 @@
     "node-gyp-build": "^4.8.4"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.1",
     "@types/node": "^24.10.0",
     "@typescript-eslint/eslint-plugin": "^8.46.4",
     "@typescript-eslint/parser": "^8.46.4",
+    "@vitest/coverage-v8": "^4.0.8",
     "eslint": "^9.39.1",
     "node-gyp": "^11.5.0",
+    "typedoc": "^0.28.14",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.8",
-    "@vitest/coverage-v8": "^4.0.8",
-    "typedoc": "^0.28.14"
+    "vitest": "^4.0.8"
   },
   "binary": {
     "module_name": "syslog_native",
