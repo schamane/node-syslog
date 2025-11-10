@@ -1,3 +1,10 @@
+---
+title: Installation Guide
+layout: default
+parent: Documentation
+nav_order: 3
+---
+
 # Installation Guide
 
 This guide covers installing and setting up node-syslog in your project.
@@ -240,7 +247,7 @@ services:
 
 After successful installation:
 
-1. Read the [API Reference](./api-reference.md)
+1. Read the [API Reference]({{ site.baseurl }}/api/)
 2. Check the [Examples](./examples.md)
 3. Review the [Migration Guide](./migration.md) if upgrading from node-syslog v1
 
@@ -250,4 +257,4 @@ If you encounter issues not covered here:
 
 - Check [GitHub Issues](https://github.com/yourusername/node-syslog/issues)
 - Start a [Discussion](https://github.com/yourusername/node-syslog/discussions)
-- Review [Troubleshooting Guide](./troubleshooting.md)
+- Review [Troubleshooting Guide]({{ site.baseurl }}/docs/troubleshooting/)

@@ -1,0 +1,97 @@
+# Site settings
+title: node-syslog
+description: Modern Node.js syslog library with fluent TypeScript API
+url: "https://schamane.github.io/node-syslog"
+baseurl: "/node-syslog"
+
+# Theme
+remote_theme: pmarsceill/just-the-docs@v0.8.2
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Just the Docs configuration
+color_scheme: light
+search_enabled: true
+search_tokenizer_separator: /[\s/]+/
+heading_anchors: true
+permalink: pretty
+
+# Aux links for the upper right navigation
+aux_links:
+  "View on GitHub":
+    - "//github.com/schamane/node-syslog"
+
+# Makes Aux links open in a new tab
+aux_links_new_tab: true
+
+# Footer content
+footer_content: "Copyright &copy; 2025 node-syslog. Distributed by MIT License."
+
+# Google Analytics Tracking (optional)
+ga_tracking: ""
+
+# Collections for documentation structure
+collections:
+  api:
+    output: true
+    permalink: /:collection/:name/
+
+# Navigation structure
+just_the_docs:
+  collections:
+    docs:
+      name: Documentation
+      nav_fold: true
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - "*.ts"
+  - "*.js"
+  - package.json
+  - package-lock.json
+  - tsconfig.json
+  - .git/
+  - .gitignore
+  - README.md
+  - src/
+  - test/
+  - scripts/
+  - binding.gyp
+  - .eslintrc.js
+  - vitest.config.ts
+
+# Include for processing
+include:
+  - _pages
+
+# Kramdown settings
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    block:
+      line_numbers: false
+
+# Site timezone
+timezone: UTC
+
+# Default values
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"

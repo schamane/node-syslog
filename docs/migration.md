@@ -1,3 +1,10 @@
+---
+title: Migration Guide
+layout: default
+parent: Documentation
+nav_order: 5
+---
+
 # Migration Guide
 
 This guide helps you migrate from the old `node-syslog` package to the new modern implementation.
@@ -448,7 +455,7 @@ try {
 
 ## Need Help?
 
-- Check the [API Reference](./api-reference.md)
+- Check the [API Reference]({{ site.baseurl }}/api/)
 - Review [Examples](./examples.md)
 - Open an [Issue](https://github.com/yourusername/node-syslog/issues)
 - Start a [Discussion](https://github.com/yourusername/node-syslog/discussions)

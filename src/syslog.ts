@@ -2,7 +2,11 @@ import { SyslogOptions, SyslogFacility, SyslogLevel, SyslogOption } from './type
 
 /**
  * Native module loader with fallback
+ * @internal
  */
+declare const require: (id: string) => any;
+declare const __dirname: string;
+
 function loadNativeModule() {
   try {
     // Try to load the precompiled binary first
@@ -68,7 +72,7 @@ export class Syslog {
    */
   constructor(options: SyslogOptions = {}) {
     this.native = loadNativeModule();
-    this.ident = options.ident || require.main?.filename || process.argv[1] || 'node';
+    this.ident = options.ident || (typeof require !== 'undefined' && require.main?.filename) || 'node';
     this.facility = options.facility ?? SyslogFacility.LOG_USER;
     this.options = options.options ?? SyslogOption.LOG_PID;
     
