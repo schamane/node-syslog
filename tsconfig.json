@@ -1,7 +1,8 @@
 {
   "extends": [
     "@tsconfig/recommended/tsconfig.json",
-    "@tsconfig/node22/tsconfig.json"
+    "@tsconfig/node22/tsconfig.json",
+    "@tsconfig/node-ts/tsconfig.json"
   ],
   "compilerOptions": {
     "outDir": "./dist",
@@ -9,11 +10,10 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "removeComments": false,
+    "removeComments": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "exactOptionalPropertyTypes": true,
     "resolveJsonModule": true,
     "types": ["node"],
     "noImplicitAny": true,

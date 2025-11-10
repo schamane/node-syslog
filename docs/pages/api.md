@@ -41,9 +41,9 @@ Creates a new syslog instance with the specified options.
 ```typescript
 const logger = new Syslog({
   ident: 'myapp',
-  facility: Facility.LOCAL0,
-  options: [Option.PID, Option.NDELAY],
-  logLevel: LogLevel.INFO
+  facility: SyslogFacility.LOCAL0,
+  options: [SyslogOption.PID, SyslogOption.NDELAY],
+  logLevel: SyslogLevel.INFO
 })
 ```
 
@@ -148,7 +148,7 @@ if (logger.isDebugEnabled()) {
 }
 ```
 
-## Types and Enums
+## Types and Constants
 
 ### SyslogOptions
 
@@ -157,71 +157,71 @@ Configuration options for creating a Syslog instance.
 ```typescript
 interface SyslogOptions {
   ident: string                    // Required: Identifier for log messages
-  facility?: Facility              // Optional: Syslog facility (default: 'user')
-  options?: Option[]               // Optional: Syslog options (default: [])
-  logLevel?: LogLevel              // Optional: Minimum log level (default: 'info')
+  facility?: SyslogFacilityType   // Optional: Syslog facility (default: 'user')
+  options?: SyslogOptionType[]     // Optional: Syslog options (default: [])
+  logLevel?: SyslogLevelType       // Optional: Minimum log level (default: 'info')
 }
 ```
 
-### Facility
+### SyslogFacility
 
 Syslog facility constants.
 
 ```typescript
-enum Facility {
-  KERN = 0,        // Kernel messages
-  USER = 1,        // User-level messages (default)
-  MAIL = 2,        // Mail system
-  DAEMON = 3,      // System daemons
-  AUTH = 4,        // Security/authorization
-  SYSLOG = 5,      // Internal syslog messages
-  LPR = 6,         // Line printer subsystem
-  NEWS = 7,        // Network news subsystem
-  UUCP = 8,        // UUCP subsystem
-  CRON = 9,        // Clock daemon
-  AUTHPRIV = 10,   // Security/authorization (private)
-  FTP = 11,        // FTP daemon
-  LOCAL0 = 16,     // Local use 0
-  LOCAL1 = 17,     // Local use 1
-  LOCAL2 = 18,     // Local use 2
-  LOCAL3 = 19,     // Local use 3
-  LOCAL4 = 20,     // Local use 4
-  LOCAL5 = 21,     // Local use 5
-  LOCAL6 = 22,     // Local use 6
-  LOCAL7 = 23      // Local use 7
-}
+const SyslogFacility = {
+  KERN: 0,         // Kernel messages
+  USER: 1,         // User-level messages (default)
+  MAIL: 2,         // Mail system
+  DAEMON: 3,       // System daemons
+  AUTH: 4,         // Security/authorization
+  SYSLOG: 5,       // Internal syslog messages
+  LPR: 6,          // Line printer subsystem
+  NEWS: 7,         // Network news subsystem
+  UUCP: 8,         // UUCP subsystem
+  CRON: 9,         // Clock daemon
+  AUTHPRIV: 10,    // Security/authorization (private)
+  FTP: 11,         // FTP daemon
+  LOCAL0: 16,      // Local use 0
+  LOCAL1: 17,      // Local use 1
+  LOCAL2: 18,      // Local use 2
+  LOCAL3: 19,      // Local use 3
+  LOCAL4: 20,      // Local use 4
+  LOCAL5: 21,      // Local use 5
+  LOCAL6: 22,      // Local use 6
+  LOCAL7: 23       // Local use 7
+} as const
 ```
 
-### LogLevel
+### SyslogLevel
 
 Log level constants.
 
 ```typescript
-enum LogLevel {
-  EMERG = 0,       // Emergency: system is unusable
-  ALERT = 1,       // Alert: action must be taken immediately
-  CRIT = 2,        // Critical: critical conditions
-  ERR = 3,         // Error: error conditions
-  WARNING = 4,     // Warning: warning conditions
-  NOTICE = 5,      // Notice: normal but significant condition
-  INFO = 6,        // Informational: informational messages
-  DEBUG = 7        // Debug: debug-level messages
-}
+const SyslogLevel = {
+  EMERG: 0,        // Emergency: system is unusable
+  ALERT: 1,        // Alert: action must be taken immediately
+  CRIT: 2,         // Critical: critical conditions
+  ERR: 3,          // Error: error conditions
+  WARNING: 4,      // Warning: warning conditions
+  NOTICE: 5,       // Notice: normal but significant condition
+  INFO: 6,         // Informational: informational messages
+  DEBUG: 7         // Debug: debug-level messages
+} as const
 ```
 
-### Option
+### SyslogOption
 
 Syslog option constants.
 
 ```typescript
-enum Option {
-  PID = 0x01,      // Log the process ID with each message
-  CONS = 0x02,     // Write to console if there's an error sending to syslog
-  ODELAY = 0x04,   // Delay connection until first message is logged
-  NDELAY = 0x08,   // Connect immediately
-  NOWAIT = 0x10,   // Don't wait for child processes that log messages
-  PERROR = 0x20    // Log to stderr as well
-}
+const SyslogOption = {
+  PID: 0x01,       // Log the process ID with each message
+  CONS: 0x02,      // Write to console if there's an error sending to syslog
+  ODELAY: 0x04,    // Delay connection until first message is logged
+  NDELAY: 0x08,    // Connect immediately
+  NOWAIT: 0x10,    // Don't wait for child processes that log messages
+  PERROR: 0x20     // Log to stderr as well
+} as const
 ```
 
 ## Convenience Functions

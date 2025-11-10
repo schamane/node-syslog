@@ -51,17 +51,17 @@ const logger = new Syslog({
 })
 \`\`\`
 
-## Types and Enums
+## Types and Constants
 
-### [Facility]({{ site.baseurl }}/api/enums/Facility.html)
+### [SyslogFacility]({{ site.baseurl }}/api/variables/SyslogFacility.html)
 
 Syslog facility constants.
 
-### [LogLevel]({{ site.baseurl }}/api/enums/LogLevel.html)
+### [SyslogLevel]({{ site.baseurl }}/api/variables/SyslogLevel.html)
 
 Log level constants.
 
-### [Option]({{ site.baseurl }}/api/enums/Option.html)
+### [SyslogOption]({{ site.baseurl }}/api/variables/SyslogOption.html)
 
 Syslog option constants.
 

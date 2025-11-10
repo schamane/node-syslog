@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import mockSyslog from './mocks/native';
 
 // Import after mocking (setup is handled in setup.ts)
-import { Syslog, createSyslog, Facilities, Levels, Options } from '../src/syslog';
+import { Syslog, createSyslog, SyslogFacility, SyslogLevel, SyslogOption, Levels } from '../src/index';
+import type { SyslogOptionType } from '../src/index';
 
 describe('Syslog', () => {
   beforeEach(() => {
@@ -21,14 +22,14 @@ describe('Syslog', () => {
     it('should create a Syslog instance with custom options', () => {
       const options = {
         ident: 'test-app',
-        facility: Facilities.LOG_LOCAL0,
-        options: Options.LOG_PID | Options.LOG_CONS,
+        facility: SyslogFacility.LOG_LOCAL0,
+        options: (SyslogOption.LOG_PID | SyslogOption.LOG_CONS) as SyslogOptionType,
       };
       
       const logger = new Syslog(options);
       expect(logger.getIdent()).toBe('test-app');
-      expect(logger.getFacility()).toBe(Facilities.LOG_LOCAL0);
-      expect(logger.getOptions()).toBe(Options.LOG_PID | Options.LOG_CONS);
+      expect(logger.getFacility()).toBe(SyslogFacility.LOG_LOCAL0);
+      expect(logger.getOptions()).toBe(SyslogOption.LOG_PID | SyslogOption.LOG_CONS);
     });
   });
 

@@ -1,4 +1,4 @@
-import type { SyslogOptions } from './types/index.js';
+import type { SyslogOptions, SyslogFacilityType, SyslogLevelType, SyslogOptionType } from './types/index.js';
 import { SyslogFacility, SyslogLevel, SyslogOption } from './types/index.js';
 
 /**
@@ -48,7 +48,7 @@ function loadNativeModule() {
  * ```typescript
  * const logger = new Syslog({
  *   ident: 'my-app',
- *   facility: Facilities.LOG_LOCAL0
+ *   facility: SyslogFacility.LOG_LOCAL0
  * });
  * 
  * logger.info('Application started')
@@ -59,8 +59,8 @@ export class Syslog {
   private native: any;
   private initialized: boolean = false;
   private ident: string;
-  private facility: SyslogFacility;
-  private options: SyslogOption;
+  private facility: SyslogFacilityType;
+  private options: SyslogOptionType;
 
   /**
    * Create a new Syslog instance
@@ -75,12 +75,12 @@ export class Syslog {
    * // Default configuration
    * const logger = new Syslog();
    * 
-   * // Custom configuration
-   * const logger = new Syslog({
-   *   ident: 'web-server',
-   *   facility: Facilities.LOG_DAEMON,
-   *   options: Options.LOG_PID | Options.LOG_CONS
-   * });
+ * // Custom configuration
+ * const logger = new Syslog({
+ *   ident: 'web-server',
+ *   facility: SyslogFacility.LOG_DAEMON,
+ *   options: SyslogOption.LOG_PID | SyslogOption.LOG_CONS
+ * });
    * ```
    */
   constructor(options: SyslogOptions = {}) {
@@ -197,7 +197,7 @@ export class Syslog {
    * @param message Message to log
    * @param context Optional context object
    */
-  log(level: SyslogLevel, message: string, context?: Record<string, any>): this {
+  log(level: SyslogLevelType, message: string, context?: Record<string, any>): this {
     if (!this.initialized) {
       this.initialize();
     }
@@ -247,7 +247,7 @@ export class Syslog {
   /**
    * Get the current facility
    */
-  getFacility(): SyslogFacility {
+  getFacility(): SyslogFacilityType {
     return this.facility;
   }
 
@@ -261,7 +261,7 @@ export class Syslog {
   /**
    * Get the current options
    */
-  getOptions(): SyslogOption {
+  getOptions(): SyslogOptionType {
     return this.options;
   }
 

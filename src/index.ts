@@ -17,6 +17,9 @@ export {
 
 export type {
   SyslogOptions,
+  SyslogFacilityType,
+  SyslogLevelType,
+  SyslogOptionType,
 } from './types/index.js';
 
 export {

@@ -24,13 +24,13 @@ pnpm add node-syslog
 ## Quick Start
 
 ```typescript
-import { Syslog, Facilities, Levels } from 'node-syslog';
+import { Syslog, SyslogFacility, SyslogLevel, SyslogOption } from 'node-syslog';
 
 // Create a logger instance
 const logger = new Syslog({
   ident: 'my-app',
-  facility: Facilities.LOG_LOCAL0,
-  options: Options.LOG_PID
+  facility: SyslogFacility.LOG_LOCAL0,
+  options: SyslogOption.LOG_PID
 });
 
 // Use fluent interface
@@ -77,28 +77,28 @@ logger.debug(message, context?)
 ### Constants
 
 ```typescript
-import { Facilities, Levels, Options } from 'node-syslog';
+import { SyslogFacility, SyslogLevel, SyslogOption } from 'node-syslog';
 
 // Facilities
-Facilities.LOG_USER     // 1
-Facilities.LOG_LOCAL0   // 16
-Facilities.LOG_DAEMON   // 3
+SyslogFacility.LOG_USER     // 1
+SyslogFacility.LOG_LOCAL0   // 16
+SyslogFacility.LOG_DAEMON   // 3
 // ... and more
 
 // Levels
-Levels.LOG_EMERG    // 0
-Levels.LOG_ALERT    // 1
-Levels.LOG_CRIT     // 2
-Levels.LOG_ERR      // 3
-Levels.LOG_WARNING  // 4
-Levels.LOG_NOTICE   // 5
-Levels.LOG_INFO     // 6
-Levels.LOG_DEBUG    // 7
+SyslogLevel.LOG_EMERG    // 0
+SyslogLevel.LOG_ALERT    // 1
+SyslogLevel.LOG_CRIT     // 2
+SyslogLevel.LOG_ERR      // 3
+SyslogLevel.LOG_WARNING  // 4
+SyslogLevel.LOG_NOTICE   // 5
+SyslogLevel.LOG_INFO     // 6
+SyslogLevel.LOG_DEBUG    // 7
 
 // Options
-Options.LOG_PID      // 0x01
-Options.LOG_CONS     // 0x02
-Options.LOG_NDELAY   // 0x08
+SyslogOption.LOG_PID      // 0x01
+SyslogOption.LOG_CONS     // 0x02
+SyslogOption.LOG_NDELAY   // 0x08
 // ... and more
 ```
 
@@ -107,11 +107,11 @@ Options.LOG_NDELAY   // 0x08
 ### Basic Usage
 
 ```typescript
-import { Syslog, Facilities } from 'node-syslog';
+import { Syslog, SyslogFacility } from 'node-syslog';
 
 const logger = new Syslog({
   ident: 'web-server',
-  facility: Facilities.LOG_DAEMON
+  facility: SyslogFacility.LOG_DAEMON
 });
 
 logger.info('Server listening on port 3000');
@@ -156,12 +156,12 @@ logger
 ### Custom Facility
 
 ```typescript
-import { Syslog, Facilities, Options } from 'node-syslog';
+import { Syslog, SyslogFacility, SyslogOption } from 'node-syslog';
 
 const logger = new Syslog({
   ident: 'payment-service',
-  facility: Facilities.LOG_LOCAL1,
-  options: Options.LOG_PID | Options.LOG_CONS
+  facility: SyslogFacility.LOG_LOCAL1,
+  options: SyslogOption.LOG_PID | SyslogOption.LOG_CONS
 });
 
 logger.critical('Payment processing failed', {
@@ -211,11 +211,11 @@ syslog.init('my-app', syslog.LOG_PID | syslog.LOG_ODELAY, syslog.LOG_LOCAL0);
 syslog.log(syslog.LOG_INFO, 'Message');
 
 // New node-syslog
-import { Syslog, Facilities, Options, Levels } from 'node-syslog';
+import { Syslog, SyslogFacility, SyslogOption, SyslogLevel } from 'node-syslog';
 const logger = new Syslog({
   ident: 'my-app',
-  facility: Facilities.LOG_LOCAL0,
-  options: Options.LOG_PID | Options.LOG_ODELAY
+  facility: SyslogFacility.LOG_LOCAL0,
+  options: SyslogOption.LOG_PID | SyslogOption.LOG_ODELAY
 });
 logger.info('Message');
 ```

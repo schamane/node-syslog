@@ -40,7 +40,7 @@ const syslog = require('node-syslog');
 
 **After:**
 ```typescript
-import { Syslog, Facilities, Levels, Options } from 'node-syslog';
+import { Syslog, SyslogFacility, SyslogLevel, SyslogOption } from 'node-syslog';
 // or for convenience functions:
 import { info, error, warning } from 'node-syslog';
 ```
@@ -56,8 +56,8 @@ syslog.init('my-app', syslog.LOG_PID | syslog.LOG_ODELAY, syslog.LOG_LOCAL0);
 ```typescript
 const logger = new Syslog({
   ident: 'my-app',
-  facility: Facilities.LOG_LOCAL0,
-  options: Options.LOG_PID | Options.LOG_ODELAY
+  facility: SyslogFacility.LOG_LOCAL0,
+  options: SyslogOption.LOG_PID | SyslogOption.LOG_ODELAY
 });
 ```
 
@@ -94,9 +94,9 @@ const options = syslog.LOG_PID;
 
 **After:**
 ```typescript
-const facility = Facilities.LOG_LOCAL0;
-const level = Levels.LOG_INFO;
-const options = Options.LOG_PID;
+const facility = SyslogFacility.LOG_LOCAL0;
+const level = SyslogLevel.LOG_INFO;
+const options = SyslogOption.LOG_PID;
 ```
 
 ## Complete Migration Examples
@@ -130,12 +130,12 @@ app.listen(3000, () => {
 **After:**
 ```typescript
 import express from 'express';
-import { Syslog, Facilities, Options } from 'node-syslog';
+import { Syslog, SyslogFacility, SyslogOption } from 'node-syslog';
 
 const logger = new Syslog({
   ident: 'web-server',
-  facility: Facilities.LOG_DAEMON,
-  options: Options.LOG_PID
+  facility: SyslogFacility.LOG_DAEMON,
+  options: SyslogOption.LOG_PID
 });
 
 const app = express();
@@ -187,12 +187,12 @@ function query(sql, params, callback) {
 **After:**
 ```typescript
 import mysql from 'mysql';
-import { Syslog, Facilities, Options } from 'node-syslog';
+import { Syslog, SyslogFacility, SyslogOption } from 'node-syslog';
 
 const logger = new Syslog({
   ident: 'db-service',
-  facility: Facilities.LOG_LOCAL1,
-  options: Options.LOG_PID | Options.LOG_CONS
+  facility: SyslogFacility.LOG_LOCAL1,
+  options: SyslogOption.LOG_PID | SyslogOption.LOG_CONS
 });
 
 interface QueryResult {
@@ -247,11 +247,11 @@ function processJob(job) {
 **After:**
 ```typescript
 import { Worker } from 'worker_threads';
-import { Syslog, Facilities } from 'node-syslog';
+import { Syslog, SyslogFacility } from 'node-syslog';
 
 const logger = new Syslog({
   ident: 'worker',
-  facility: Facilities.LOG_LOCAL2
+  facility: SyslogFacility.LOG_LOCAL2
 });
 
 interface Job {
@@ -316,8 +316,8 @@ logger
 // Full IntelliSense support
 const logger = new Syslog({
   ident: 'my-app',
-  facility: Facilities.LOG_LOCAL0, // Auto-completion
-  options: Options.LOG_PID | Options.LOG_CONS  // Type-safe
+  facility: SyslogFacility.LOG_LOCAL0, // Auto-completion
+  options: SyslogOption.LOG_PID | SyslogOption.LOG_CONS  // Type-safe
 });
 
 logger.info('Message'); // Method signatures with types
@@ -356,7 +356,7 @@ npm install node-syslog@2
 
 ```typescript
 // compatibility.ts
-import { Syslog, Facilities, Levels, Options } from 'node-syslog';
+import { Syslog, SyslogFacility, SyslogLevel, SyslogOption } from 'node-syslog';
 
 let globalLogger: Syslog | null = null;
 
@@ -369,14 +369,14 @@ export const legacy = {
     if (!globalLogger) throw new Error('Syslog not initialized');
     
     switch (priority) {
-      case Levels.LOG_EMERG: globalLogger.emergency(message); break;
-      case Levels.LOG_ALERT: globalLogger.alert(message); break;
-      case Levels.LOG_CRIT: globalLogger.critical(message); break;
-      case Levels.LOG_ERR: globalLogger.error(message); break;
-      case Levels.LOG_WARNING: globalLogger.warning(message); break;
-      case Levels.LOG_NOTICE: globalLogger.notice(message); break;
-      case Levels.LOG_INFO: globalLogger.info(message); break;
-      case Levels.LOG_DEBUG: globalLogger.debug(message); break;
+      case SyslogLevel.LOG_EMERG: globalLogger.emergency(message); break;
+      case SyslogLevel.LOG_ALERT: globalLogger.alert(message); break;
+      case SyslogLevel.LOG_CRIT: globalLogger.critical(message); break;
+      case SyslogLevel.LOG_ERR: globalLogger.error(message); break;
+      case SyslogLevel.LOG_WARNING: globalLogger.warning(message); break;
+      case SyslogLevel.LOG_NOTICE: globalLogger.notice(message); break;
+      case SyslogLevel.LOG_INFO: globalLogger.info(message); break;
+      case SyslogLevel.LOG_DEBUG: globalLogger.debug(message); break;
     }
   }
 };
@@ -387,8 +387,8 @@ export const legacy = {
 ```typescript
 // Phase 1: Use compatibility layer
 import { legacy } from './compatibility';
-legacy.init('my-app', Options.LOG_PID, Facilities.LOG_USER);
-legacy.log(Levels.LOG_INFO, 'Still using old API');
+legacy.init('my-app', SyslogOption.LOG_PID, SyslogFacility.LOG_USER);
+legacy.log(SyslogLevel.LOG_INFO, 'Still using old API');
 
 // Phase 2: Mix old and new
 import { Syslog } from 'node-syslog';

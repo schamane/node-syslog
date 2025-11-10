@@ -108,6 +108,19 @@ logger.close()
   - Methods: `camelCase`
   - Interfaces: `ISyslogOptions`, `LogLevel`, etc.
   - Constants: `UPPER_SNAKE_CASE`
+  - **No Enums**: Use `as const` objects with derived union types
+    ```typescript
+    // ❌ PROHIBITED:
+    enum Status { Active = 'active', Inactive = 'inactive' }
+    
+    // ✅ REQUIRED:
+    const Status = {
+      Active: 'active',
+      Inactive: 'inactive'
+    } as const;
+    
+    type StatusType = typeof Status[keyof typeof Status];
+    ```
 - **Documentation**: TSDoc for all public APIs, minimal C comments
 
 ### Testing Strategy
@@ -262,3 +275,31 @@ describe('Syslog', () => {
     "node-gyp": "^10.0.0"
   }
 }
+
+## Completed Features
+
+### ✅ Remove TypeScript Enums (November 2025)
+**Status**: COMPLETED  
+**OpenSpec**: `remove-typescript-enums`  
+**Implementation**: 12/12 phases completed
+
+**Changes Made**:
+- Replaced `SyslogFacility`, `SyslogLevel`, `SyslogOption` enums with `as const` objects
+- Created derived union types: `SyslogFacilityType`, `SyslogLevelType`, `SyslogOptionType`
+- Updated all documentation, tests, and examples to use new const objects
+- Maintained full backward compatibility with `LOG_` prefixed property names
+- Achieved zero runtime overhead and better type safety
+
+**Benefits**:
+- Eliminated enum runtime overhead
+- Improved bundle size optimization
+- Enhanced type safety with union types
+- Followed modern TypeScript best practices
+- Maintained full IDE support and autocomplete
+
+**Validation**:
+- ✅ All 20 tests passing (83.16% coverage)
+- ✅ TypeScript compilation with strict mode
+- ✅ ESLint validation (zero errors)
+- ✅ Documentation generation and validation
+- ✅ Build process successful

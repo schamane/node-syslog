@@ -15,13 +15,13 @@ Real-world examples and usage patterns for node-syslog.
 
 ```typescript
 import express from 'express'
-import { Syslog, Facility, Option } from 'node-syslog'
+import { Syslog, SyslogFacility, SyslogOption } from 'node-syslog'
 
 const app = express()
 const logger = new Syslog({
   ident: 'webapp',
-  facility: Facility.LOCAL0,
-  options: [Option.PID, Option.NDELAY]
+  facility: SyslogFacility.LOCAL0,
+  options: [SyslogOption.PID, SyslogOption.NDELAY]
 })
 
 // Request logging middleware
@@ -121,7 +121,7 @@ process.on('SIGINT', () => {
 
 ```typescript
 import fastify from 'fastify'
-import { Syslog, Facility } from 'node-syslog'
+import { Syslog, SyslogFacility } from 'node-syslog'
 
 const app = fastify({
   logger: false // We'll use our own logger
@@ -129,7 +129,7 @@ const app = fastify({
 
 const logger = new Syslog({
   ident: 'fastify-app',
-  facility: Facility.LOCAL1
+  facility: SyslogFacility.LOCAL1
 })
 
 // Request logging hook
@@ -246,11 +246,11 @@ process.on('SIGTERM', () => {
 
 ```typescript
 import { Pool, PoolClient } from 'pg'
-import { Syslog, Facility } from 'node-syslog'
+import { Syslog, SyslogFacility } from 'node-syslog'
 
 const logger = new Syslog({
   ident: 'database-service',
-  facility: Facility.LOCAL2
+  facility: SyslogFacility.LOCAL2
 })
 
 // Database connection pool
@@ -443,7 +443,7 @@ main().catch(error => {
 
 ```typescript
 import { Worker, isMainThread, parentPort, workerData } from 'worker_threads'
-import { Syslog, Facility, LogLevel } from 'node-syslog'
+import { Syslog, SyslogFacility, SyslogLevel } from 'node-syslog'
 
 interface Job {
   id: string
@@ -471,9 +471,9 @@ class WorkerService {
   constructor(private workerCount: number = 4) {
     this.logger = new Syslog({
       ident: 'worker-service',
-      facility: Facility.DAEMON,
+      facility: SyslogFacility.DAEMON,
       options: ['pid', 'ndelay'],
-      logLevel: LogLevel.INFO
+      logLevel: SyslogLevel.INFO
     })
   }
 
@@ -611,7 +611,7 @@ if (!isMainThread) {
   const { workerId } = workerData as { workerId: number }
   const logger = new Syslog({
     ident: `worker-${workerId}`,
-    facility: Facility.LOCAL3
+    facility: SyslogFacility.LOCAL3
   })
 
   parentPort?.on('message', async (job: Job) => {
@@ -745,12 +745,12 @@ if (isMainThread) {
 
 import { Command } from 'commander'
 import { readFileSync, writeFileSync } from 'fs'
-import { Syslog, Facility, LogLevel } from 'node-syslog'
+import { Syslog, SyslogFacility, SyslogLevel } from 'node-syslog'
 
 const program = new Command()
 const logger = new Syslog({
   ident: 'mycli',
-  facility: Facility.LOCAL1,
+  facility: SyslogFacility.LOCAL1,
   options: ['pid', 'ndelay']
 })
 
@@ -921,7 +921,7 @@ program.parse()
 
 ```typescript
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { Syslog, Facility, LogLevel } from '../src/index'
+import { Syslog, SyslogFacility, SyslogLevel } from '../src/index'
 
 // Mock the native module
 vi.mock('../binding.node', () => ({
@@ -937,8 +937,8 @@ describe('Syslog', () => {
   beforeEach(() => {
     logger = new Syslog({
       ident: 'test-app',
-      facility: Facility.LOCAL0,
-      logLevel: LogLevel.DEBUG
+      facility: SyslogFacility.LOCAL0,
+      logLevel: SyslogLevel.DEBUG
     })
   })
 
@@ -1066,7 +1066,7 @@ describe('Syslog', () => {
       
       const infoLogger = new Syslog({
         ident: 'test',
-        logLevel: LogLevel.INFO
+        logLevel: SyslogLevel.INFO
       })
       
       infoLogger.debug('This should not appear')
@@ -1082,14 +1082,14 @@ describe('Syslog', () => {
     it('should check if debug is enabled', () => {
       const infoLogger = new Syslog({
         ident: 'test',
-        logLevel: LogLevel.INFO
+        logLevel: SyslogLevel.INFO
       })
       
       expect(infoLogger.isDebugEnabled()).toBe(false)
       
       const debugLogger = new Syslog({
         ident: 'test',
-        logLevel: LogLevel.DEBUG
+        logLevel: SyslogLevel.DEBUG
       })
       
       expect(debugLogger.isDebugEnabled()).toBe(true)

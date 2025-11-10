@@ -54,13 +54,13 @@ logger.close()
 ### Advanced Configuration
 
 ```typescript
-import { Syslog, Facility, LogLevel, Option } from 'node-syslog'
+import { Syslog, SyslogFacility, SyslogLevel, SyslogOption } from 'node-syslog'
 
 const logger = new Syslog({
   ident: 'production-app',
-  facility: Facility.DAEMON,
-  options: [Option.PID, Option.NDELAY, Option.LOG_PID],
-  logLevel: LogLevel.INFO
+  facility: SyslogFacility.DAEMON,
+  options: [SyslogOption.PID, SyslogOption.NDELAY, SyslogOption.LOG_PID],
+  logLevel: SyslogLevel.INFO
 })
 
 // Structured logging

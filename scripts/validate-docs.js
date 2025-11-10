@@ -15,6 +15,7 @@ const __dirname = path.dirname(__filename)
 // Configuration
 const rootDir = path.join(__dirname, '..')
 const docsDir = path.join(__dirname, '../docs')
+const pagesDir = path.join(docsDir, 'pages')
 const requiredFiles = [
   'index.md',
   'getting-started.md',
@@ -30,7 +31,7 @@ const requiredDirs = [
 ]
 
 const requiredRootFiles = [
-  '_config.yml'
+  // None - _config.yml is in docs/ directory
 ]
 
 // Validation results
@@ -86,7 +87,7 @@ function validateLinks(content, filePath) {
 }
 
 function validateNavigation() {
-  const configPath = path.join(rootDir, '_config.yml')
+  const configPath = path.join(docsDir, '_config.yml')
   if (!fs.existsSync(configPath)) {
     errors.push('❌ Missing _config.yml')
     return
@@ -111,8 +112,8 @@ function validateApiDocs() {
     return
   }
   
-  // Recursively find all markdown files
-  function findMarkdownFiles(dir) {
+  // Recursively find all documentation files
+  function findDocumentationFiles(dir) {
     const files = []
     const items = fs.readdirSync(dir)
     
@@ -121,8 +122,8 @@ function validateApiDocs() {
       const stat = fs.statSync(fullPath)
       
       if (stat.isDirectory()) {
-        files.push(...findMarkdownFiles(fullPath))
-      } else if (item.endsWith('.md')) {
+        files.push(...findDocumentationFiles(fullPath))
+      } else if (item.endsWith('.html') || item.endsWith('.md')) {
         files.push(path.relative(apiDir, fullPath))
       }
     }
@@ -130,14 +131,24 @@ function validateApiDocs() {
     return files
   }
   
-  const apiFiles = findMarkdownFiles(apiDir)
+  const apiFiles = findDocumentationFiles(apiDir)
   
   if (apiFiles.length === 0) {
     warnings.push('⚠️  No API documentation files found')
   }
   
   // Check for main API files
-  const expectedApiFiles = ['README.md', 'classes/Syslog.md', 'enums/SyslogFacility.md', 'enums/SyslogLevel.md', 'enums/SyslogOption.md', 'interfaces/SyslogOptions.md']
+  const expectedApiFiles = [
+    'index.md', 
+    'classes/Syslog.html', 
+    'variables/SyslogFacility.html', 
+    'variables/SyslogLevel.html', 
+    'variables/SyslogOption.html',
+    'types/SyslogFacilityType.html', 
+    'types/SyslogLevelType.html', 
+    'types/SyslogOptionType.html',
+    'interfaces/SyslogOptions.html'
+  ]
   expectedApiFiles.forEach(expected => {
     const found = apiFiles.some(f => f === expected)
     if (!found) {
@@ -159,7 +170,7 @@ function main() {
   // Validate required files
   console.log('📄 Checking required docs files...')
   requiredFiles.forEach(file => {
-    const filePath = path.join(docsDir, file)
+    const filePath = path.join(pagesDir, file)
     validateFile(filePath)
   })
   
@@ -186,7 +197,7 @@ function main() {
   console.log('🔗 Checking internal links...')
   const markdownFiles = requiredFiles.filter(f => f.endsWith('.md'))
   markdownFiles.forEach(file => {
-    const filePath = path.join(docsDir, file)
+    const filePath = path.join(pagesDir, file)
     if (fs.existsSync(filePath)) {
       const content = fs.readFileSync(filePath, 'utf8')
       validateLinks(content, filePath)

@@ -38,10 +38,11 @@ The configurations are applied in this order (later configs override earlier one
 - **`verbatimModuleSyntax`**: Strict import/export syntax checking
 - **`rewriteRelativeImportExtensions`**: Automatically adds `.js` extensions to imports
 
-### Enum Support
-- **`erasableSyntaxOnly: false`**: Explicitly disabled to allow regular enums
-- **Rationale**: Maintains compatibility with existing enum definitions
-- **Override**: Required due to @tsconfig/node-ts defaulting to `true`
+### Const Object Support
+- **`erasableSyntaxOnly: false`**: Explicitly disabled (though not needed for const objects)
+- **Rationale**: Previously maintained enum compatibility, now using `as const` objects
+- **Current Approach**: Const objects with derived union types provide better type safety
+- **Override**: Maintained for consistency with base configuration
 
 ### Type Checking
 - **Enhanced strictness** from all three base configs
@@ -88,9 +89,9 @@ import { Syslog } from './syslog';
 **Error**: `Cannot find module 'X' or its corresponding type declarations`
 **Solution**: Ensure proper extension usage and module resolution
 
-#### 4. Enum Syntax
-**Error**: `This syntax is not allowed when 'erasableSyntaxOnly' is enabled`
-**Solution**: Ensure `erasableSyntaxOnly: false` is set to override base config defaults
+#### 4. Const Object Usage
+**Error**: `Property 'X' does not exist on type 'typeof Y'`
+**Solution**: Use correct property names with `LOG_` prefix (e.g., `SyslogFacility.LOG_USER`)
 
 ## Benefits
 

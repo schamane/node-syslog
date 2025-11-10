@@ -110,17 +110,17 @@ tail -f /var/log/syslog | grep example
 ### Full Configuration Example
 
 ```typescript
-import { Syslog, Facility, LogLevel, Option } from 'node-syslog'
+import { Syslog, SyslogFacility, SyslogLevel, SyslogOption } from 'node-syslog'
 
 const logger = new Syslog({
   ident: 'production-app',
-  facility: Facility.DAEMON,
+  facility: SyslogFacility.DAEMON,
   options: [
-    Option.PID,      // Include process ID
-    Option.NDELAY,   // Open connection immediately
-    Option.LOG_PID   // Log the PID with each message
+    SyslogOption.PID,      // Include process ID
+    SyslogOption.NDELAY,   // Open connection immediately
+    SyslogOption.LOG_PID   // Log the PID with each message
   ],
-  logLevel: LogLevel.INFO
+  logLevel: SyslogLevel.INFO
 })
 ```
 
@@ -129,47 +129,47 @@ const logger = new Syslog({
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `ident` | string | Required | Identifier for log messages |
-| `facility` | Facility | 'user' | Syslog facility (kern, user, mail, daemon, etc.) |
-| `options` | Option[] | [] | Syslog options (pid, ndelay, nowait, etc.) |
-| `logLevel` | LogLevel | 'info' | Minimum log level to output |
+| `facility` | SyslogFacilityType | 'user' | Syslog facility (kern, user, mail, daemon, etc.) |
+| `options` | SyslogOptionType[] | [] | Syslog options (pid, ndelay, nowait, etc.) |
+| `logLevel` | SyslogLevelType | 'info' | Minimum log level to output |
 
 ### Available Facilities
 
 ```typescript
-import { Facility } from 'node-syslog'
+import { SyslogFacility } from 'node-syslog'
 
 // Common facilities
-Facility.KERN      // Kernel messages
-Facility.USER      // User-level messages (default)
-Facility.MAIL      // Mail system
-Facility.DAEMON    // System daemons
-Facility.AUTH      // Security/authorization
-Facility.SYSLOG    // Internal syslog messages
-Facility.LPR       // Line printer subsystem
-Facility.NEWS      // Network news subsystem
-Facility.UUCP      // UUCP subsystem
-Facility.CRON      // Clock daemon
-Facility.AUTHPRIV  // Security/authorization (private)
-Facility.FTP       // FTP daemon
-Facility.LOCAL0    // Local use 0
-Facility.LOCAL1    // Local use 1
+SyslogFacility.KERN      // Kernel messages
+SyslogFacility.USER      // User-level messages (default)
+SyslogFacility.MAIL      // Mail system
+SyslogFacility.DAEMON    // System daemons
+SyslogFacility.AUTH      // Security/authorization
+SyslogFacility.SYSLOG    // Internal syslog messages
+SyslogFacility.LPR       // Line printer subsystem
+SyslogFacility.NEWS      // Network news subsystem
+SyslogFacility.UUCP      // UUCP subsystem
+SyslogFacility.CRON      // Clock daemon
+SyslogFacility.AUTHPRIV  // Security/authorization (private)
+SyslogFacility.FTP       // FTP daemon
+SyslogFacility.LOCAL0    // Local use 0
+SyslogFacility.LOCAL1    // Local use 1
 // ... LOCAL2 through LOCAL7
 ```
 
 ### Available Log Levels
 
 ```typescript
-import { LogLevel } from 'node-syslog'
+import { SyslogLevel } from 'node-syslog'
 
 // From most to least severe
-LogLevel.EMERG     // Emergency: system is unusable
-LogLevel.ALERT     // Alert: action must be taken immediately
-LogLevel.CRIT      // Critical: critical conditions
-LogLevel.ERR       // Error: error conditions
-LogLevel.WARNING   // Warning: warning conditions
-LogLevel.NOTICE    // Notice: normal but significant condition
-LogLevel.INFO      // Informational: informational messages
-LogLevel.DEBUG     // Debug: debug-level messages
+SyslogLevel.EMERG     // Emergency: system is unusable
+SyslogLevel.ALERT     // Alert: action must be taken immediately
+SyslogLevel.CRIT      // Critical: critical conditions
+SyslogLevel.ERR       // Error: error conditions
+SyslogLevel.WARNING   // Warning: warning conditions
+SyslogLevel.NOTICE    // Notice: normal but significant condition
+SyslogLevel.INFO      // Informational: informational messages
+SyslogLevel.DEBUG     // Debug: debug-level messages
 ```
 
 ## Logging Methods
@@ -225,12 +225,12 @@ if (logger.isDebugEnabled()) {
 
 ```typescript
 import express from 'express'
-import { Syslog, Facility } from 'node-syslog'
+import { Syslog, SyslogFacility } from 'node-syslog'
 
 const app = express()
 const logger = new Syslog({
   ident: 'webapp',
-  facility: Facility.LOCAL0,
+  facility: SyslogFacility.LOCAL0,
   options: ['pid', 'ndelay']
 })
 
@@ -277,12 +277,12 @@ app.listen(PORT, () => {
 #!/usr/bin/env node
 
 import { Command } from 'commander'
-import { Syslog, Facility } from 'node-syslog'
+import { Syslog, SyslogFacility } from 'node-syslog'
 
 const program = new Command()
 const logger = new Syslog({
   ident: 'mycli',
-  facility: Facility.LOCAL1
+  facility: SyslogFacility.LOCAL1
 })
 
 program
@@ -315,7 +315,7 @@ program.parse()
 ### Background Service
 
 ```typescript
-import { Syslog, Facility, LogLevel } from 'node-syslog'
+import { Syslog, SyslogFacility, SyslogLevel } from 'node-syslog'
 
 class BackgroundService {
   private logger: Syslog
@@ -324,9 +324,9 @@ class BackgroundService {
   constructor() {
     this.logger = new Syslog({
       ident: 'background-service',
-      facility: Facility.DAEMON,
+      facility: SyslogFacility.DAEMON,
       options: ['pid', 'ndelay'],
-      logLevel: LogLevel.INFO
+      logLevel: SyslogLevel.INFO
     })
   }
 
@@ -505,12 +505,12 @@ cat /etc/rsyslog.conf | grep -v "^#"
 Enable debug logging to troubleshoot issues:
 
 ```typescript
-import { Syslog, LogLevel } from 'node-syslog'
+import { Syslog, SyslogLevel } from 'node-syslog'
 
 const logger = new Syslog({
   ident: 'debug-app',
   facility: 'local0',
-  logLevel: LogLevel.DEBUG  // Enable all levels including debug
+  logLevel: SyslogLevel.DEBUG  // Enable all levels including debug
 })
 
 logger.debug('Debug mode enabled')
