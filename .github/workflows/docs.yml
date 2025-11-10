@@ -35,16 +35,8 @@ jobs:
         node-version: '22'
         cache: 'pnpm'
         
-    - name: Install native build tools
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential python3 make g++
-        
-    - name: Approve build scripts
-      run: pnpm approve-builds
-      
     - name: Install dependencies
-      run: pnpm install --frozen-lockfile
+      run: pnpm install --frozen-lockfile --ignore-scripts
       
     - name: Build TypeScript
       run: pnpm run build
@@ -57,16 +49,15 @@ jobs:
       with:
         ruby-version: '3.2'
         bundler-cache: true
+        working-directory: docs
         
     - name: Install Jekyll dependencies
-      run: |
-        cd docs
-        bundle install
+      run: bundle install
+      working-directory: docs
         
     - name: Build Jekyll site
-      run: |
-        cd docs
-        bundle exec jekyll build --baseurl="/node-syslog"
+      run: bundle exec jekyll build --baseurl="/node-syslog"
+      working-directory: docs
         
     - name: Setup Pages
       uses: actions/configure-pages@v4

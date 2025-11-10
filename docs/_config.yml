@@ -41,11 +41,14 @@ collections:
   api:
     output: true
     permalink: /:collection/:name/
+  pages:
+    output: true
+    permalink: /:name/
 
 # Navigation structure
 just_the_docs:
   collections:
-    docs:
+    pages:
       name: Documentation
       nav_fold: true
 
@@ -58,24 +61,31 @@ exclude:
   - vendor/cache/
   - vendor/gems/
   - vendor/ruby/
-  - "*.ts"
-  - "*.js"
-  - package.json
-  - package-lock.json
-  - tsconfig.json
-  - .git/
-  - .gitignore
-  - README.md
-  - src/
-  - test/
-  - scripts/
-  - binding.gyp
-  - .eslintrc.js
-  - vitest.config.ts
+  - "../src/"
+  - "../test/"
+  - "../scripts/"
+  - "../binding.gyp"
+  - "../.git/"
+  - "../.gitignore"
+  - "../README.md"
+  - "../package.json"
+  - "../package-lock.json"
+  - "../tsconfig.json"
+  - "../pnpm-lock.yaml"
+  - "../.eslintrc.js"
+  - "../vitest.config.ts"
+  - "../AGENTS.md"
+  - "../CONTRIBUTING.md"
+  - "../LICENSE.md"
+  - "../openspec/"
 
 # Include for processing
 include:
-  - _pages
+  - _data
+  - _layouts
+  - _includes
+  - _sass
+  - assets
 
 # Kramdown settings
 kramdown:
@@ -93,5 +103,10 @@ defaults:
   - scope:
       path: ""
       type: "pages"
+    values:
+      layout: "default"
+  - scope:
+      path: ""
+      type: "api"
     values:
       layout: "default"

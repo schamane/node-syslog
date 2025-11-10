@@ -1,8 +1,7 @@
 {
   "extends": [
     "@tsconfig/recommended/tsconfig.json",
-    "@tsconfig/node22/tsconfig.json",
-    "@tsconfig/node-ts/tsconfig.json"
+    "@tsconfig/node22/tsconfig.json"
   ],
   "compilerOptions": {
     "outDir": "./dist",

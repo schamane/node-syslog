@@ -12,11 +12,11 @@
     "test:coverage": "vitest --coverage",
     "dev": "tsc --watch",
     "lint": "eslint src --ext .ts",
-    "prepublishOnly": "npm run build && npm run build:native",
+    "prepublishOnly": "pnpm run build && npm run build:native",
     "install": "node scripts/install.js",
     "docs:build": "typedoc && node scripts/build-docs.js",
     "docs:serve": "bundle exec jekyll serve --livereload",
-    "docs:deploy": "npm run docs:build && bundle exec jekyll build",
+    "docs:deploy": "pnpm run docs:build && bundle exec jekyll build",
     "docs:validate": "node scripts/validate-docs.js"
   },
   "keywords": [
@@ -65,5 +65,10 @@
     "remote_path": "./{module_name}/v{version}/",
     "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{arch}.tar.gz",
     "host": "https://github.com/schamane/node-syslog/releases/download"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@mapbox/node-pre-gyp"
+    ]
   }
 }
