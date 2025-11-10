@@ -1,0 +1,59 @@
+{
+  "name": "node-syslog",
+  "version": "2.0.0",
+  "description": "Modern Node.js syslog library with fluent TypeScript API",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "build:native": "node-gyp rebuild",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "dev": "tsc --watch",
+    "lint": "eslint src --ext .ts",
+    "prepublishOnly": "npm run build && npm run build:native",
+    "install": "node scripts/install.js"
+  },
+  "keywords": [
+    "syslog",
+    "logging",
+    "linux",
+    "native",
+    "n-api",
+    "typescript"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
+  "dependencies": {
+    "@mapbox/node-pre-gyp": "^1.0.11",
+    "node-addon-api": "^8.0.0",
+    "node-gyp-build": "^4.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "node-gyp": "^10.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^2.0.0",
+    "@vitest/coverage-v8": "^2.0.0"
+  },
+  "binary": {
+    "module_name": "syslog_native",
+    "module_path": "./lib/binding/{node_abi}-{platform}-{arch}/",
+    "remote_path": "./{module_name}/v{version}/",
+    "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{arch}.tar.gz",
+    "host": "https://github.com/schamane/node-syslog/releases/download"
+  }
+}
