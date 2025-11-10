@@ -40,20 +40,20 @@
     "arm64"
   ],
   "dependencies": {
-    "@mapbox/node-pre-gyp": "^1.0.11",
-    "node-addon-api": "^8.0.0",
-    "node-gyp-build": "^4.8.0"
+    "@mapbox/node-pre-gyp": "^2.0.0",
+    "node-addon-api": "^8.5.0",
+    "node-gyp-build": "^4.8.4"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.0.0",
-    "@typescript-eslint/parser": "^8.0.0",
-    "eslint": "^9.0.0",
-    "node-gyp": "^10.0.0",
-    "typescript": "^5.0.0",
-    "vitest": "^2.0.0",
-    "@vitest/coverage-v8": "^2.0.0",
-    "typedoc": "^0.25.0"
+    "@types/node": "^24.10.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.4",
+    "@typescript-eslint/parser": "^8.46.4",
+    "eslint": "^9.39.1",
+    "node-gyp": "^11.5.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.8",
+    "@vitest/coverage-v8": "^4.0.8",
+    "typedoc": "^0.28.14"
   },
   "binary": {
     "module_name": "syslog_native",
