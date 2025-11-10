@@ -17,17 +17,9 @@
     "exactOptionalPropertyTypes": true,
     "resolveJsonModule": true,
     "types": ["node"],
-    "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
-    "noImplicitThis": true,
-    "erasableSyntaxOnly": false
+    "noImplicitThis": true
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "**/*.test.ts"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

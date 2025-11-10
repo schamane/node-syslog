@@ -38,6 +38,11 @@ The configurations are applied in this order (later configs override earlier one
 - **`verbatimModuleSyntax`**: Strict import/export syntax checking
 - **`rewriteRelativeImportExtensions`**: Automatically adds `.js` extensions to imports
 
+### Enum Support
+- **`erasableSyntaxOnly: false`**: Explicitly disabled to allow regular enums
+- **Rationale**: Maintains compatibility with existing enum definitions
+- **Override**: Required due to @tsconfig/node-ts defaulting to `true`
+
 ### Type Checking
 - **Enhanced strictness** from all three base configs
 - **Community best practices** enforced
@@ -82,6 +87,10 @@ import { Syslog } from './syslog';
 #### 3. Module Resolution
 **Error**: `Cannot find module 'X' or its corresponding type declarations`
 **Solution**: Ensure proper extension usage and module resolution
+
+#### 4. Enum Syntax
+**Error**: `This syntax is not allowed when 'erasableSyntaxOnly' is enabled`
+**Solution**: Ensure `erasableSyntaxOnly: false` is set to override base config defaults
 
 ## Benefits
 
