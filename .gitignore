@@ -1,2 +1,9 @@
 .env
 /.plan/
+/node_modules/
+.DS_Store
+/dist/
+/coverage/
+**/.bundle/
+**/vendor/bundle/
+Gemfile.lock
