@@ -59,6 +59,20 @@ jobs:
       run: bundle exec jekyll build --baseurl="/node-syslog"
       working-directory: docs
         
+    - name: Verify build output
+      run: |
+        echo "Checking Jekyll build output..."
+        ls -la docs/_site/
+        echo "Checking API documentation..."
+        ls -la docs/_site/api/
+        echo "Verifying no file conflicts..."
+        if [ -f "docs/_site/api/index.html" ]; then
+          echo "✅ API index.html found"
+        else
+          echo "❌ API index.html missing"
+          exit 1
+        fi
+        
     - name: Setup Pages
       uses: actions/configure-pages@v4
       
@@ -79,3 +93,5 @@ jobs:
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
+      with:
+        error-urls: true

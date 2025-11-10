@@ -76,8 +76,9 @@ Configuration options for creating a Syslog instance.
 *This documentation is automatically generated from TypeScript source code.*
 `
 
-// Write API index
-fs.writeFileSync(path.join(apiDir, 'index.md'), apiIndex)
+// Write API index (commented out to prevent conflict with TypeDoc index.html)
+// fs.writeFileSync(path.join(apiDir, 'index.md'), apiIndex)
+console.log('ℹ️  Skipping API index.md generation to prevent conflict with TypeDoc index.html')
 
 // Add frontmatter to all generated markdown files
 function addFrontmatter(filePath) {

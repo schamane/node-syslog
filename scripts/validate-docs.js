@@ -139,7 +139,7 @@ function validateApiDocs() {
   
   // Check for main API files
   const expectedApiFiles = [
-    'index.md', 
+    'index.html', 
     'classes/Syslog.html', 
     'variables/SyslogFacility.html', 
     'variables/SyslogLevel.html', 

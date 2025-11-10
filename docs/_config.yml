@@ -78,6 +78,7 @@ exclude:
   - "../CONTRIBUTING.md"
   - "../LICENSE.md"
   - "../openspec/"
+  - "api/*.md"  # Exclude markdown files in api directory to prevent conflicts with TypeDoc HTML
 
 # Include for processing
 include:
