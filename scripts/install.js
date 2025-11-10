@@ -13,12 +13,15 @@ const npg = require('@mapbox/node-pre-gyp');
 
 const binary = require(path.join(__dirname, '../package.json')).binary;
 
+const package_json_path = path.join(__dirname, '../package.json');
+
 try {
-  const binding_path = npg.find(binary.package_name);
-  module.exports = require(binding_path);
+  const binding_path = npg.find(package_json_path);
+  global.binding = require(binding_path);
 } catch (error) {
   // Fallback to building from source
-  npg.run();
-  const binding_path = npg.find(binary.package_name);
-  module.exports = require(binding_path);
+  const runner = new npg.Run({ package_json_path });
+  runner.parseArgv(['rebuild']);
+  const binding_path = npg.find(package_json_path);
+  global.binding = require(binding_path);
 }
