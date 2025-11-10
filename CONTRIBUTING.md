@@ -22,6 +22,8 @@ Thank you for your interest in contributing to node-syslog! This document provid
 2. **Install dependencies**
    ```bash
    npm install
+   # or
+   pnpm install
    ```
 
 3. **Build the project**
@@ -29,6 +31,25 @@ Thank you for your interest in contributing to node-syslog! This document provid
    npm run build
    npm run build:native
    ```
+
+### TypeScript Configuration
+
+This project uses a triple-base TypeScript configuration for optimal development experience:
+
+- **@tsconfig/recommended**: TypeScript team best practices
+- **@tsconfig/node22**: Node.js 22 LTS optimized settings  
+- **@tsconfig/node-ts**: TypeScript 5.8+ features
+
+**Key Features:**
+- `nodenext` module resolution with `verbatimModuleSyntax`
+- `rewriteRelativeImportExtensions` for ESM compatibility
+- Enhanced strict type checking from all base configs
+- TypeScript 5.9.3 maintained (no downgrade)
+
+**Module System Notes:**
+- Imports require explicit file extensions (`.js`) due to `nodenext`
+- Use `import type` for type-only imports with `verbatimModuleSyntax`
+- `rewriteRelativeImportExtensions` automatically adds extensions in output
 
 4. **Run tests**
    ```bash

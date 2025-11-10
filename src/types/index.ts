@@ -5,7 +5,7 @@
  * Common facilities include LOG_USER for general user-level messages
  * and LOG_DAEMON for system daemons.
  */
-export const enum SyslogFacility {
+export enum SyslogFacility {
   LOG_KERN = 0,
   LOG_USER = 1,
   LOG_MAIL = 2,
@@ -34,7 +34,7 @@ export const enum SyslogFacility {
  * Levels indicate the severity of the log message.
  * Lower numbers indicate higher severity (LOG_EMERG = 0 is most severe).
  */
-export const enum SyslogLevel {
+export enum SyslogLevel {
   LOG_EMERG = 0,
   LOG_ALERT = 1,
   LOG_CRIT = 2,
@@ -52,7 +52,7 @@ export const enum SyslogLevel {
  * Common options include LOG_PID to include the process ID
  * and LOG_CONS to write to console if syslog is unavailable.
  */
-export const enum SyslogOption {
+export enum SyslogOption {
   LOG_PID = 0x01,
   LOG_CONS = 0x02,
   LOG_ODELAY = 0x04,

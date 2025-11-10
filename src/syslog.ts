@@ -1,4 +1,5 @@
-import { SyslogOptions, SyslogFacility, SyslogLevel, SyslogOption } from './types';
+import type { SyslogOptions } from './types/index.js';
+import { SyslogFacility, SyslogLevel, SyslogOption } from './types/index.js';
 
 /**
  * Native module loader with fallback

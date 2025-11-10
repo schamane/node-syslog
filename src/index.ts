@@ -13,14 +13,14 @@ export {
   notice,
   info,
   debug,
-} from './syslog';
+} from './syslog.js';
 
 export type {
   SyslogOptions,
-} from './types';
+} from './types/index.js';
 
 export {
   SyslogFacility,
   SyslogLevel,
   SyslogOption,
-} from './types';
+} from './types/index.js';
