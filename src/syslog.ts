@@ -72,7 +72,7 @@ export class Syslog {
    */
   constructor(options: SyslogOptions = {}) {
     this.native = loadNativeModule();
-    this.ident = options.ident || (typeof require !== 'undefined' && require.main?.filename) || 'node';
+    this.ident = options.ident || (typeof require !== 'undefined' && (require as any).main?.filename) || 'node';
     this.facility = options.facility ?? SyslogFacility.LOG_USER;
     this.options = options.options ?? SyslogOption.LOG_PID;
     
@@ -263,17 +263,54 @@ export class Syslog {
 /**
  * Static access to facility constants
  */
-export const Facilities = SyslogFacility;
+export const Facilities: Record<string, number> = {
+  LOG_KERN: SyslogFacility.LOG_KERN,
+  LOG_USER: SyslogFacility.LOG_USER,
+  LOG_MAIL: SyslogFacility.LOG_MAIL,
+  LOG_DAEMON: SyslogFacility.LOG_DAEMON,
+  LOG_AUTH: SyslogFacility.LOG_AUTH,
+  LOG_SYSLOG: SyslogFacility.LOG_SYSLOG,
+  LOG_LPR: SyslogFacility.LOG_LPR,
+  LOG_NEWS: SyslogFacility.LOG_NEWS,
+  LOG_UUCP: SyslogFacility.LOG_UUCP,
+  LOG_CRON: SyslogFacility.LOG_CRON,
+  LOG_AUTHPRIV: SyslogFacility.LOG_AUTHPRIV,
+  LOG_FTP: SyslogFacility.LOG_FTP,
+  LOG_LOCAL0: SyslogFacility.LOG_LOCAL0,
+  LOG_LOCAL1: SyslogFacility.LOG_LOCAL1,
+  LOG_LOCAL2: SyslogFacility.LOG_LOCAL2,
+  LOG_LOCAL3: SyslogFacility.LOG_LOCAL3,
+  LOG_LOCAL4: SyslogFacility.LOG_LOCAL4,
+  LOG_LOCAL5: SyslogFacility.LOG_LOCAL5,
+  LOG_LOCAL6: SyslogFacility.LOG_LOCAL6,
+  LOG_LOCAL7: SyslogFacility.LOG_LOCAL7,
+};
 
 /**
  * Static access to level constants
  */
-export const Levels = SyslogLevel;
+export const Levels: Record<string, number> = {
+  LOG_EMERG: SyslogLevel.LOG_EMERG,
+  LOG_ALERT: SyslogLevel.LOG_ALERT,
+  LOG_CRIT: SyslogLevel.LOG_CRIT,
+  LOG_ERR: SyslogLevel.LOG_ERR,
+  LOG_WARNING: SyslogLevel.LOG_WARNING,
+  LOG_NOTICE: SyslogLevel.LOG_NOTICE,
+  LOG_INFO: SyslogLevel.LOG_INFO,
+  LOG_DEBUG: SyslogLevel.LOG_DEBUG,
+};
 
 /**
  * Static access to option constants
  */
-export const Options = SyslogOption;
+export const Options: Record<string, number> = {
+  LOG_PID: SyslogOption.LOG_PID,
+  LOG_CONS: SyslogOption.LOG_CONS,
+  LOG_ODELAY: SyslogOption.LOG_ODELAY,
+  LOG_NDELAY: SyslogOption.LOG_NDELAY,
+  LOG_NOWAIT: SyslogOption.LOG_NOWAIT,
+  LOG_PERROR: SyslogOption.LOG_PERROR,
+};
 
 /**
  * Create a new Syslog instance with default settings
