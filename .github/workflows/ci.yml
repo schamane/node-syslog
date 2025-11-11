@@ -35,6 +35,7 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
           platforms: linux/amd64
           is-pr: ${{ github.event_name == 'pull_request' }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Run containerized tests
         run: |
@@ -156,6 +157,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           login-enabled: false
+          password: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Build native binaries
         uses: ./.github/actions/build-native-binaries
@@ -186,6 +188,7 @@ jobs:
           tags: security-scan:latest
           cache-from: type=gha
           login-enabled: false
+          password: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
@@ -225,6 +228,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          password: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Create GitHub Release
         uses: ./.github/actions/create-release
@@ -232,6 +236,7 @@ jobs:
           generate-notes: true
           draft: false
           prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   # NPM publish job (only on tags)
   publish:
@@ -248,3 +253,5 @@ jobs:
         
       - name: Publish to NPM
         uses: ./.github/actions/publish-npm
+        with:
+          token: ${{ secrets.NPM_TOKEN }}

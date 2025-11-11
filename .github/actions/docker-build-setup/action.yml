@@ -47,8 +47,7 @@ inputs:
     default: ${{ github.actor }}
   password:
     description: 'Registry password'
-    required: false
-    default: ${{ secrets.GITHUB_TOKEN }}
+    required: true
   login-enabled:
     description: 'Enable registry login'
     required: false

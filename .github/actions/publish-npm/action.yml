@@ -11,8 +11,7 @@ inputs:
     default: 'https://registry.npmjs.org'
   token:
     description: 'NPM auth token'
-    required: false
-    default: ${{ secrets.NPM_TOKEN }}
+    required: true
   publish-command:
     description: 'Publish command to run'
     required: false
