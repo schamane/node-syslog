@@ -4,6 +4,10 @@ description: Modern Node.js syslog library with fluent TypeScript API
 url: "https://schamane.github.io/node-syslog"
 baseurl: "/node-syslog"
 
+# Custom meta information
+meta:
+  generator: "Jekyll v4.4.1"
+
 # Theme
 remote_theme: pmarsceill/just-the-docs@v0.8.2
 

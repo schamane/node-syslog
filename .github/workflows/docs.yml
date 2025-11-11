@@ -78,6 +78,12 @@ jobs:
     - name: Setup Pages
       uses: actions/configure-pages@v4
         
+    - name: Add .nojekyll to build output
+      run: |
+        # Ensure .nojekyll file exists in build output to disable GitHub Pages Jekyll processing
+        touch docs/_site/.nojekyll
+        echo "✅ Added .nojekyll to disable GitHub Pages Jekyll processing"
+        
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
