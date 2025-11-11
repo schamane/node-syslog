@@ -196,10 +196,61 @@ class ContainerTestRunner {
   }
 
   /**
+   * Run tests directly in CI environment
+   */
+  async runTestsDirectly(testCommand = 'test') {
+    console.log(`🧪 Running tests directly in CI environment: ${testCommand}`);
+    
+    // Map test commands to actual npm scripts
+    const scriptMap = {
+      'test': 'vitest',
+      'test:coverage': 'vitest --coverage',
+      'test:watch': 'vitest --watch'
+    };
+
+    const actualCommand = scriptMap[testCommand] || testCommand;
+    
+    return new Promise((resolve, reject) => {
+      const child = spawn('pnpm', actualCommand.split(' '), {
+        stdio: 'inherit',
+        cwd: this.projectRoot,
+        env: {
+          ...process.env,
+          FORCE_COLOR: '1'
+        }
+      });
+
+      child.on('close', (code) => {
+        if (code === 0) {
+          console.log('✓ Tests completed successfully');
+          resolve(code);
+        } else {
+          console.log(`✗ Tests failed with code ${code}`);
+          reject(new Error(`Tests failed with code ${code}`));
+        }
+      });
+
+      child.on('error', reject);
+    });
+  }
+
+  /**
    * Main execution method
    */
   async run(testCommand = 'test') {
     try {
+      // Check if we're in CI environment (GitHub Actions, GitLab CI, etc.)
+      const isCI = process.env.GITHUB_ACTIONS === 'true' || 
+                   process.env.GITLAB_CI === 'true' || 
+                   process.env.CI === 'true';
+      
+      if (isCI) {
+        console.log('🤖 CI environment detected, running tests directly...');
+        await this.runTestsDirectly(testCommand);
+        console.log('🎉 CI testing completed successfully!');
+        return;
+      }
+
       console.log('🚀 Starting containerized test runner...');
       
       // Validate environment
@@ -220,7 +271,7 @@ class ContainerTestRunner {
       console.log('🎉 Containerized testing completed successfully!');
       
     } catch (error) {
-      console.error('❌ Containerized testing failed:', error.message);
+      console.error('❌ Testing failed:', error.message);
       process.exit(1);
     }
   }
