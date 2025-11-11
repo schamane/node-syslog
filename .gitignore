@@ -1,5 +1,6 @@
 .env
 /.plan/
+/.docker/
 /node_modules/
 .DS_Store
 /dist/
