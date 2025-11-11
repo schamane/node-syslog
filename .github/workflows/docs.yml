@@ -7,14 +7,16 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 permissions:
   contents: read
   pages: write
   id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
 
 jobs:
   build:
@@ -75,28 +77,6 @@ jobs:
         
     - name: Setup Pages
       uses: actions/configure-pages@v4
-      id: pages
-      with:
-        # Enable automatic Pages site creation if it doesn't exist
-        enablement: true
-      continue-on-error: true
-        
-    - name: Pages Setup Status
-      run: |
-        if [ "${{ steps.pages.outcome }}" == "failure" ]; then
-          echo "⚠️ GitHub Pages not configured for this repository"
-          echo "📋 To enable GitHub Pages:"
-          echo "   1. Go to repository Settings"
-          echo "   2. Scroll to 'Pages' section"
-          echo "   3. Source: Deploy from a branch"
-          echo "   4. Branch: main"
-          echo "   5. Folder: /docs"
-          echo "   6. Save and retry this workflow"
-          echo ""
-          echo "🔗 Once configured, this workflow will deploy automatically"
-        else
-          echo "✅ GitHub Pages configured successfully"
-        fi
         
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
@@ -116,29 +96,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
       
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
-      id: pages
-      with:
-        enablement: true
-      continue-on-error: true
-      
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
-      if: steps.pages.outcome == 'success'
-      with:
-        error-urls: true
-        
-    - name: Deployment Status
-      run: |
-        if [ "${{ steps.pages.outcome }}" == "failure" ]; then
-          echo "❌ Deployment skipped: GitHub Pages not configured"
-          echo ""
-          echo "📋 Manual setup required:"
-          echo "   Repository Settings → Pages → Source: Deploy from branch"
-          echo "   Branch: main, Folder: /docs"
-        else
-          echo "✅ Deployment completed successfully"
-          echo "🌐 Site available at: ${{ steps.deployment.outputs.page_url }}"
-        fi
