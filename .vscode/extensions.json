@@ -1,0 +1,33 @@
+{
+  "recommendations": [
+    // Container and Docker support
+    "ms-vscode-remote.remote-containers",
+    "ms-azuretools.vscode-docker",
+    
+    // Testing and debugging
+    "vitest.explorer",
+    "ZixuanChen.vitest-explorer",
+    
+    // TypeScript and Node.js
+    "ms-vscode.vscode-typescript-next",
+    "ms-vscode.vscode-json",
+    
+    // Development tools
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "bradlc.vscode-tailwindcss",
+    
+    // Git and workflow
+    "eamodio.gitlens",
+    "ms-vscode.vscode-github-actions",
+    
+    // Documentation
+    "shd101wyy.markdown-preview-enhanced",
+    "yzhang.markdown-all-in-one"
+  ],
+  "unwantedRecommendations": [
+    // Avoid conflicting extensions
+    "ms-vscode.vscode-npm-scripts",
+    "ms-vscode.node-debug2"
+  ]
+}

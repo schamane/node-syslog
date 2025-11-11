@@ -1,0 +1,49 @@
+{
+  "timestamp": "2025-11-11T11:36:15.619Z",
+  "local_results": {
+    "passed": 20,
+    "failed": 0,
+    "total": 20,
+    "duration": 187,
+    "coverage": {
+      "statements": 83.16,
+      "branches": 66.66,
+      "functions": 72.5,
+      "lines": 83.16
+    },
+    "environment": {
+      "node_version": "v25.1.0",
+      "platform": "darwin",
+      "containerized": false,
+      "ci": false
+    }
+  },
+  "container_results": {
+    "passed": 20,
+    "failed": 0,
+    "total": 20,
+    "duration": 219,
+    "coverage": {
+      "statements": 83.16,
+      "branches": 66.66,
+      "functions": 72.5,
+      "lines": 83.16
+    },
+    "environment": {
+      "node_version": "container",
+      "platform": "linux",
+      "containerized": true,
+      "ci": false
+    }
+  },
+  "consistency_checks": {
+    "test_count_match": true,
+    "coverage_consistency": true,
+    "performance_within_threshold": true,
+    "environment_parity": true
+  },
+  "recommendations": [
+    "All consistency checks passed - containerized testing is properly configured"
+  ],
+  "status": "passed"
+}

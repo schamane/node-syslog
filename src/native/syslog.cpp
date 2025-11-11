@@ -1,7 +1,8 @@
 #include <napi.h>
 #include <syslog.h>
-#include <string.h>
-#include <stdlib.h>
+#include <string>
+#include <cstring>
+#include <cstdlib>
 
 class SyslogNative : public Napi::ObjectWrap<SyslogNative> {
 public:
@@ -14,9 +15,9 @@ private:
     Napi::Value Openlog(const Napi::CallbackInfo& info);
     Napi::Value Syslog(const Napi::CallbackInfo& info);
     Napi::Value Closelog(const Napi::CallbackInfo& info);
-    Napi::Value GetFacilities(const Napi::CallbackInfo& info);
-    Napi::Value GetLevels(const Napi::CallbackInfo& info);
-    Napi::Value GetOptions(const Napi::CallbackInfo& info);
+    static Napi::Value GetFacilities(const Napi::CallbackInfo& info);
+    static Napi::Value GetLevels(const Napi::CallbackInfo& info);
+    static Napi::Value GetOptions(const Napi::CallbackInfo& info);
 };
 
 Napi::FunctionReference SyslogNative::constructor;

@@ -1,0 +1,110 @@
+version: '3.8'
+
+services:
+  node-syslog-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.optimized
+      target: runtime
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    image: localhost/node-syslog-test:latest
+    container_name: node-syslog-test-runner
+    volumes:
+      # Optimized volume mounting strategy
+      - type: bind
+        source: ./src
+        target: /app/src
+        consistency: cached
+      - type: bind
+        source: ./test
+        target: /app/test
+        consistency: cached
+      - type: bind
+        source: ./scripts
+        target: /app/scripts
+        consistency: cached
+      # Cache node_modules for faster restarts
+      - node_modules_cache:/app/node_modules
+      # Cache pnpm store
+      - pnpm_store:/root/.local/share/pnpm/store
+    environment:
+      - NODE_ENV=test
+      - CI=true
+      - CONTAINERIZED=true
+      - DEBUG=${DEBUG:-}
+    ports:
+      - "9229:9229"  # Debug port
+    networks:
+      - test-network
+    # Resource limits for performance monitoring
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    # Health check for monitoring
+    healthcheck:
+      test: ["CMD", "node", "-e", "process.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    # Optimized restart policy
+    restart: unless-stopped
+    # Performance tuning
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    # Security settings
+    security_opt:
+      - no-new-privileges:true
+    # Use tmpfs for temporary files
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+      - /var/tmp:noexec,nosuid,size=50m
+
+  # Performance monitoring service (optional)
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-syslog-monitor
+    ports:
+      - "9100:9100"
+    networks:
+      - test-network
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    profiles:
+      - monitoring
+
+networks:
+  test-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  node_modules_cache:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/.docker/node_modules
+  pnpm_store:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/.docker/pnpm-store

@@ -8,8 +8,9 @@
   "scripts": {
     "build": "tsc",
     "build:native": "node-gyp rebuild",
-    "test": "vitest",
-    "test:coverage": "vitest --coverage",
+    "test": "node scripts/container-test.js test",
+    "test:coverage": "node scripts/container-test.js test:coverage",
+    "test:watch": "node scripts/container-test.js test:watch",
     "dev": "tsc --watch",
     "lint": "eslint src --ext .ts",
     "prepublishOnly": "pnpm run build && npm run build:native",

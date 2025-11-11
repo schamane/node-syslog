@@ -1,0 +1,81 @@
+{
+  // TypeScript and JavaScript settings
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.suggest.autoImports": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.preferences.includePackageJsonAutoImports": "auto",
+  
+  // Testing settings
+  "vitest.enable": true,
+  "vitest.commandLine": "pnpm test",
+  "vitest.debugExclude": [
+    "**/node_modules/**",
+    "**/dist/**"
+  ],
+  
+  // Editor settings
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.rulers": [80, 120],
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  
+  // File associations
+  "files.associations": {
+    "*.gyp": "json",
+    "*.md": "markdown"
+  },
+  
+  // Container and terminal settings
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.env.linux": {
+    "NODE_ENV": "development"
+  },
+  "docker.showExplorer": true,
+  "docker.showStartPage": false,
+  
+  // Debug settings
+  "debug.node.autoAttach": "on",
+  "debug.terminal.clearBeforeReusing": true,
+  "debug.allowBreakpointsEverywhere": true,
+  
+  // Git settings
+  "git.enableSmartCommit": true,
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  
+  // Explorer settings
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "*.ts": "${capture}.js, ${capture}.d.ts, ${capture}.map",
+    "package.json": "pnpm-lock.yaml, package-lock.json, yarn.lock",
+    "tsconfig.json": "tsconfig.*.json",
+    "Dockerfile": "Dockerfile.*, .dockerignore",
+    ".env": ".env.*"
+  },
+  
+  // Search settings
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/coverage": true,
+    "**/.git": true,
+    "**/docs/api": true
+  },
+  
+  // Problem matcher settings
+  "problems.patterns": [
+    {
+      "name": "Vitest",
+      "regexp": "^(.*):(\\d+):(\\d+)\\s*-\\s*(.*)$",
+      "file": 1,
+      "line": 2,
+      "column": 3,
+      "message": 4
+    }
+  ]
+}

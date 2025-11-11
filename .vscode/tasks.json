@@ -1,0 +1,162 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Tests in Container",
+      "type": "shell",
+      "command": "node",
+      "args": ["scripts/container-test.js", "test"],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": [
+        "$vitest"
+      ],
+      "detail": "Run all tests through containerized environment"
+    },
+    {
+      "label": "Run Test Coverage in Container",
+      "type": "shell",
+      "command": "node",
+      "args": ["scripts/container-test.js", "test:coverage"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": [
+        "$vitest"
+      ],
+      "detail": "Run tests with coverage through containerized environment"
+    },
+    {
+      "label": "Run Tests in Watch Mode (Container)",
+      "type": "shell",
+      "command": "node",
+      "args": ["scripts/container-test.js", "test:watch"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "isBackground": true,
+      "problemMatcher": [
+        {
+          "pattern": [
+            {
+              "regexp": ".",
+              "file": 1,
+              "location": 2,
+              "message": 3
+            }
+          ],
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": ".*\\[ Waiting for file changes .*\\].*",
+            "endsPattern": ".*\\[ Test completed .*\\].*"
+          }
+        }
+      ],
+      "detail": "Run tests in watch mode through containerized environment"
+    },
+    {
+      "label": "Build Native Module in Container",
+      "type": "shell",
+      "command": "node",
+      "args": ["scripts/container-test.js", "npm run build:native"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "detail": "Build native C++ addon through containerized environment"
+    },
+    {
+      "label": "Build TypeScript",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "build"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": [
+        "$tsc"
+      ],
+      "detail": "Compile TypeScript to JavaScript"
+    },
+    {
+      "label": "Container Test Coverage",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/container-test.js",
+      "args": ["npm run test:coverage"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "Start Container with Debug Port",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/container-test.js",
+      "args": ["node --inspect=0.0.0.0:9229 ./node_modules/.bin/vitest run --watch"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated"
+      },
+      "problemMatcher": ["$tsc"],
+      "isBackground": true
+    },
+    {
+      "label": "Build Debug Container",
+      "type": "shell",
+      "command": "podman-compose",
+      "args": ["build"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    }
+  ]
+}
