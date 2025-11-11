@@ -204,7 +204,6 @@ jobs:
           tags: native-build:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: ${{ matrix.arch == 'arm64' && 'linux/arm64' || 'linux/amd64' }}
           
       - name: Compile native module
         run: |
