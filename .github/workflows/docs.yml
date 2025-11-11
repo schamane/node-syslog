@@ -60,6 +60,10 @@ jobs:
     - name: Build Jekyll site
       run: bundle exec jekyll build --baseurl="/node-syslog"
       working-directory: docs
+      
+    - name: Fix Jekyll generator meta tag
+      run: ./fix-generator.sh
+      working-directory: docs
         
     - name: Verify build output
       run: |

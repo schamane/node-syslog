@@ -8,6 +8,26 @@ baseurl: "/node-syslog"
 meta:
   generator: "Jekyll v4.4.1"
 
+# Ensure custom layouts are used
+layouts_dir: _layouts
+includes_dir: _includes
+
+# Override default plugin behavior
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# SEO plugin configuration
+twitter:
+  username: schamane
+  card: summary
+
+social:
+  name: schamane
+  links:
+    - https://github.com/schamane/node-syslog
+
 # Theme
 remote_theme: pmarsceill/just-the-docs@v0.8.2
 

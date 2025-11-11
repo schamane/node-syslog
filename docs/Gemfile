@@ -1,10 +1,17 @@
 source "https://rubygems.org"
 
-source "https://rubygems.org"
-ruby "~> 3.2"
+# Use Ruby version compatible with Jekyll 4.4.1
+ruby ">= 3.2.0"
 
+# Jekyll 4.4.1 with compatible dependencies
 gem "jekyll", "~> 4.4.1"
-gem "just-the-docs", "~> 0.10.1"
+gem "just-the-docs", "~> 0.8.2"
+
+group :jekyll_plugins do
+  gem "jekyll-feed", "~> 0.17"
+  gem "jekyll-sitemap"
+  gem "jekyll-seo-tag"
+end
 
 group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.17"
