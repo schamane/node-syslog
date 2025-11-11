@@ -6,4 +6,5 @@
 /coverage/
 **/.bundle/
 **/vendor/bundle/
+/build/
 Gemfile.lock
