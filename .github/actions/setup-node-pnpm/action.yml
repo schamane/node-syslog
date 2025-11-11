@@ -1,0 +1,33 @@
+name: 'Setup Node.js and pnpm'
+description: 'Install Node.js, pnpm, and project dependencies'
+inputs:
+  node-version:
+    description: 'Node.js version to install'
+    required: false
+    default: '22'
+  cache:
+    description: 'Package manager to cache'
+    required: false
+    default: 'pnpm'
+  registry-url:
+    description: 'Registry URL for authentication'
+    required: false
+    default: ''
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: ${{ inputs.cache }}
+        registry-url: ${{ inputs.registry-url }}
+        
+    - name: Install pnpm
+      uses: pnpm/action-setup@v3
+      with:
+        version: latest
+        
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install

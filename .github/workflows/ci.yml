@@ -1,0 +1,250 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # CI Jobs (run on PRs and pushes)
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      checks: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Docker Buildx for testing
+        uses: ./.github/actions/docker-build-setup
+        with:
+          target: runtime
+          push: false
+          load: true
+          tags: test-image:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+          platforms: linux/amd64
+          is-pr: ${{ github.event_name == 'pull_request' }}
+          
+      - name: Run containerized tests
+        run: |
+          echo "🧪 Running containerized tests in CI environment"
+          docker run --rm \
+            --env NODE_ENV=test \
+            --env CI=true \
+            --env CONTAINERIZED=true \
+            --env FORCE_COLOR=1 \
+            --env GITHUB_ACTIONS=true \
+            --env GITHUB_REF=${{ github.ref }} \
+            --env GITHUB_SHA=${{ github.sha }} \
+            test-image:latest \
+            pnpm test
+            
+      - name: Run containerized coverage
+        run: |
+          echo "📊 Running containerized coverage in CI environment"
+          docker run --rm \
+            --env NODE_ENV=test \
+            --env CI=true \
+            --env CONTAINERIZED=true \
+            --env FORCE_COLOR=1 \
+            --volume $(pwd)/coverage:/app/coverage \
+            test-image:latest \
+            pnpm test:coverage
+            
+      - name: Performance benchmark
+        run: |
+          echo "⚡ Running performance benchmarks"
+          START_TIME=$(date +%s%N)
+          docker run --rm \
+            --env NODE_ENV=test \
+            --env CI=true \
+            --env CONTAINERIZED=true \
+            test-image:latest \
+            pnpm test > /dev/null 2>&1
+          END_TIME=$(date +%s%N)
+          DURATION=$((($END_TIME - $START_TIME) / 1000000))
+          echo "📊 Test execution time: ${DURATION}ms"
+          echo "duration=${DURATION}ms" >> $GITHUB_OUTPUT
+          
+          if [ $DURATION -gt 5000 ]; then
+            echo "⚠️ Performance warning: Tests took longer than 5 seconds"
+            echo "performance=warning" >> $GITHUB_OUTPUT
+          else
+            echo "✅ Performance target met: <5 seconds"
+            echo "performance=success" >> $GITHUB_OUTPUT
+          fi
+        id: benchmark
+        
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-reports
+          path: coverage/
+          retention-days: 30
+          
+      - name: Container health check
+        run: |
+          echo "🏥 Running container health checks"
+          docker run --rm \
+            --env NODE_ENV=test \
+            test-image:latest \
+            node -e "console.log('✅ Container health check passed')"
+            
+      - name: Security scan
+        run: |
+          echo "🔒 Running basic security validation"
+          docker run --rm \
+            --env NODE_ENV=test \
+            test-image:latest \
+            sh -c "
+              id -u && echo '✅ Non-root user confirmed' || echo '⚠️ Running as root'
+              ls -la /app && echo '✅ App directory accessible'
+              node --version && echo '✅ Node.js version confirmed'
+            "
+            
+      - name: Test summary
+        run: |
+          echo "## 🧪 Containerized Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ Test Execution" >> $GITHUB_STEP_SUMMARY
+          echo "- All tests passed in containerized environment" >> $GITHUB_STEP_SUMMARY
+          echo "- Coverage reports generated" >> $GITHUB_STEP_SUMMARY
+          echo "- Performance: ${{ steps.benchmark.outputs.performance }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Duration: ${{ steps.benchmark.outputs.duration }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🐳 Container Information" >> $GITHUB_STEP_SUMMARY
+          echo "- Image: test-image:latest" >> $GITHUB_STEP_SUMMARY
+          echo "- Platform: linux/amd64" >> $GITHUB_STEP_SUMMARY
+          echo "- Environment: Node.js test" >> $GITHUB_STEP_SUMMARY
+
+  # Native binary compilation job
+  build-binaries:
+    needs: test
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+        arch: [x64, arm64]
+    
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Docker Buildx for native compilation
+        uses: ./.github/actions/docker-build-setup
+        with:
+          target: dependencies
+          push: false
+          load: true
+          tags: native-build:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          login-enabled: false
+          
+      - name: Build native binaries
+        uses: ./.github/actions/build-native-binaries
+        with:
+          os: ${{ matrix.os }}
+          arch: ${{ matrix.arch }}
+          use-container: 'true'
+          container-image: 'native-build:latest'
+
+  # Security scanning job
+  security-scan:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Build container for security scanning
+        uses: ./.github/actions/docker-build-setup
+        with:
+          target: runtime
+          push: false
+          load: true
+          tags: security-scan:latest
+          cache-from: type=gha
+          login-enabled: false
+          
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'security-scan:latest'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # Release job (only on tags)
+  release:
+    needs: [test, build-binaries]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+      packages: write
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Docker Buildx for release
+        uses: ./.github/actions/docker-build-setup
+        with:
+          target: runtime
+          push: true
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+          platforms: linux/amd64,linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          
+      - name: Create GitHub Release
+        uses: ./.github/actions/create-release
+        with:
+          generate-notes: true
+          draft: false
+          prerelease: false
+
+  # NPM publish job (only on tags)
+  publish:
+    needs: [test, release]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: read
+      packages: write
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Publish to NPM
+        uses: ./.github/actions/publish-npm

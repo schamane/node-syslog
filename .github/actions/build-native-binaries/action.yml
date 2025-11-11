@@ -1,0 +1,89 @@
+name: 'Build Native Binaries'
+description: 'Cross-compile native modules for multiple architectures'
+inputs:
+  os:
+    description: 'Operating system for build'
+    required: true
+  arch:
+    description: 'Architecture for build'
+    required: true
+  use-container:
+    description: 'Use containerized build'
+    required: false
+    default: 'false'
+  container-image:
+    description: 'Container image for build'
+    required: false
+    default: 'build-image:latest'
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up QEMU for ARM64 cross-compilation
+      if: inputs.arch == 'arm64'
+      uses: docker/setup-qemu-action@v3
+      with:
+        platforms: arm64
+        
+    - name: Build native module (Direct)
+      if: inputs.use-container == 'false'
+      shell: bash
+      run: |
+        if [ "${{ inputs.arch }}" = "arm64" ]; then
+          export CC=aarch64-linux-gnu-gcc
+          export CXX=aarch64-linux-gnu-g++
+          export npm_config_arch=arm64
+          export npm_config_target_arch=arm64
+        fi
+        pnpm run build:native
+        
+    - name: Build native module (Container)
+      if: inputs.use-container == 'true'
+      shell: bash
+      run: |
+        echo "🔨 Building native module for ${{ inputs.arch }} on ${{ inputs.os }}"
+        
+        # Create build container with appropriate architecture
+        if [ "${{ inputs.arch }}" = "arm64" ]; then
+          PLATFORM_FLAG="--platform linux/arm64"
+          export CC=aarch64-linux-gnu-gcc
+          export CXX=aarch64-linux-gnu-g++
+          export npm_config_arch=arm64
+          export npm_config_target_arch=arm64
+        else
+          PLATFORM_FLAG="--platform linux/amd64"
+        fi
+        
+        docker run --rm $PLATFORM_FLAG \
+          -v $(pwd):/app \
+          -w /app \
+          --env NODE_ENV=production \
+          --env CC=$CC \
+          --env CXX=$CXX \
+          --env npm_config_arch=$npm_config_arch \
+          --env npm_config_target_arch=$npm_config_target_arch \
+          ${{ inputs.container-image }} \
+          sh -c "
+            pnpm install --frozen-lockfile &&
+            pnpm run build:native &&
+            echo '✅ Native module compiled successfully'
+          "
+          
+    - name: Package binary with node-pre-gyp
+      shell: bash
+      run: |
+        echo "📦 Packaging binary for ${{ inputs.arch }}"
+        
+        if [ "${{ inputs.arch }}" = "arm64" ]; then
+          export npm_config_arch=arm64
+          export npm_config_target_arch=arm64
+        fi
+        
+        npx node-pre-gyp package
+        echo "✅ Binary packaged successfully"
+        
+    - name: Upload binary artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: binary-${{ inputs.os }}-${{ inputs.arch }}
+        path: lib/binding/
+        retention-days: 30

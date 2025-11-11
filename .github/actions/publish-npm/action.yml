@@ -1,0 +1,52 @@
+name: 'Publish to NPM'
+description: 'Build and publish package to NPM registry'
+inputs:
+  node-version:
+    description: 'Node.js version'
+    required: false
+    default: '22'
+  registry-url:
+    description: 'NPM registry URL'
+    required: false
+    default: 'https://registry.npmjs.org'
+  token:
+    description: 'NPM auth token'
+    required: false
+    default: ${{ secrets.NPM_TOKEN }}
+  publish-command:
+    description: 'Publish command to run'
+    required: false
+    default: 'pnpm publish --no-git-checks --access public'
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js and pnpm
+      uses: ./.github/actions/setup-node-pnpm
+      with:
+        node-version: ${{ inputs.node-version }}
+        registry-url: ${{ inputs.registry-url }}
+        
+    - name: Build package
+      shell: bash
+      run: pnpm run build
+        
+    - name: Publish to NPM
+      shell: bash
+      run: ${{ inputs.publish-command }}
+      env:
+        NODE_AUTH_TOKEN: ${{ inputs.token }}
+        
+    - name: Verify publish
+      shell: bash
+      run: |
+        echo "📦 Verifying package was published..."
+        PACKAGE_NAME=$(node -p "require('./package.json').name")
+        PACKAGE_VERSION=$(node -p "require('./package.json').version")
+        
+        # Check if package exists on NPM
+        if npm view $PACKAGE_NAME@$PACKAGE_VERSION > /dev/null 2>&1; then
+          echo "✅ Package $PACKAGE_NAME@$PACKAGE_VERSION published successfully"
+        else
+          echo "❌ Package verification failed"
+          exit 1
+        fi
