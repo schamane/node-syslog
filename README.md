@@ -21,6 +21,10 @@ pnpm add node-syslog
 
 **Note:** This package only supports Linux x64/ARM64 systems.
 
+## Documentation
+
+Full documentation is available at: https://schamane.github.io/node-syslog/
+
 ## Quick Start
 
 ```typescript
