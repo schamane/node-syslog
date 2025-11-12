@@ -1,0 +1,26 @@
+<footer class="site-footer h-card">
+  <data class="u-url" href="{{ "/" | relative_url }}"></data>
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="{{ 'feed.xml' | relative_url }}">
+            <svg class="svg-icon orange"><use xlink:href="{{ 'assets/minima-social-icons.svg#rss' | relative_url }}"></use></svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>{{ site.description | default: "A modern Node.js syslog library with TypeScript support." }}</p>
+      </div>
+    </div>
+
+    <div class="social-links">
+      {% if site.github.is_project_page %}
+        <a class="social-link" href="{{ site.github.repository_url }}" rel="noopener noreferrer" title="View on GitHub">
+          <svg class="svg-icon"><use xlink:href="{{ 'assets/minima-social-icons.svg#github' | relative_url }}"></use></svg>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</footer>
