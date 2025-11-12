@@ -15,11 +15,7 @@ social:
     - https://github.com/schamane/node-syslog
 
 # Theme
-remote_theme: pmarsceill/just-the-docs@v0.8.2
-
-# Force theme to load assets
-plugins:
-  - jekyll-remote-theme
+theme: just-the-docs
 
 # Build settings
 markdown: kramdown
