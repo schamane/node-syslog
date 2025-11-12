@@ -17,6 +17,10 @@ social:
 # Theme
 remote_theme: pmarsceill/just-the-docs@v0.8.2
 
+# Force theme to load assets
+plugins:
+  - jekyll-remote-theme
+
 # Build settings
 markdown: kramdown
 highlighter: rouge

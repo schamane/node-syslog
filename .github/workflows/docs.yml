@@ -115,6 +115,10 @@ jobs:
         echo "📁 Generated assets:"
         find _site -name "*.css" -o -name "*.js" -o -name "*.svg" -o -name "*.png" | sort
         
+        # List all directories in _site
+        echo "📁 All directories in _site:"
+        find _site -type d | sort
+        
         # Show expected URL structure
         echo "🌐 Expected URL structure:"
         echo "  / (index.html)"
