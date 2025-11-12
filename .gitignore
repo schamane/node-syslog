@@ -9,3 +9,4 @@
 **/vendor/bundle/
 /build/
 Gemfile.lock
+/docs/api/
