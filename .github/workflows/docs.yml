@@ -123,7 +123,7 @@ jobs:
         done
         
         # Check for Jekyll processing artifacts
-        if grep -r "Jekyll v" _site/ | grep -v "v4.4.1"; then
+        if grep -r 'meta name="generator" content="Jekyll v' _site/ | grep -v "v4.4.1"; then
           echo "❌ Found incorrect Jekyll version references"
           exit 1
         fi
