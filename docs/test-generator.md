@@ -1,6 +1,7 @@
 ---
 title: Test Generator Tag
 nav_order: 9
+has_children: false
 ---
 
 # Testing Jekyll Generator Tag

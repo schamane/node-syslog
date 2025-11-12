@@ -56,6 +56,7 @@ just_the_docs:
     api:
       name: API Reference
       nav_fold: false
+  nav_fold: true
 
 # Exclude from processing
 exclude:

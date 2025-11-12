@@ -1,6 +1,7 @@
 ---
 title: Debugging Guide
 nav_order: 7
+has_children: false
 ---
 
 # Containerized Testing Debugging Guide

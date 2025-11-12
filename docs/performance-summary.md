@@ -1,6 +1,7 @@
 ---
 title: Performance Summary
 nav_order: 8
+has_children: false
 ---
 
 # Containerized Testing Performance Summary
