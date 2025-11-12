@@ -96,11 +96,18 @@ jobs:
       run: bundle exec jekyll build --baseurl="/node-syslog"
       working-directory: docs
         
-    - name: Add .nojekyll to build output
+    - name: Verify no .nojekyll files exist
       run: |
-        # Ensure .nojekyll file exists in build output to disable GitHub Pages Jekyll processing
-        touch _site/.nojekyll
-        echo "✅ Added .nojekyll to disable GitHub Pages Jekyll processing"
+        # Ensure no .nojekyll files exist to allow GitHub Pages Jekyll processing
+        if [[ -f "_site/.nojekyll" ]]; then
+          rm _site/.nojekyll
+          echo "✅ Removed .nojekyll to enable GitHub Pages Jekyll processing"
+        fi
+        if [[ -f "_site/api/.nojekyll" ]]; then
+          rm _site/api/.nojekyll
+          echo "✅ Removed api/.nojekyll to enable GitHub Pages Jekyll processing"
+        fi
+        echo "✅ Verified no .nojekyll files blocking theme processing"
       working-directory: docs
         
     - name: Validate Jekyll Build

@@ -9,5 +9,6 @@
   "excludeProtected": true,
   "excludeInternal": true,
   "hideGenerator": true,
-  "sort": ["source-order"]
+  "sort": ["source-order"],
+  "githubPages": false
 }
