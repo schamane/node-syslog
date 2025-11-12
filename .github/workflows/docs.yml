@@ -100,6 +100,13 @@ jobs:
       run: ./fix-generator.sh
       working-directory: docs
         
+    - name: Add .nojekyll to build output
+      run: |
+        # Ensure .nojekyll file exists in build output to disable GitHub Pages Jekyll processing
+        touch _site/.nojekyll
+        echo "✅ Added .nojekyll to disable GitHub Pages Jekyll processing"
+      working-directory: docs
+        
     - name: Validate Jekyll Build
       run: |
         echo "🔍 Validating Jekyll build output..."
@@ -122,13 +129,6 @@ jobs:
         fi
         
         echo "✅ Build validation complete"
-      working-directory: docs
-        
-    - name: Add .nojekyll to build output
-      run: |
-        # Ensure .nojekyll file exists in build output to disable GitHub Pages Jekyll processing
-        touch _site/.nojekyll
-        echo "✅ Added .nojekyll to disable GitHub Pages Jekyll processing"
       working-directory: docs
         
     - name: Deploy to GitHub Pages
