@@ -76,38 +76,61 @@ jobs:
     - name: Install Jekyll dependencies
       run: bundle install
       working-directory: docs
+      
+    - name: Update just-the-docs to latest
+      run: |
+        echo "🔄 Updating just-the-docs to latest patch version..."
+        bundle update just-the-docs
+        echo "✅ just-the-docs updated successfully"
+      working-directory: docs
         
-    - name: Verify Jekyll Version
+    - name: Verify Jekyll and just-the-docs versions
       run: |
         echo "Checking Jekyll version..."
         JEKYLL_VERSION=$(bundle exec jekyll --version | cut -d' ' -f2)
         echo "Installed Jekyll version: $JEKYLL_VERSION"
-        EXPECTED_VERSION="4.4.1"
+        EXPECTED_JEKYLL="4.4.1"
         
-        if [[ "$JEKYLL_VERSION" == "$EXPECTED_VERSION" ]]; then
-          echo "✅ Jekyll version matches expected: $EXPECTED_VERSION"
+        if [[ "$JEKYLL_VERSION" == "$EXPECTED_JEKYLL" ]]; then
+          echo "✅ Jekyll version matches expected: $EXPECTED_JEKYLL"
         else
-          echo "❌ Jekyll version mismatch. Expected: $EXPECTED_VERSION, Got: $JEKYLL_VERSION"
+          echo "❌ Jekyll version mismatch. Expected: $EXPECTED_JEKYLL, Got: $JEKYLL_VERSION"
           exit 1
         fi
+        
+        echo "Checking just-the-docs version..."
+        JTD_VERSION=$(bundle list | grep just-the-docs | awk '{print $2}')
+        echo "Installed just-the-docs version: $JTD_VERSION"
+        echo "✅ just-the-docs version verified"
       working-directory: docs
         
     - name: Build Jekyll site
       run: bundle exec jekyll build --baseurl="/node-syslog"
       working-directory: docs
-        
-    - name: Verify no .nojekyll files exist
+      
+    - name: Add .nojekyll to prevent GitHub Pages rebuild
       run: |
-        # Ensure no .nojekyll files exist to allow GitHub Pages Jekyll processing
+        # Add .nojekyll to prevent GitHub Pages from rebuilding
+        touch _site/.nojekyll
+        echo "✅ Added .nojekyll to prevent GitHub Pages rebuild"
+      working-directory: docs
+        
+    - name: Verify .nojekyll configuration
+      run: |
+        # Ensure .nojekyll exists to prevent GitHub Pages from rebuilding
         if [[ -f "_site/.nojekyll" ]]; then
-          rm _site/.nojekyll
-          echo "✅ Removed .nojekyll to enable GitHub Pages Jekyll processing"
+          echo "✅ .nojekyll exists - GitHub Pages will serve pre-built site"
+        else
+          echo "❌ .nojekyll missing - GitHub Pages might try to rebuild"
+          exit 1
         fi
+        
+        # Remove any .nojekyll files in subdirectories that might interfere
         if [[ -f "_site/api/.nojekyll" ]]; then
           rm _site/api/.nojekyll
-          echo "✅ Removed api/.nojekyll to enable GitHub Pages Jekyll processing"
+          echo "✅ Removed api/.nojekyll to prevent conflicts"
         fi
-        echo "✅ Verified no .nojekyll files blocking theme processing"
+        echo "✅ .nojekyll configuration verified"
       working-directory: docs
         
     - name: Validate Jekyll Build
