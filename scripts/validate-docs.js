@@ -15,7 +15,6 @@ const __dirname = path.dirname(__filename)
 // Configuration
 const rootDir = path.join(__dirname, '..')
 const docsDir = path.join(__dirname, '../docs')
-const pagesDir = path.join(docsDir, 'pages')
 const requiredFiles = [
   'index.md',
   'getting-started.md',
@@ -26,7 +25,6 @@ const requiredFiles = [
 ]
 
 const requiredDirs = [
-  '_data',
   'api'
 ]
 
@@ -170,18 +168,14 @@ function main() {
   // Validate required files
   console.log('📄 Checking required docs files...')
   requiredFiles.forEach(file => {
-    const filePath = path.join(pagesDir, file)
+    const filePath = path.join(docsDir, file)
     validateFile(filePath)
   })
   
   // Validate required directories
   console.log('📁 Checking required directories...')
   requiredDirs.forEach(dir => {
-    // Check both root and docs directory for API
-    let dirPath = path.join(rootDir, dir)
-    if (!fs.existsSync(dirPath)) {
-      dirPath = path.join(docsDir, dir)
-    }
+    const dirPath = path.join(docsDir, dir)
     validateDir(dirPath)
   })
   
@@ -197,7 +191,7 @@ function main() {
   console.log('🔗 Checking internal links...')
   const markdownFiles = requiredFiles.filter(f => f.endsWith('.md'))
   markdownFiles.forEach(file => {
-    const filePath = path.join(pagesDir, file)
+    const filePath = path.join(docsDir, file)
     if (fs.existsSync(filePath)) {
       const content = fs.readFileSync(filePath, 'utf8')
       validateLinks(content, filePath)
