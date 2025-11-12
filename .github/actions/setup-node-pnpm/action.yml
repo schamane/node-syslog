@@ -16,17 +16,17 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Install pnpm
+      uses: pnpm/action-setup@v3
+      with:
+        version: latest
+        
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
         cache: ${{ inputs.cache }}
         registry-url: ${{ inputs.registry-url }}
-        
-    - name: Install pnpm
-      uses: pnpm/action-setup@v3
-      with:
-        version: latest
         
     - name: Install dependencies
       shell: bash
