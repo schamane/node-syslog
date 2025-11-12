@@ -139,7 +139,8 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./docs/_site
-        publish_branch: gh-pages
+        publish_branch: main
+        destination_dir: docs
         keep_files: false
         
     - name: List deployed files
