@@ -1,0 +1,128 @@
+<h1 id="node-syslog">node-syslog</h1>
+
+<p>Modern Node.js syslog library with fluent TypeScript API for Linux systems.</p>
+
+<p><a href="https://badge.fury.io/js/node-syslog"><img src="https://badge.fury.io/js/node-syslog.svg" alt="npm version" /></a>
+<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
+<a href="https://nodejs.org/"><img src="https://img.shields.io/badge/node-%3E%3D22.0.0-brightgreen.svg" alt="Node.js Version" /></a></p>
+
+<p>A modern, TypeScript-native replacement for the deprecated <code class="language-plaintext highlighter-rouge">node-syslog</code> package. Built with N-API for cross-platform binary compatibility and featuring a fluent, synchronous API.</p>
+
+<h2 id="-features">✨ Features</h2>
+
+<ul>
+  <li><strong>Modern TypeScript</strong>: Full type safety with strict mode</li>
+  <li><strong>N-API Native</strong>: Pre-built binaries for ARM64/AMD64 Linux</li>
+  <li><strong>Fluent API</strong>: Clean, chainable interface</li>
+  <li><strong>Zero Dependencies</strong>: Runtime footprint &lt; 50KB</li>
+  <li><strong>Synchronous Only</strong>: Direct kernel syslog(3) calls (non-blocking)</li>
+  <li><strong>Linux Optimized</strong>: Designed specifically for Linux syslog systems</li>
+</ul>
+
+<h2 id="-quick-start">🚀 Quick Start</h2>
+
+<h3 id="installation">Installation</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm <span class="nb">install </span>node-syslog
+</code></pre></div></div>
+
+<h3 id="basic-usage">Basic Usage</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Syslog</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span>
+
+<span class="c1">// Create logger instance</span>
+<span class="kd">const</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+  <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">myapp</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">facility</span><span class="p">:</span> <span class="dl">'</span><span class="s1">local0</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">options</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">pid</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">odelay</span><span class="dl">'</span><span class="p">]</span>
+<span class="p">})</span>
+
+<span class="c1">// Log messages</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Server started</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">port</span><span class="p">:</span> <span class="mi">3000</span> <span class="p">})</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Connection failed</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">code</span><span class="p">:</span> <span class="dl">'</span><span class="s1">ECONNREFUSED</span><span class="dl">'</span> <span class="p">})</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">Debug information</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">userId</span><span class="p">:</span> <span class="mi">123</span> <span class="p">})</span>
+
+<span class="c1">// Close when done</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h3 id="advanced-configuration">Advanced Configuration</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Syslog</span><span class="p">,</span> <span class="nx">SyslogFacility</span><span class="p">,</span> <span class="nx">SyslogLevel</span><span class="p">,</span> <span class="nx">SyslogOption</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span>
+
+<span class="kd">const</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+  <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">production-app</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">facility</span><span class="p">:</span> <span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">DAEMON</span><span class="p">,</span>
+  <span class="na">options</span><span class="p">:</span> <span class="p">[</span><span class="nx">SyslogOption</span><span class="p">.</span><span class="nx">PID</span><span class="p">,</span> <span class="nx">SyslogOption</span><span class="p">.</span><span class="nx">NDELAY</span><span class="p">,</span> <span class="nx">SyslogOption</span><span class="p">.</span><span class="nx">LOG_PID</span><span class="p">],</span>
+  <span class="na">logLevel</span><span class="p">:</span> <span class="nx">SyslogLevel</span><span class="p">.</span><span class="nx">INFO</span>
+<span class="p">})</span>
+
+<span class="c1">// Structured logging</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">warning</span><span class="p">(</span><span class="dl">'</span><span class="s1">High memory usage</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">memoryUsage</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nf">memoryUsage</span><span class="p">(),</span>
+  <span class="na">threshold</span><span class="p">:</span> <span class="dl">'</span><span class="s1">500MB</span><span class="dl">'</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h2 id="️-architecture">🏗️ Architecture</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>┌─────────────────────────────────────────────┐
+│  TypeScript API Layer (src/index.ts)        │
+│  Fluent class, input validation, types      │
+├─────────────────────────────────────────────┤
+│  N-API C++ Bridge (src/binding.cpp)         │
+│  Direct type conversion, no threadpool      │
+├─────────────────────────────────────────────┤
+│  C Implementation (src/syslog.c)            │
+│  Direct syslog(3) calls, zero allocations   │
+└─────────────────────────────────────────────┘
+</code></pre></div></div>
+
+<h2 id="-documentation">📚 Documentation</h2>
+
+<ul>
+  <li><a href="/node-syslog/getting-started/">Getting Started Guide</a></li>
+  <li><a href="/node-syslog/api/">API Reference</a></li>
+  <li><a href="/node-syslog/installation/">Installation Guide</a></li>
+  <li><a href="/node-syslog/migration/">Migration Guide</a></li>
+  <li><a href="/node-syslog/examples/">Examples</a></li>
+</ul>
+
+<h2 id="-requirements">🔧 Requirements</h2>
+
+<ul>
+  <li><strong>Node.js</strong>: &gt;= 22.x LTS</li>
+  <li><strong>Platform</strong>: Linux only</li>
+  <li><strong>Architecture</strong>: ARM64 or AMD64</li>
+  <li><strong>System</strong>: rsyslog or syslog-ng (optional)</li>
+</ul>
+
+<h2 id="-performance">📊 Performance</h2>
+
+<ul>
+  <li><strong>Latency</strong>: &lt; 1μs overhead vs raw syslog(3)</li>
+  <li><strong>Throughput</strong>: &gt; 500,000 messages/second</li>
+  <li><strong>Memory</strong>: Zero allocations in hot path</li>
+  <li><strong>Binary Size</strong>: &lt; 50KB per architecture</li>
+</ul>
+
+<h2 id="-contributing">🤝 Contributing</h2>
+
+<p>Contributions are welcome! Please see our <a href="https://github.com/schamane/node-syslog/blob/main/CONTRIBUTING.md">Contributing Guide</a> for details.</p>
+
+<h2 id="-license">📄 License</h2>
+
+<p>MIT License - see <a href="https://github.com/schamane/node-syslog/blob/main/LICENSE.md">LICENSE</a> file for details.</p>
+
+<h2 id="-links">🔗 Links</h2>
+
+<ul>
+  <li><a href="https://github.com/schamane/node-syslog">GitHub Repository</a></li>
+  <li><a href="https://www.npmjs.com/package/node-syslog">npm Package</a></li>
+  <li><a href="https://github.com/schamane/node-syslog/issues">Issue Tracker</a></li>
+  <li><a href="https://github.com/schamane/node-syslog/discussions">Discussions</a></li>
+</ul>
+
+<hr />
+
+<p><strong>Note</strong>: This package is designed for Linux systems only. For cross-platform logging, consider alternatives like Winston or Pino.</p>

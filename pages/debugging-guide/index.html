@@ -1,0 +1,350 @@
+<h1 id="containerized-testing-debugging-guide">Containerized Testing Debugging Guide</h1>
+
+<p>This guide provides comprehensive instructions for debugging containerized tests in the node-syslog project using VS Code.</p>
+
+<h2 id="overview">Overview</h2>
+
+<p>The project includes a fully configured containerized testing environment with integrated debugging support. This allows you to:</p>
+<ul>
+  <li>Run tests in isolated container environments</li>
+  <li>Set breakpoints and debug code running inside containers</li>
+  <li>Maintain consistency between local and CI/CD environments</li>
+  <li>Debug native C++ addon issues</li>
+</ul>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ol>
+  <li><strong>Container Engine</strong>: Install Podman (recommended) or Docker
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Podman (recommended)</span>
+brew <span class="nb">install </span>podman
+   
+<span class="c"># Docker (alternative)</span>
+brew <span class="nb">install</span> <span class="nt">--cask</span> docker
+</code></pre></div>    </div>
+  </li>
+  <li><strong>VS Code Extensions</strong>: Install the recommended extensions from <code class="language-plaintext highlighter-rouge">.vscode/extensions.json</code>
+    <ul>
+      <li>Remote - Containers</li>
+      <li>Vitest Explorer</li>
+      <li>Docker</li>
+      <li>TypeScript and JavaScript Language Features</li>
+    </ul>
+  </li>
+</ol>
+
+<h2 id="quick-start">Quick Start</h2>
+
+<h3 id="1-basic-debugging">1. Basic Debugging</h3>
+
+<ol>
+  <li>Open the project in VS Code</li>
+  <li>Set breakpoints in your test files or source code</li>
+  <li>Press <code class="language-plaintext highlighter-rouge">F5</code> or go to Run and Debug panel</li>
+  <li>Select “Debug Tests in Container” configuration</li>
+  <li>Start debugging</li>
+</ol>
+
+<h3 id="2-attaching-to-running-container">2. Attaching to Running Container</h3>
+
+<ol>
+  <li>Start a container with debug port exposed:
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Using VS Code task</span>
+Ctrl+Shift+P → <span class="s2">"Tasks: Run Task"</span> → <span class="s2">"Start Container with Debug Port"</span>
+   
+<span class="c"># Or manually</span>
+node scripts/debug-container-test.js <span class="nb">test</span> <span class="nt">--debug</span>
+</code></pre></div>    </div>
+  </li>
+  <li>Set breakpoints in your code</li>
+  <li>Use “Attach to Container Node Process” debug configuration</li>
+  <li>Start debugging</li>
+</ol>
+
+<h2 id="debug-configurations">Debug Configurations</h2>
+
+<h3 id="available-debug-configurations">Available Debug Configurations</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Configuration</th>
+      <th>Purpose</th>
+      <th>Use Case</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Debug Tests in Container</td>
+      <td>Run tests with debugging</td>
+      <td>General test debugging</td>
+    </tr>
+    <tr>
+      <td>Debug Test Coverage in Container</td>
+      <td>Run coverage with debugging</td>
+      <td>Coverage analysis</td>
+    </tr>
+    <tr>
+      <td>Debug Native Tests in Container</td>
+      <td>Debug native addon</td>
+      <td>C++ addon issues</td>
+    </tr>
+    <tr>
+      <td>Attach to Container Node Process</td>
+      <td>Attach to running container</td>
+      <td>Long-running sessions</td>
+    </tr>
+    <tr>
+      <td>Debug Container with Inspector</td>
+      <td>Start with inspector enabled</td>
+      <td>Advanced debugging</td>
+    </tr>
+    <tr>
+      <td>Debug Vitest Directly (Local)</td>
+      <td>Local debugging (no container)</td>
+      <td>Quick local tests</td>
+    </tr>
+    <tr>
+      <td>Debug Container Test Script</td>
+      <td>Debug the container script itself</td>
+      <td>Script development</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="configuration-details">Configuration Details</h3>
+
+<h4 id="debug-tests-in-container">Debug Tests in Container</h4>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Debug Tests in Container"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"node"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"request"</span><span class="p">:</span><span class="w"> </span><span class="s2">"launch"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"program"</span><span class="p">:</span><span class="w"> </span><span class="s2">"${workspaceFolder}/scripts/debug-container-test.js"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"test"</span><span class="p">,</span><span class="w"> </span><span class="s2">"--debug"</span><span class="p">],</span><span class="w">
+  </span><span class="nl">"env"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"NODE_ENV"</span><span class="p">:</span><span class="w"> </span><span class="s2">"development"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="attach-to-container-node-process">Attach to Container Node Process</h4>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Attach to Container Node Process"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"node"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"request"</span><span class="p">:</span><span class="w"> </span><span class="s2">"attach"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"address"</span><span class="p">:</span><span class="w"> </span><span class="s2">"localhost"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"port"</span><span class="p">:</span><span class="w"> </span><span class="mi">9229</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"localRoot"</span><span class="p">:</span><span class="w"> </span><span class="s2">"${workspaceFolder}"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"remoteRoot"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/app"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="vs-code-tasks">VS Code Tasks</h2>
+
+<h3 id="available-tasks">Available Tasks</h3>
+
+<ul>
+  <li><strong>Container Test</strong>: Run tests in container</li>
+  <li><strong>Container Test Coverage</strong>: Run coverage in container</li>
+  <li><strong>Start Container with Debug Port</strong>: Start container with debugging enabled</li>
+  <li><strong>Build Debug Container</strong>: Build container image for debugging</li>
+</ul>
+
+<h3 id="running-tasks">Running Tasks</h3>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">Ctrl+Shift+P</code> → “Tasks: Run Task”</li>
+  <li>Select the desired task</li>
+  <li>Monitor output in the terminal panel</li>
+</ol>
+
+<h2 id="debugging-scenarios">Debugging Scenarios</h2>
+
+<h3 id="1-debugging-test-failures">1. Debugging Test Failures</h3>
+
+<p>When tests fail in the container:</p>
+
+<ol>
+  <li>Run with debug configuration:
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Debug Tests in Container
+</code></pre></div>    </div>
+  </li>
+  <li>Set breakpoints at the failing test:
+    <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// test/syslog.test.ts</span>
+<span class="nf">test</span><span class="p">(</span><span class="dl">'</span><span class="s1">should handle syslog operations</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">debugger</span><span class="p">;</span> <span class="c1">// Set breakpoint here</span>
+  <span class="c1">// Your test code</span>
+<span class="p">});</span>
+</code></pre></div>    </div>
+  </li>
+  <li>Inspect variables and step through code</li>
+</ol>
+
+<h3 id="2-debugging-native-addon-issues">2. Debugging Native Addon Issues</h3>
+
+<p>For C++ addon problems:</p>
+
+<ol>
+  <li>Use “Debug Native Tests in Container” configuration</li>
+  <li>Set breakpoints in TypeScript code that calls native functions</li>
+  <li>Examine error messages and stack traces</li>
+  <li>Check native module loading</li>
+</ol>
+
+<h3 id="3-performance-debugging">3. Performance Debugging</h3>
+
+<p>To analyze performance:</p>
+
+<ol>
+  <li>Start with debug port:
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Start Container with Debug Port
+</code></pre></div>    </div>
+  </li>
+  <li>Attach with “Attach to Container Node Process”</li>
+  <li>Use VS Code’s performance profiling tools</li>
+  <li>Analyze CPU and memory usage</li>
+</ol>
+
+<h2 id="container-debugging-tips">Container Debugging Tips</h2>
+
+<h3 id="environment-variables">Environment Variables</h3>
+
+<p>The debug container automatically sets:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">CONTAINERIZED=true</code> - Indicates running in container</li>
+  <li><code class="language-plaintext highlighter-rouge">NODE_ENV=development</code> - Development mode</li>
+  <li><code class="language-plaintext highlighter-rouge">DEBUG=*</code> - Debug logging (when –debug flag used)</li>
+  <li><code class="language-plaintext highlighter-rouge">FORCE_COLOR=1</code> - Preserve terminal colors</li>
+</ul>
+
+<h3 id="port-forwarding">Port Forwarding</h3>
+
+<p>The debug configuration uses port 9229 for Node.js inspector:</p>
+<ul>
+  <li>Container exposes port 9229</li>
+  <li>Host forwards to localhost:9229</li>
+  <li>VS Code attaches to this port</li>
+</ul>
+
+<h3 id="source-maps">Source Maps</h3>
+
+<p>Source maps are automatically configured:</p>
+<ul>
+  <li>TypeScript source maps enabled</li>
+  <li>Resolved to workspace folder</li>
+  <li>Excludes node_modules for cleaner debugging</li>
+</ul>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+
+<h3 id="common-issues">Common Issues</h3>
+
+<h4 id="1-cannot-connect-to-debug-target">1. “Cannot connect to debug target”</h4>
+<p><strong>Solution</strong>: Ensure container is running with debug port:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>node scripts/debug-container-test.js <span class="nb">test</span> <span class="nt">--debug</span>
+</code></pre></div></div>
+
+<h4 id="2-breakpoints-not-hit">2. “Breakpoints not hit”</h4>
+<p><strong>Solutions</strong>:</p>
+<ul>
+  <li>Verify source maps are generated (<code class="language-plaintext highlighter-rouge">tsconfig.json</code> sourceMap: true)</li>
+  <li>Check that breakpoints are set in <code class="language-plaintext highlighter-rouge">.ts</code> files, not compiled <code class="language-plaintext highlighter-rouge">.js</code></li>
+  <li>Ensure <code class="language-plaintext highlighter-rouge">NODE_ENV=development</code> is set</li>
+</ul>
+
+<h4 id="3-container-build-fails">3. “Container build fails”</h4>
+<p><strong>Solutions</strong>:</p>
+<ul>
+  <li>Check Dockerfile syntax</li>
+  <li>Verify all required files are present</li>
+  <li>Check container engine is running</li>
+</ul>
+
+<h4 id="4-tests-pass-locally-but-fail-in-container">4. “Tests pass locally but fail in container”</h4>
+<p><strong>Solutions</strong>:</p>
+<ul>
+  <li>Check for platform-specific differences</li>
+  <li>Verify file permissions in container</li>
+  <li>Examine environment variables</li>
+</ul>
+
+<h3 id="debug-commands">Debug Commands</h3>
+
+<h4 id="manual-container-debugging">Manual Container Debugging</h4>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Build debug container</span>
+podman-compose build
+
+<span class="c"># Run with debug port</span>
+podman-compose run <span class="nt">--rm</span> <span class="nt">-p</span> 9229:9229 node-syslog-test node <span class="nt">--inspect</span><span class="o">=</span>0.0.0.0:9229 ./node_modules/.bin/vitest run
+
+<span class="c"># Attach with Node.js inspector</span>
+node inspect localhost:9229
+</code></pre></div></div>
+
+<h4 id="container-inspection">Container Inspection</h4>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># List running containers</span>
+podman ps
+
+<span class="c"># Inspect container</span>
+podman inspect &lt;container-id&gt;
+
+<span class="c"># View container logs</span>
+podman logs &lt;container-id&gt;
+</code></pre></div></div>
+
+<h2 id="advanced-usage">Advanced Usage</h2>
+
+<h3 id="custom-debug-configurations">Custom Debug Configurations</h3>
+
+<p>Create custom debug configurations in <code class="language-plaintext highlighter-rouge">.vscode/launch.json</code>:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Custom Debug Configuration"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"node"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"request"</span><span class="p">:</span><span class="w"> </span><span class="s2">"launch"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"program"</span><span class="p">:</span><span class="w"> </span><span class="s2">"${workspaceFolder}/scripts/debug-container-test.js"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"test:custom"</span><span class="p">,</span><span class="w"> </span><span class="s2">"--debug"</span><span class="p">,</span><span class="w"> </span><span class="s2">"--verbose"</span><span class="p">],</span><span class="w">
+  </span><span class="nl">"env"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"CUSTOM_VAR"</span><span class="p">:</span><span class="w"> </span><span class="s2">"value"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"NODE_ENV"</span><span class="p">:</span><span class="w"> </span><span class="s2">"development"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h3 id="multi-container-debugging">Multi-Container Debugging</h3>
+
+<p>For complex scenarios requiring multiple containers:</p>
+
+<ol>
+  <li>Modify <code class="language-plaintext highlighter-rouge">docker-compose.yml</code> to expose additional ports</li>
+  <li>Create attach configurations for each service</li>
+  <li>Use compound debug configurations</li>
+</ol>
+
+<h3 id="integration-with-cicd">Integration with CI/CD</h3>
+
+<p>The same containerized testing environment can be used in CI/CD:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># .github/workflows/test.yml</span>
+<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Run Containerized Tests</span>
+  <span class="na">run</span><span class="pi">:</span> <span class="s">node scripts/container-test.js</span>
+</code></pre></div></div>
+
+<h2 id="best-practices">Best Practices</h2>
+
+<ol>
+  <li><strong>Always use containerized debugging</strong> for consistency</li>
+  <li><strong>Set meaningful breakpoints</strong> at logical boundaries</li>
+  <li><strong>Use environment variables</strong> to control debug behavior</li>
+  <li><strong>Clean up containers</strong> after debugging sessions</li>
+  <li><strong>Document custom configurations</strong> for team sharing</li>
+</ol>
+
+<h2 id="getting-help">Getting Help</h2>
+
+<ul>
+  <li>Check the <a href="https://code.visualstudio.com/docs/editor/debugging">VS Code Debugging Documentation</a></li>
+  <li>Review <a href="https://nodejs.org/en/docs/guides/debugging-getting-started/">Node.js Inspector Documentation</a></li>
+  <li>Examine container logs for detailed error information</li>
+  <li>Use the project’s issue tracker for container-specific problems</li>
+</ul>

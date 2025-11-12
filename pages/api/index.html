@@ -1,0 +1,296 @@
+<h1 id="api-reference">API Reference</h1>
+
+<p>Complete API documentation for the node-syslog library.</p>
+
+<h2 id="core-classes">Core Classes</h2>
+
+<h3 id="syslog">Syslog</h3>
+
+<p>The main class for syslog functionality.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Syslog</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span>
+
+<span class="kd">const</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+  <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">myapp</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">facility</span><span class="p">:</span> <span class="dl">'</span><span class="s1">local0</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">options</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">pid</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">odelay</span><span class="dl">'</span><span class="p">]</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h4 id="constructor">Constructor</h4>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">constructor</span><span class="p">(</span><span class="nx">options</span><span class="p">:</span> <span class="nx">SyslogOptions</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Creates a new syslog instance with the specified options.</p>
+
+<p><strong>Parameters:</strong></p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">options</code> - Configuration options for the syslog instance</li>
+</ul>
+
+<p><strong>Example:</strong></p>
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+  <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">myapp</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">facility</span><span class="p">:</span> <span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">LOCAL0</span><span class="p">,</span>
+  <span class="na">options</span><span class="p">:</span> <span class="p">[</span><span class="nx">SyslogOption</span><span class="p">.</span><span class="nx">PID</span><span class="p">,</span> <span class="nx">SyslogOption</span><span class="p">.</span><span class="nx">NDELAY</span><span class="p">],</span>
+  <span class="na">logLevel</span><span class="p">:</span> <span class="nx">SyslogLevel</span><span class="p">.</span><span class="nx">INFO</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h4 id="methods">Methods</h4>
+
+<h5 id="emergmessage-string-context-object-void">emerg(message: string, context?: object): void</h5>
+
+<p>Log an emergency message.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">logger</span><span class="p">.</span><span class="nf">emerg</span><span class="p">(</span><span class="dl">'</span><span class="s1">System is unusable!</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">service</span><span class="p">:</span> <span class="dl">'</span><span class="s1">database</span><span class="dl">'</span> <span class="p">})</span>
+</code></pre></div></div>
+
+<h5 id="alertmessage-string-context-object-void">alert(message: string, context?: object): void</h5>
+
+<p>Log an alert message.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">logger</span><span class="p">.</span><span class="nf">alert</span><span class="p">(</span><span class="dl">'</span><span class="s1">Immediate action required!</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">threshold</span><span class="p">:</span> <span class="dl">'</span><span class="s1">90%</span><span class="dl">'</span> <span class="p">})</span>
+</code></pre></div></div>
+
+<h5 id="critmessage-string-context-object-void">crit(message: string, context?: object): void</h5>
+
+<p>Log a critical message.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">logger</span><span class="p">.</span><span class="nf">crit</span><span class="p">(</span><span class="dl">'</span><span class="s1">Critical system failure</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">component</span><span class="p">:</span> <span class="dl">'</span><span class="s1">auth</span><span class="dl">'</span> <span class="p">})</span>
+</code></pre></div></div>
+
+<h5 id="errormessage-string-context-object-void">error(message: string, context?: object): void</h5>
+
+<p>Log an error message.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Database connection failed</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> 
+  <span class="na">host</span><span class="p">:</span> <span class="dl">'</span><span class="s1">localhost</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">port</span><span class="p">:</span> <span class="mi">5432</span><span class="p">,</span>
+  <span class="na">error</span><span class="p">:</span> <span class="dl">'</span><span class="s1">ECONNREFUSED</span><span class="dl">'</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h5 id="warningmessage-string-context-object-void">warning(message: string, context?: object): void</h5>
+
+<p>Log a warning message.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">logger</span><span class="p">.</span><span class="nf">warning</span><span class="p">(</span><span class="dl">'</span><span class="s1">High memory usage</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> 
+  <span class="na">usage</span><span class="p">:</span> <span class="dl">'</span><span class="s1">85%</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">threshold</span><span class="p">:</span> <span class="dl">'</span><span class="s1">80%</span><span class="dl">'</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h5 id="noticemessage-string-context-object-void">notice(message: string, context?: object): void</h5>
+
+<p>Log a notice message.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">logger</span><span class="p">.</span><span class="nf">notice</span><span class="p">(</span><span class="dl">'</span><span class="s1">Server configuration updated</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> 
+  <span class="na">config</span><span class="p">:</span> <span class="dl">'</span><span class="s1">nginx.conf</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">version</span><span class="p">:</span> <span class="dl">'</span><span class="s1">1.20.2</span><span class="dl">'</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h5 id="infomessage-string-context-object-void">info(message: string, context?: object): void</h5>
+
+<p>Log an info message.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">User logged in successfully</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> 
+  <span class="na">userId</span><span class="p">:</span> <span class="mi">12345</span><span class="p">,</span>
+  <span class="na">ip</span><span class="p">:</span> <span class="dl">'</span><span class="s1">192.168.1.100</span><span class="dl">'</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h5 id="debugmessage-string-context-object-void">debug(message: string, context?: object): void</h5>
+
+<p>Log a debug message.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">Processing request</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> 
+  <span class="na">requestId</span><span class="p">:</span> <span class="dl">'</span><span class="s1">req_abc123</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">method</span><span class="p">:</span> <span class="dl">'</span><span class="s1">POST</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">url</span><span class="p">:</span> <span class="dl">'</span><span class="s1">/api/users</span><span class="dl">'</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h5 id="close-void">close(): void</h5>
+
+<p>Close the syslog connection and clean up resources.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">logger</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h5 id="isdebugenabled-boolean">isDebugEnabled(): boolean</h5>
+
+<p>Check if debug logging is enabled.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if </span><span class="p">(</span><span class="nx">logger</span><span class="p">.</span><span class="nf">isDebugEnabled</span><span class="p">())</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">Expensive debug operation</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">data</span><span class="p">:</span> <span class="nf">getLargeObject</span><span class="p">()</span> <span class="p">})</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="types-and-constants">Types and Constants</h2>
+
+<h3 id="syslogoptions">SyslogOptions</h3>
+
+<p>Configuration options for creating a Syslog instance.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">interface</span> <span class="nx">SyslogOptions</span> <span class="p">{</span>
+  <span class="nl">ident</span><span class="p">:</span> <span class="kr">string</span>                    <span class="c1">// Required: Identifier for log messages</span>
+  <span class="nx">facility</span><span class="p">?:</span> <span class="nx">SyslogFacilityType</span>   <span class="c1">// Optional: Syslog facility (default: 'user')</span>
+  <span class="nx">options</span><span class="p">?:</span> <span class="nx">SyslogOptionType</span><span class="p">[]</span>     <span class="c1">// Optional: Syslog options (default: [])</span>
+  <span class="nx">logLevel</span><span class="p">?:</span> <span class="nx">SyslogLevelType</span>       <span class="c1">// Optional: Minimum log level (default: 'info')</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="syslogfacility">SyslogFacility</h3>
+
+<p>Syslog facility constants.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">SyslogFacility</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">KERN</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>         <span class="c1">// Kernel messages</span>
+  <span class="na">USER</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>         <span class="c1">// User-level messages (default)</span>
+  <span class="na">MAIL</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>         <span class="c1">// Mail system</span>
+  <span class="na">DAEMON</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>       <span class="c1">// System daemons</span>
+  <span class="na">AUTH</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>         <span class="c1">// Security/authorization</span>
+  <span class="na">SYSLOG</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>       <span class="c1">// Internal syslog messages</span>
+  <span class="na">LPR</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>          <span class="c1">// Line printer subsystem</span>
+  <span class="na">NEWS</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>         <span class="c1">// Network news subsystem</span>
+  <span class="na">UUCP</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>         <span class="c1">// UUCP subsystem</span>
+  <span class="na">CRON</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>         <span class="c1">// Clock daemon</span>
+  <span class="na">AUTHPRIV</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>    <span class="c1">// Security/authorization (private)</span>
+  <span class="na">FTP</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span>         <span class="c1">// FTP daemon</span>
+  <span class="na">LOCAL0</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>      <span class="c1">// Local use 0</span>
+  <span class="na">LOCAL1</span><span class="p">:</span> <span class="mi">17</span><span class="p">,</span>      <span class="c1">// Local use 1</span>
+  <span class="na">LOCAL2</span><span class="p">:</span> <span class="mi">18</span><span class="p">,</span>      <span class="c1">// Local use 2</span>
+  <span class="na">LOCAL3</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span>      <span class="c1">// Local use 3</span>
+  <span class="na">LOCAL4</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>      <span class="c1">// Local use 4</span>
+  <span class="na">LOCAL5</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span>      <span class="c1">// Local use 5</span>
+  <span class="na">LOCAL6</span><span class="p">:</span> <span class="mi">22</span><span class="p">,</span>      <span class="c1">// Local use 6</span>
+  <span class="na">LOCAL7</span><span class="p">:</span> <span class="mi">23</span>       <span class="c1">// Local use 7</span>
+<span class="p">}</span> <span class="kd">as const</span>
+</code></pre></div></div>
+
+<h3 id="sysloglevel">SyslogLevel</h3>
+
+<p>Log level constants.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">SyslogLevel</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">EMERG</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>        <span class="c1">// Emergency: system is unusable</span>
+  <span class="na">ALERT</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>        <span class="c1">// Alert: action must be taken immediately</span>
+  <span class="na">CRIT</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>         <span class="c1">// Critical: critical conditions</span>
+  <span class="na">ERR</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>          <span class="c1">// Error: error conditions</span>
+  <span class="na">WARNING</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>      <span class="c1">// Warning: warning conditions</span>
+  <span class="na">NOTICE</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>       <span class="c1">// Notice: normal but significant condition</span>
+  <span class="na">INFO</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>         <span class="c1">// Informational: informational messages</span>
+  <span class="na">DEBUG</span><span class="p">:</span> <span class="mi">7</span>         <span class="c1">// Debug: debug-level messages</span>
+<span class="p">}</span> <span class="kd">as const</span>
+</code></pre></div></div>
+
+<h3 id="syslogoption">SyslogOption</h3>
+
+<p>Syslog option constants.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">SyslogOption</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">PID</span><span class="p">:</span> <span class="mh">0x01</span><span class="p">,</span>       <span class="c1">// Log the process ID with each message</span>
+  <span class="na">CONS</span><span class="p">:</span> <span class="mh">0x02</span><span class="p">,</span>      <span class="c1">// Write to console if there's an error sending to syslog</span>
+  <span class="na">ODELAY</span><span class="p">:</span> <span class="mh">0x04</span><span class="p">,</span>    <span class="c1">// Delay connection until first message is logged</span>
+  <span class="na">NDELAY</span><span class="p">:</span> <span class="mh">0x08</span><span class="p">,</span>    <span class="c1">// Connect immediately</span>
+  <span class="na">NOWAIT</span><span class="p">:</span> <span class="mh">0x10</span><span class="p">,</span>    <span class="c1">// Don't wait for child processes that log messages</span>
+  <span class="na">PERROR</span><span class="p">:</span> <span class="mh">0x20</span>     <span class="c1">// Log to stderr as well</span>
+<span class="p">}</span> <span class="kd">as const</span>
+</code></pre></div></div>
+
+<h2 id="convenience-functions">Convenience Functions</h2>
+
+<p>For quick logging without creating an instance:</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">info</span><span class="p">,</span> <span class="nx">error</span><span class="p">,</span> <span class="nx">warning</span><span class="p">,</span> <span class="nx">debug</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span>
+
+<span class="c1">// Uses default configuration</span>
+<span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Application started</span><span class="dl">'</span><span class="p">)</span>
+<span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Something went wrong</span><span class="dl">'</span><span class="p">)</span>
+<span class="nf">warning</span><span class="p">(</span><span class="dl">'</span><span class="s1">Warning message</span><span class="dl">'</span><span class="p">)</span>
+<span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">Debug information</span><span class="dl">'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="error-handling">Error Handling</h2>
+
+<p>The library throws descriptive errors for common issues:</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">SyslogError</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span>
+
+<span class="k">try</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+    <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">myapp</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">facility</span><span class="p">:</span> <span class="dl">'</span><span class="s1">invalid</span><span class="dl">'</span> <span class="kd">as </span><span class="kr">any</span>  <span class="c1">// This will throw</span>
+  <span class="p">})</span>
+<span class="p">}</span> <span class="k">catch </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if </span><span class="p">(</span><span class="nx">error</span> <span class="k">instanceof</span> <span class="nx">SyslogError</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Syslog configuration error:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="common-errors">Common Errors</h3>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">SyslogError: Invalid facility: invalid</code> - Invalid facility name</li>
+  <li><code class="language-plaintext highlighter-rouge">SyslogError: Invalid option: invalid</code> - Invalid option name</li>
+  <li><code class="language-plaintext highlighter-rouge">SyslogError: Invalid log level: invalid</code> - Invalid log level name</li>
+  <li><code class="language-plaintext highlighter-rouge">SyslogError: ident is required</code> - Missing ident parameter</li>
+</ul>
+
+<h2 id="performance-considerations">Performance Considerations</h2>
+
+<h3 id="memory-usage">Memory Usage</h3>
+
+<p>The library is designed for minimal memory usage:</p>
+
+<ul>
+  <li>Zero allocations in the hot logging path</li>
+  <li>Static buffers for message formatting</li>
+  <li>Efficient string concatenation</li>
+</ul>
+
+<h3 id="cpu-performance">CPU Performance</h3>
+
+<p>Typical performance characteristics:</p>
+
+<ul>
+  <li><strong>Latency</strong>: &lt; 1μs overhead vs raw syslog(3)</li>
+  <li><strong>Throughput</strong>: &gt; 500,000 messages/second</li>
+  <li><strong>Event Loop Impact</strong>: &lt; 0.01% at 10,000 logs/second</li>
+</ul>
+
+<h3 id="best-practices">Best Practices</h3>
+
+<ol>
+  <li><strong>Reuse logger instances</strong> - Avoid creating new instances for each log message</li>
+  <li><strong>Check log levels</strong> - Use <code class="language-plaintext highlighter-rouge">isDebugEnabled()</code> to skip expensive operations</li>
+  <li><strong>Batch context</strong> - Include relevant context in a single log call</li>
+  <li><strong>Avoid string concatenation</strong> - Let the library handle message formatting</li>
+</ol>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Good - reuse instance</span>
+<span class="kd">const</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span> <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">myapp</span><span class="dl">'</span> <span class="p">})</span>
+
+<span class="c1">// Good - check debug level</span>
+<span class="k">if </span><span class="p">(</span><span class="nx">logger</span><span class="p">.</span><span class="nf">isDebugEnabled</span><span class="p">())</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">Expensive operation</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">data</span><span class="p">:</span> <span class="nf">expensiveComputation</span><span class="p">()</span> <span class="p">})</span>
+<span class="p">}</span>
+
+<span class="c1">// Good - structured context</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Request failed</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">url</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span>
+  <span class="na">method</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">method</span><span class="p">,</span>
+  <span class="na">statusCode</span><span class="p">:</span> <span class="nx">res</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">,</span>
+  <span class="na">duration</span><span class="p">:</span> <span class="nb">Date</span><span class="p">.</span><span class="nf">now</span><span class="p">()</span> <span class="o">-</span> <span class="nx">startTime</span>
+<span class="p">})</span>
+
+<span class="c1">// Avoid - creating instances repeatedly</span>
+<span class="k">for </span><span class="p">(</span><span class="kd">const</span> <span class="nx">item</span> <span class="k">of</span> <span class="nx">items</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span> <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">loop</span><span class="dl">'</span> <span class="p">})</span>  <span class="c1">// Bad!</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Processing item</span><span class="dl">'</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>

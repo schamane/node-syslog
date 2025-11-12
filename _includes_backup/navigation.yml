@@ -1,0 +1,33 @@
+# Navigation structure for Jekyll site
+main:
+  - title: "Getting Started"
+    url: "/getting-started/"
+    children:
+      - title: "Quick Start"
+        url: "/"
+      - title: "Installation"
+        url: "/installation/"
+      - title: "Getting Started Guide"
+        url: "/getting-started/"
+  
+  - title: "Documentation"
+    url: "/docs/"
+    children:
+      - title: "API Reference"
+        url: "/api/"
+      - title: "Examples"
+        url: "/examples/"
+      - title: "Migration Guide"
+        url: "/migration/"
+  
+  - title: "External Links"
+    children:
+      - title: "GitHub Repository"
+        url: "https://github.com/schamane/node-syslog"
+        external: true
+      - title: "npm Package"
+        url: "https://www.npmjs.com/package/node-syslog"
+        external: true
+      - title: "Issue Tracker"
+        url: "https://github.com/schamane/node-syslog/issues"
+        external: true

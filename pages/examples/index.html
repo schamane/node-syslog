@@ -1,0 +1,1129 @@
+<h1 id="examples">Examples</h1>
+
+<p>Real-world examples and usage patterns for node-syslog.</p>
+
+<h2 id="web-application-examples">Web Application Examples</h2>
+
+<h3 id="expressjs-server">Express.js Server</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">express</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">express</span><span class="dl">'</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">Syslog</span><span class="p">,</span> <span class="nx">SyslogFacility</span><span class="p">,</span> <span class="nx">SyslogOption</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span>
+
+<span class="kd">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="nf">express</span><span class="p">()</span>
+<span class="kd">const</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+  <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">webapp</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">facility</span><span class="p">:</span> <span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">LOCAL0</span><span class="p">,</span>
+  <span class="na">options</span><span class="p">:</span> <span class="p">[</span><span class="nx">SyslogOption</span><span class="p">.</span><span class="nx">PID</span><span class="p">,</span> <span class="nx">SyslogOption</span><span class="p">.</span><span class="nx">NDELAY</span><span class="p">]</span>
+<span class="p">})</span>
+
+<span class="c1">// Request logging middleware</span>
+<span class="nx">app</span><span class="p">.</span><span class="nf">use</span><span class="p">((</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">start</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nf">now</span><span class="p">()</span>
+  
+  <span class="nx">res</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">finish</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">duration</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nf">now</span><span class="p">()</span> <span class="o">-</span> <span class="nx">start</span>
+    <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">HTTP Request</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">method</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">method</span><span class="p">,</span>
+      <span class="na">url</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span>
+      <span class="na">statusCode</span><span class="p">:</span> <span class="nx">res</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">,</span>
+      <span class="na">duration</span><span class="p">:</span> <span class="s2">`</span><span class="p">${</span><span class="nx">duration</span><span class="p">}</span><span class="s2">ms`</span><span class="p">,</span>
+      <span class="na">userAgent</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">User-Agent</span><span class="dl">'</span><span class="p">),</span>
+      <span class="na">ip</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">ip</span><span class="p">,</span>
+      <span class="na">contentLength</span><span class="p">:</span> <span class="nx">res</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">Content-Length</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">})</span>
+  <span class="p">})</span>
+  
+  <span class="nf">next</span><span class="p">()</span>
+<span class="p">})</span>
+
+<span class="c1">// Error handling middleware</span>
+<span class="nx">app</span><span class="p">.</span><span class="nf">use</span><span class="p">((</span><span class="nx">err</span><span class="p">:</span> <span class="nb">Error</span><span class="p">,</span> <span class="nx">req</span><span class="p">:</span> <span class="nx">express</span><span class="p">.</span><span class="nx">Request</span><span class="p">,</span> <span class="nx">res</span><span class="p">:</span> <span class="nx">express</span><span class="p">.</span><span class="nx">Response</span><span class="p">,</span> <span class="nx">next</span><span class="p">:</span> <span class="nx">express</span><span class="p">.</span><span class="nx">NextFunction</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Unhandled error</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">error</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+    <span class="na">stack</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">stack</span><span class="p">,</span>
+    <span class="na">url</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span>
+    <span class="na">method</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">method</span><span class="p">,</span>
+    <span class="na">userAgent</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">User-Agent</span><span class="dl">'</span><span class="p">),</span>
+    <span class="na">ip</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">ip</span>
+  <span class="p">})</span>
+  
+  <span class="nx">res</span><span class="p">.</span><span class="nf">status</span><span class="p">(</span><span class="mi">500</span><span class="p">).</span><span class="nf">json</span><span class="p">({</span> 
+    <span class="na">error</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Internal server error</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">requestId</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="dl">'</span><span class="s1">x-request-id</span><span class="dl">'</span><span class="p">]</span>
+  <span class="p">})</span>
+<span class="p">})</span>
+
+<span class="c1">// Routes</span>
+<span class="nx">app</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">/health</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">Health check requested</span><span class="dl">'</span><span class="p">)</span>
+  <span class="nx">res</span><span class="p">.</span><span class="nf">json</span><span class="p">({</span> <span class="na">status</span><span class="p">:</span> <span class="dl">'</span><span class="s1">ok</span><span class="dl">'</span><span class="p">,</span> <span class="na">timestamp</span><span class="p">:</span> <span class="k">new</span> <span class="nc">Date</span><span class="p">().</span><span class="nf">toISOString</span><span class="p">()</span> <span class="p">})</span>
+<span class="p">})</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nf">post</span><span class="p">(</span><span class="dl">'</span><span class="s1">/api/users</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Creating user</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">ip</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">ip</span><span class="p">,</span>
+    <span class="na">userAgent</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">User-Agent</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">})</span>
+  
+  <span class="k">try</span> <span class="p">{</span>
+    <span class="c1">// User creation logic here</span>
+    <span class="kd">const</span> <span class="nx">userId</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">10000</span><span class="p">)</span>
+    
+    <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">User created successfully</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+      <span class="nx">userId</span><span class="p">,</span>
+      <span class="na">ip</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">ip</span>
+    <span class="p">})</span>
+    
+    <span class="nx">res</span><span class="p">.</span><span class="nf">status</span><span class="p">(</span><span class="mi">201</span><span class="p">).</span><span class="nf">json</span><span class="p">({</span> <span class="nx">userId</span><span class="p">,</span> <span class="na">message</span><span class="p">:</span> <span class="dl">'</span><span class="s1">User created</span><span class="dl">'</span> <span class="p">})</span>
+  <span class="p">}</span> <span class="k">catch </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">User creation failed</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">error</span><span class="p">:</span> <span class="nx">error</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span> <span class="p">:</span> <span class="nc">String</span><span class="p">(</span><span class="nx">error</span><span class="p">),</span>
+      <span class="na">ip</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">ip</span>
+    <span class="p">})</span>
+    
+    <span class="nx">res</span><span class="p">.</span><span class="nf">status</span><span class="p">(</span><span class="mi">400</span><span class="p">).</span><span class="nf">json</span><span class="p">({</span> <span class="na">error</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Failed to create user</span><span class="dl">'</span> <span class="p">})</span>
+  <span class="p">}</span>
+<span class="p">})</span>
+
+<span class="kd">const</span> <span class="nx">PORT</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">3000</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nf">listen</span><span class="p">(</span><span class="nx">PORT</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Server started</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> 
+    <span class="na">port</span><span class="p">:</span> <span class="nx">PORT</span><span class="p">,</span>
+    <span class="na">nodeVersion</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">version</span><span class="p">,</span>
+    <span class="na">environment</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_ENV</span> <span class="o">||</span> <span class="dl">'</span><span class="s1">development</span><span class="dl">'</span>
+  <span class="p">})</span>
+<span class="p">})</span>
+
+<span class="c1">// Graceful shutdown</span>
+<span class="nx">process</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">SIGTERM</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">SIGTERM received, shutting down gracefully</span><span class="dl">'</span><span class="p">)</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+  <span class="nx">process</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="p">})</span>
+
+<span class="nx">process</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">SIGINT</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">SIGINT received, shutting down gracefully</span><span class="dl">'</span><span class="p">)</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+  <span class="nx">process</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h3 id="fastify-server">Fastify Server</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">fastify</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">fastify</span><span class="dl">'</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">Syslog</span><span class="p">,</span> <span class="nx">SyslogFacility</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span>
+
+<span class="kd">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="nf">fastify</span><span class="p">({</span>
+  <span class="na">logger</span><span class="p">:</span> <span class="kc">false</span> <span class="c1">// We'll use our own logger</span>
+<span class="p">})</span>
+
+<span class="kd">const</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+  <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">fastify-app</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">facility</span><span class="p">:</span> <span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">LOCAL1</span>
+<span class="p">})</span>
+
+<span class="c1">// Request logging hook</span>
+<span class="nx">app</span><span class="p">.</span><span class="nf">addHook</span><span class="p">(</span><span class="dl">'</span><span class="s1">onRequest</span><span class="dl">'</span><span class="p">,</span> <span class="k">async </span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">reply</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">request</span><span class="p">.</span><span class="nx">startTime</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nf">now</span><span class="p">()</span>
+<span class="p">})</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nf">addHook</span><span class="p">(</span><span class="dl">'</span><span class="s1">onResponse</span><span class="dl">'</span><span class="p">,</span> <span class="k">async </span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">reply</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">duration</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nf">now</span><span class="p">()</span> <span class="o">-</span> <span class="p">(</span><span class="nx">request</span><span class="p">.</span><span class="nx">startTime</span> <span class="kd">as </span><span class="kr">number</span><span class="p">)</span>
+  
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">HTTP Request</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">method</span><span class="p">:</span> <span class="nx">request</span><span class="p">.</span><span class="nx">method</span><span class="p">,</span>
+    <span class="na">url</span><span class="p">:</span> <span class="nx">request</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span>
+    <span class="na">statusCode</span><span class="p">:</span> <span class="nx">reply</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">,</span>
+    <span class="na">duration</span><span class="p">:</span> <span class="s2">`</span><span class="p">${</span><span class="nx">duration</span><span class="p">}</span><span class="s2">ms`</span><span class="p">,</span>
+    <span class="na">userAgent</span><span class="p">:</span> <span class="nx">request</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="dl">'</span><span class="s1">user-agent</span><span class="dl">'</span><span class="p">],</span>
+    <span class="na">ip</span><span class="p">:</span> <span class="nx">request</span><span class="p">.</span><span class="nx">ip</span><span class="p">,</span>
+    <span class="na">contentLength</span><span class="p">:</span> <span class="nx">reply</span><span class="p">.</span><span class="nf">getHeader</span><span class="p">(</span><span class="dl">'</span><span class="s1">content-length</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">})</span>
+<span class="p">})</span>
+
+<span class="c1">// Error handling hook</span>
+<span class="nx">app</span><span class="p">.</span><span class="nf">addHook</span><span class="p">(</span><span class="dl">'</span><span class="s1">onError</span><span class="dl">'</span><span class="p">,</span> <span class="k">async </span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">reply</span><span class="p">,</span> <span class="nx">error</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Request error</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">error</span><span class="p">:</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+    <span class="na">stack</span><span class="p">:</span> <span class="nx">error</span><span class="p">.</span><span class="nx">stack</span><span class="p">,</span>
+    <span class="na">url</span><span class="p">:</span> <span class="nx">request</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span>
+    <span class="na">method</span><span class="p">:</span> <span class="nx">request</span><span class="p">.</span><span class="nx">method</span><span class="p">,</span>
+    <span class="na">statusCode</span><span class="p">:</span> <span class="nx">reply</span><span class="p">.</span><span class="nx">statusCode</span>
+  <span class="p">})</span>
+<span class="p">})</span>
+
+<span class="c1">// Routes</span>
+<span class="nx">app</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">/health</span><span class="dl">'</span><span class="p">,</span> <span class="k">async </span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">reply</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">Health check requested</span><span class="dl">'</span><span class="p">)</span>
+  <span class="k">return</span> <span class="p">{</span> 
+    <span class="na">status</span><span class="p">:</span> <span class="dl">'</span><span class="s1">ok</span><span class="dl">'</span><span class="p">,</span> 
+    <span class="na">timestamp</span><span class="p">:</span> <span class="k">new</span> <span class="nc">Date</span><span class="p">().</span><span class="nf">toISOString</span><span class="p">(),</span>
+    <span class="na">uptime</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nf">uptime</span><span class="p">()</span>
+  <span class="p">}</span>
+<span class="p">})</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nf">post</span><span class="p">(</span><span class="dl">'</span><span class="s1">/api/data</span><span class="dl">'</span><span class="p">,</span> <span class="k">async </span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">reply</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Processing data</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">ip</span><span class="p">:</span> <span class="nx">request</span><span class="p">.</span><span class="nx">ip</span><span class="p">,</span>
+    <span class="na">contentType</span><span class="p">:</span> <span class="nx">request</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="dl">'</span><span class="s1">content-type</span><span class="dl">'</span><span class="p">]</span>
+  <span class="p">})</span>
+  
+  <span class="k">try</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">request</span><span class="p">.</span><span class="nx">body</span> <span class="kd">as </span><span class="kr">any</span>
+    
+    <span class="c1">// Validate data</span>
+    <span class="k">if </span><span class="p">(</span><span class="o">!</span><span class="nx">data</span> <span class="o">||</span> <span class="k">typeof</span> <span class="nx">data</span> <span class="o">!==</span> <span class="dl">'</span><span class="s1">object</span><span class="dl">'</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">warning</span><span class="p">(</span><span class="dl">'</span><span class="s1">Invalid data received</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">ip</span><span class="p">:</span> <span class="nx">request</span><span class="p">.</span><span class="nx">ip</span> <span class="p">})</span>
+      <span class="k">return</span> <span class="nx">reply</span><span class="p">.</span><span class="nf">status</span><span class="p">(</span><span class="mi">400</span><span class="p">).</span><span class="nf">send</span><span class="p">({</span> <span class="na">error</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Invalid data</span><span class="dl">'</span> <span class="p">})</span>
+    <span class="p">}</span>
+    
+    <span class="c1">// Process data</span>
+    <span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="na">id</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">),</span>
+      <span class="na">processed</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+      <span class="na">timestamp</span><span class="p">:</span> <span class="k">new</span> <span class="nc">Date</span><span class="p">().</span><span class="nf">toISOString</span><span class="p">()</span>
+    <span class="p">}</span>
+    
+    <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Data processed successfully</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">resultId</span><span class="p">:</span> <span class="nx">result</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
+      <span class="na">ip</span><span class="p">:</span> <span class="nx">request</span><span class="p">.</span><span class="nx">ip</span>
+    <span class="p">})</span>
+    
+    <span class="k">return</span> <span class="nx">reply</span><span class="p">.</span><span class="nf">status</span><span class="p">(</span><span class="mi">201</span><span class="p">).</span><span class="nf">send</span><span class="p">(</span><span class="nx">result</span><span class="p">)</span>
+  <span class="p">}</span> <span class="k">catch </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Data processing failed</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">error</span><span class="p">:</span> <span class="nx">error</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span> <span class="p">:</span> <span class="nc">String</span><span class="p">(</span><span class="nx">error</span><span class="p">),</span>
+      <span class="na">stack</span><span class="p">:</span> <span class="nx">error</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">stack</span> <span class="p">:</span> <span class="kc">undefined</span><span class="p">,</span>
+      <span class="na">ip</span><span class="p">:</span> <span class="nx">request</span><span class="p">.</span><span class="nx">ip</span>
+    <span class="p">})</span>
+    
+    <span class="k">return</span> <span class="nx">reply</span><span class="p">.</span><span class="nf">status</span><span class="p">(</span><span class="mi">500</span><span class="p">).</span><span class="nf">send</span><span class="p">({</span> <span class="na">error</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Processing failed</span><span class="dl">'</span> <span class="p">})</span>
+  <span class="p">}</span>
+<span class="p">})</span>
+
+<span class="kd">const</span> <span class="nx">start</span> <span class="o">=</span> <span class="k">async </span><span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">try</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">PORT</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">3000</span>
+    <span class="k">await</span> <span class="nx">app</span><span class="p">.</span><span class="nf">listen</span><span class="p">({</span> <span class="na">port</span><span class="p">:</span> <span class="nx">PORT</span><span class="p">,</span> <span class="na">host</span><span class="p">:</span> <span class="dl">'</span><span class="s1">0.0.0.0</span><span class="dl">'</span> <span class="p">})</span>
+    
+    <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Fastify server started</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">port</span><span class="p">:</span> <span class="nx">PORT</span><span class="p">,</span>
+      <span class="na">nodeVersion</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">version</span><span class="p">,</span>
+      <span class="na">environment</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_ENV</span> <span class="o">||</span> <span class="dl">'</span><span class="s1">development</span><span class="dl">'</span>
+    <span class="p">})</span>
+  <span class="p">}</span> <span class="k">catch </span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Failed to start server</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">error</span><span class="p">:</span> <span class="nx">err</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">?</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span> <span class="p">:</span> <span class="nc">String</span><span class="p">(</span><span class="nx">err</span><span class="p">),</span>
+      <span class="na">stack</span><span class="p">:</span> <span class="nx">err</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">?</span> <span class="nx">err</span><span class="p">.</span><span class="nx">stack</span> <span class="p">:</span> <span class="kc">undefined</span>
+    <span class="p">})</span>
+    <span class="nx">process</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nf">start</span><span class="p">()</span>
+
+<span class="c1">// Graceful shutdown</span>
+<span class="nx">process</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">SIGTERM</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">SIGTERM received, shutting down gracefully</span><span class="dl">'</span><span class="p">)</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+  <span class="nx">process</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h2 id="database-examples">Database Examples</h2>
+
+<h3 id="postgresql-with-pg">PostgreSQL with pg</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Pool</span><span class="p">,</span> <span class="nx">PoolClient</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">pg</span><span class="dl">'</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">Syslog</span><span class="p">,</span> <span class="nx">SyslogFacility</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span>
+
+<span class="kd">const</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+  <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">database-service</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">facility</span><span class="p">:</span> <span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">LOCAL2</span>
+<span class="p">})</span>
+
+<span class="c1">// Database connection pool</span>
+<span class="kd">const</span> <span class="nx">pool</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Pool</span><span class="p">({</span>
+  <span class="na">host</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">DB_HOST</span> <span class="o">||</span> <span class="dl">'</span><span class="s1">localhost</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">port</span><span class="p">:</span> <span class="nf">parseInt</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">DB_PORT</span> <span class="o">||</span> <span class="dl">'</span><span class="s1">5432</span><span class="dl">'</span><span class="p">),</span>
+  <span class="na">database</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">DB_NAME</span> <span class="o">||</span> <span class="dl">'</span><span class="s1">myapp</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">user</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">DB_USER</span> <span class="o">||</span> <span class="dl">'</span><span class="s1">postgres</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">password</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">DB_PASSWORD</span><span class="p">,</span>
+  <span class="na">max</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+  <span class="na">idleTimeoutMillis</span><span class="p">:</span> <span class="mi">30000</span><span class="p">,</span>
+  <span class="na">connectionTimeoutMillis</span><span class="p">:</span> <span class="mi">2000</span><span class="p">,</span>
+<span class="p">})</span>
+
+<span class="c1">// Log pool events</span>
+<span class="nx">pool</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">connect</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">client</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">New database client connected</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">totalCount</span><span class="p">:</span> <span class="nx">pool</span><span class="p">.</span><span class="nx">totalCount</span><span class="p">,</span>
+    <span class="na">idleCount</span><span class="p">:</span> <span class="nx">pool</span><span class="p">.</span><span class="nx">idleCount</span><span class="p">,</span>
+    <span class="na">waitingCount</span><span class="p">:</span> <span class="nx">pool</span><span class="p">.</span><span class="nx">waitingCount</span>
+  <span class="p">})</span>
+<span class="p">})</span>
+
+<span class="nx">pool</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">error</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">client</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Database pool error</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">error</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+    <span class="na">stack</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">stack</span><span class="p">,</span>
+    <span class="na">totalCount</span><span class="p">:</span> <span class="nx">pool</span><span class="p">.</span><span class="nx">totalCount</span>
+  <span class="p">})</span>
+<span class="p">})</span>
+
+<span class="kr">interface</span> <span class="nx">User</span> <span class="p">{</span>
+  <span class="nl">id</span><span class="p">:</span> <span class="kr">number</span>
+  <span class="nx">name</span><span class="p">:</span> <span class="kr">string</span>
+  <span class="nx">email</span><span class="p">:</span> <span class="kr">string</span>
+  <span class="nx">created_at</span><span class="p">:</span> <span class="nb">Date</span>
+<span class="p">}</span>
+
+<span class="kd">class</span> <span class="nc">UserService</span> <span class="p">{</span>
+  <span class="k">async</span> <span class="nf">createUser</span><span class="p">(</span><span class="nx">name</span><span class="p">:</span> <span class="kr">string</span><span class="p">,</span> <span class="nx">email</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">User</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">client</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">pool</span><span class="p">.</span><span class="nf">connect</span><span class="p">()</span>
+    
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Creating user</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">email</span> <span class="p">})</span>
+      
+      <span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nf">query</span><span class="p">(</span>
+        <span class="dl">'</span><span class="s1">INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *</span><span class="dl">'</span><span class="p">,</span>
+        <span class="p">[</span><span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">]</span>
+      <span class="p">)</span>
+      
+      <span class="kd">const</span> <span class="nx">user</span> <span class="o">=</span> <span class="nx">result</span><span class="p">.</span><span class="nx">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">User created successfully</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+        <span class="na">userId</span><span class="p">:</span> <span class="nx">user</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
+        <span class="na">name</span><span class="p">:</span> <span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span>
+        <span class="na">email</span><span class="p">:</span> <span class="nx">user</span><span class="p">.</span><span class="nx">email</span>
+      <span class="p">})</span>
+      
+      <span class="k">return</span> <span class="nx">user</span>
+    <span class="p">}</span> <span class="k">catch </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Failed to create user</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+        <span class="na">error</span><span class="p">:</span> <span class="nx">error</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span> <span class="p">:</span> <span class="nc">String</span><span class="p">(</span><span class="nx">error</span><span class="p">),</span>
+        <span class="nx">name</span><span class="p">,</span>
+        <span class="nx">email</span><span class="p">,</span>
+        <span class="na">stack</span><span class="p">:</span> <span class="nx">error</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">stack</span> <span class="p">:</span> <span class="kc">undefined</span>
+      <span class="p">})</span>
+      <span class="k">throw</span> <span class="nx">error</span>
+    <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+      <span class="nx">client</span><span class="p">.</span><span class="nf">release</span><span class="p">()</span>
+      
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">Database client released</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+        <span class="na">totalCount</span><span class="p">:</span> <span class="nx">pool</span><span class="p">.</span><span class="nx">totalCount</span><span class="p">,</span>
+        <span class="na">idleCount</span><span class="p">:</span> <span class="nx">pool</span><span class="p">.</span><span class="nx">idleCount</span><span class="p">,</span>
+        <span class="na">waitingCount</span><span class="p">:</span> <span class="nx">pool</span><span class="p">.</span><span class="nx">waitingCount</span>
+      <span class="p">})</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  
+  <span class="k">async</span> <span class="nf">getUserById</span><span class="p">(</span><span class="nx">id</span><span class="p">:</span> <span class="kr">number</span><span class="p">):</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">User</span> <span class="o">|</span> <span class="kc">null</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">client</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">pool</span><span class="p">.</span><span class="nf">connect</span><span class="p">()</span>
+    
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">Fetching user by ID</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">userId</span><span class="p">:</span> <span class="nx">id</span> <span class="p">})</span>
+      
+      <span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nf">query</span><span class="p">(</span>
+        <span class="dl">'</span><span class="s1">SELECT * FROM users WHERE id = $1</span><span class="dl">'</span><span class="p">,</span>
+        <span class="p">[</span><span class="nx">id</span><span class="p">]</span>
+      <span class="p">)</span>
+      
+      <span class="kd">const</span> <span class="nx">user</span> <span class="o">=</span> <span class="nx">result</span><span class="p">.</span><span class="nx">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">||</span> <span class="kc">null</span>
+      
+      <span class="k">if </span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">User found</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">userId</span><span class="p">:</span> <span class="nx">id</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="nx">user</span><span class="p">.</span><span class="nx">name</span> <span class="p">})</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">logger</span><span class="p">.</span><span class="nf">warning</span><span class="p">(</span><span class="dl">'</span><span class="s1">User not found</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">userId</span><span class="p">:</span> <span class="nx">id</span> <span class="p">})</span>
+      <span class="p">}</span>
+      
+      <span class="k">return</span> <span class="nx">user</span>
+    <span class="p">}</span> <span class="k">catch </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Failed to fetch user</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+        <span class="na">error</span><span class="p">:</span> <span class="nx">error</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span> <span class="p">:</span> <span class="nc">String</span><span class="p">(</span><span class="nx">error</span><span class="p">),</span>
+        <span class="na">userId</span><span class="p">:</span> <span class="nx">id</span><span class="p">,</span>
+        <span class="na">stack</span><span class="p">:</span> <span class="nx">error</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">stack</span> <span class="p">:</span> <span class="kc">undefined</span>
+      <span class="p">})</span>
+      <span class="k">throw</span> <span class="nx">error</span>
+    <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+      <span class="nx">client</span><span class="p">.</span><span class="nf">release</span><span class="p">()</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  
+  <span class="k">async</span> <span class="nf">updateUser</span><span class="p">(</span><span class="nx">id</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span> <span class="nx">updates</span><span class="p">:</span> <span class="nb">Partial</span><span class="o">&lt;</span><span class="nx">User</span><span class="o">&gt;</span><span class="p">):</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">User</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">client</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">pool</span><span class="p">.</span><span class="nf">connect</span><span class="p">()</span>
+    
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Updating user</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">userId</span><span class="p">:</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">updates</span> <span class="p">})</span>
+      
+      <span class="kd">const</span> <span class="nx">fields</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nf">keys</span><span class="p">(</span><span class="nx">updates</span><span class="p">).</span><span class="nf">filter</span><span class="p">(</span><span class="nx">key</span> <span class="o">=&gt;</span> <span class="nx">updates</span><span class="p">[</span><span class="nx">key</span> <span class="kd">as </span><span class="kr">keyof</span> <span class="nx">User</span><span class="p">]</span> <span class="o">!==</span> <span class="kc">undefined</span><span class="p">)</span>
+      <span class="kd">const</span> <span class="nx">values</span> <span class="o">=</span> <span class="nx">fields</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="nx">field</span> <span class="o">=&gt;</span> <span class="nx">updates</span><span class="p">[</span><span class="nx">field</span> <span class="kd">as </span><span class="kr">keyof</span> <span class="nx">User</span><span class="p">])</span>
+      <span class="kd">const</span> <span class="nx">setClause</span> <span class="o">=</span> <span class="nx">fields</span><span class="p">.</span><span class="nf">map</span><span class="p">((</span><span class="nx">field</span><span class="p">,</span> <span class="nx">index</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="s2">`</span><span class="p">${</span><span class="nx">field</span><span class="p">}</span><span class="s2"> = $</span><span class="p">${</span><span class="nx">index</span> <span class="o">+</span> <span class="mi">2</span><span class="p">}</span><span class="s2">`</span><span class="p">).</span><span class="nf">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">, </span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="kd">const</span> <span class="nx">query</span> <span class="o">=</span> <span class="s2">`UPDATE users SET </span><span class="p">${</span><span class="nx">setClause</span><span class="p">}</span><span class="s2">, updated_at = NOW() WHERE id = $1 RETURNING *`</span>
+      <span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nf">query</span><span class="p">(</span><span class="nx">query</span><span class="p">,</span> <span class="p">[</span><span class="nx">id</span><span class="p">,</span> <span class="p">...</span><span class="nx">values</span><span class="p">])</span>
+      
+      <span class="kd">const</span> <span class="nx">user</span> <span class="o">=</span> <span class="nx">result</span><span class="p">.</span><span class="nx">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      
+      <span class="k">if </span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">User updated successfully</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+          <span class="na">userId</span><span class="p">:</span> <span class="nx">id</span><span class="p">,</span>
+          <span class="na">updatedFields</span><span class="p">:</span> <span class="nx">fields</span>
+        <span class="p">})</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">logger</span><span class="p">.</span><span class="nf">warning</span><span class="p">(</span><span class="dl">'</span><span class="s1">User not found for update</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">userId</span><span class="p">:</span> <span class="nx">id</span> <span class="p">})</span>
+      <span class="p">}</span>
+      
+      <span class="k">return</span> <span class="nx">user</span>
+    <span class="p">}</span> <span class="k">catch </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Failed to update user</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+        <span class="na">error</span><span class="p">:</span> <span class="nx">error</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span> <span class="p">:</span> <span class="nc">String</span><span class="p">(</span><span class="nx">error</span><span class="p">),</span>
+        <span class="na">userId</span><span class="p">:</span> <span class="nx">id</span><span class="p">,</span>
+        <span class="nx">updates</span><span class="p">,</span>
+        <span class="na">stack</span><span class="p">:</span> <span class="nx">error</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">stack</span> <span class="p">:</span> <span class="kc">undefined</span>
+      <span class="p">})</span>
+      <span class="k">throw</span> <span class="nx">error</span>
+    <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+      <span class="nx">client</span><span class="p">.</span><span class="nf">release</span><span class="p">()</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Usage example</span>
+<span class="k">async</span> <span class="kd">function</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">userService</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">UserService</span><span class="p">()</span>
+  
+  <span class="k">try</span> <span class="p">{</span>
+    <span class="c1">// Create a user</span>
+    <span class="kd">const</span> <span class="nx">user</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">userService</span><span class="p">.</span><span class="nf">createUser</span><span class="p">(</span><span class="dl">'</span><span class="s1">John Doe</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">john@example.com</span><span class="dl">'</span><span class="p">)</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Created user:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">user</span><span class="p">)</span>
+    
+    <span class="c1">// Fetch the user</span>
+    <span class="kd">const</span> <span class="nx">fetchedUser</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">userService</span><span class="p">.</span><span class="nf">getUserById</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Fetched user:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">fetchedUser</span><span class="p">)</span>
+    
+    <span class="c1">// Update the user</span>
+    <span class="kd">const</span> <span class="nx">updatedUser</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">userService</span><span class="p">.</span><span class="nf">updateUser</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">John Smith</span><span class="dl">'</span> <span class="p">})</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Updated user:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">updatedUser</span><span class="p">)</span>
+    
+  <span class="p">}</span> <span class="k">catch </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Application error</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">error</span><span class="p">:</span> <span class="nx">error</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span> <span class="p">:</span> <span class="nc">String</span><span class="p">(</span><span class="nx">error</span><span class="p">),</span>
+      <span class="na">stack</span><span class="p">:</span> <span class="nx">error</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">stack</span> <span class="p">:</span> <span class="kc">undefined</span>
+    <span class="p">})</span>
+  <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+    <span class="k">await</span> <span class="nx">pool</span><span class="p">.</span><span class="nf">end</span><span class="p">()</span>
+    <span class="nx">logger</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nf">main</span><span class="p">().</span><span class="k">catch</span><span class="p">(</span><span class="nx">error</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Failed to start application</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">error</span><span class="p">:</span> <span class="nx">error</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span> <span class="p">:</span> <span class="nc">String</span><span class="p">(</span><span class="nx">error</span><span class="p">),</span>
+    <span class="na">stack</span><span class="p">:</span> <span class="nx">error</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">stack</span> <span class="p">:</span> <span class="kc">undefined</span>
+  <span class="p">})</span>
+  <span class="nx">process</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h2 id="background-service-examples">Background Service Examples</h2>
+
+<h3 id="worker-thread-service">Worker Thread Service</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Worker</span><span class="p">,</span> <span class="nx">isMainThread</span><span class="p">,</span> <span class="nx">parentPort</span><span class="p">,</span> <span class="nx">workerData</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">worker_threads</span><span class="dl">'</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">Syslog</span><span class="p">,</span> <span class="nx">SyslogFacility</span><span class="p">,</span> <span class="nx">SyslogLevel</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span>
+
+<span class="kr">interface</span> <span class="nx">Job</span> <span class="p">{</span>
+  <span class="nl">id</span><span class="p">:</span> <span class="kr">string</span>
+  <span class="kd">type</span><span class="p">:</span> <span class="kr">string</span>
+  <span class="nx">data</span><span class="p">:</span> <span class="kr">any</span>
+  <span class="nx">priority</span><span class="p">:</span> <span class="dl">'</span><span class="s1">low</span><span class="dl">'</span> <span class="o">|</span> <span class="dl">'</span><span class="s1">medium</span><span class="dl">'</span> <span class="o">|</span> <span class="dl">'</span><span class="s1">high</span><span class="dl">'</span>
+  <span class="nx">createdAt</span><span class="p">:</span> <span class="nb">Date</span>
+<span class="p">}</span>
+
+<span class="kr">interface</span> <span class="nx">JobResult</span> <span class="p">{</span>
+  <span class="nl">jobId</span><span class="p">:</span> <span class="kr">string</span>
+  <span class="nx">success</span><span class="p">:</span> <span class="nx">boolean</span>
+  <span class="nx">result</span><span class="p">?:</span> <span class="kr">any</span>
+  <span class="nx">error</span><span class="p">?:</span> <span class="kr">string</span>
+  <span class="nx">processedAt</span><span class="p">:</span> <span class="nb">Date</span>
+  <span class="nx">duration</span><span class="p">:</span> <span class="kr">number</span>
+<span class="p">}</span>
+
+<span class="kd">class</span> <span class="nc">WorkerService</span> <span class="p">{</span>
+  <span class="k">private</span> <span class="nx">logger</span><span class="p">:</span> <span class="nx">Syslog</span>
+  <span class="k">private</span> <span class="nx">workers</span><span class="p">:</span> <span class="nx">Worker</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">private</span> <span class="nx">jobQueue</span><span class="p">:</span> <span class="nx">Job</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">private</span> <span class="nx">isProcessing</span> <span class="o">=</span> <span class="kc">false</span>
+
+  <span class="nf">constructor</span><span class="p">(</span><span class="k">private</span> <span class="nx">workerCount</span><span class="p">:</span> <span class="kr">number</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+      <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">worker-service</span><span class="dl">'</span><span class="p">,</span>
+      <span class="na">facility</span><span class="p">:</span> <span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">DAEMON</span><span class="p">,</span>
+      <span class="na">options</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">pid</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">ndelay</span><span class="dl">'</span><span class="p">],</span>
+      <span class="na">logLevel</span><span class="p">:</span> <span class="nx">SyslogLevel</span><span class="p">.</span><span class="nx">INFO</span>
+    <span class="p">})</span>
+  <span class="p">}</span>
+
+  <span class="k">async</span> <span class="nf">start</span><span class="p">():</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="k">void</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Starting worker service</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">workerCount</span><span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">workerCount</span> <span class="p">})</span>
+    
+    <span class="c1">// Create worker threads</span>
+    <span class="k">for </span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">workerCount</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="nx">worker</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Worker</span><span class="p">(</span><span class="nx">__filename</span><span class="p">,</span> <span class="p">{</span>
+        <span class="na">workerData</span><span class="p">:</span> <span class="p">{</span> <span class="na">workerId</span><span class="p">:</span> <span class="nx">i</span> <span class="p">}</span>
+      <span class="p">})</span>
+      
+      <span class="nx">worker</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">message</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="na">result</span><span class="p">:</span> <span class="nx">JobResult</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nf">handleJobResult</span><span class="p">(</span><span class="nx">result</span><span class="p">)</span>
+      <span class="p">})</span>
+      
+      <span class="nx">worker</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">error</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Worker error</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+          <span class="na">workerId</span><span class="p">:</span> <span class="nx">i</span><span class="p">,</span>
+          <span class="na">error</span><span class="p">:</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+          <span class="na">stack</span><span class="p">:</span> <span class="nx">error</span><span class="p">.</span><span class="nx">stack</span>
+        <span class="p">})</span>
+      <span class="p">})</span>
+      
+      <span class="nx">worker</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">exit</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">code</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">if </span><span class="p">(</span><span class="nx">code</span> <span class="o">!==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Worker stopped unexpectedly</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+            <span class="na">workerId</span><span class="p">:</span> <span class="nx">i</span><span class="p">,</span>
+            <span class="na">exitCode</span><span class="p">:</span> <span class="nx">code</span>
+          <span class="p">})</span>
+        <span class="p">}</span>
+      <span class="p">})</span>
+      
+      <span class="k">this</span><span class="p">.</span><span class="nx">workers</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="nx">worker</span><span class="p">)</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Worker created</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">workerId</span><span class="p">:</span> <span class="nx">i</span> <span class="p">})</span>
+    <span class="p">}</span>
+    
+    <span class="c1">// Start processing jobs</span>
+    <span class="k">this</span><span class="p">.</span><span class="nf">processJobs</span><span class="p">()</span>
+    
+    <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Worker service started successfully</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">workerCount</span><span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">workers</span><span class="p">.</span><span class="nx">length</span>
+    <span class="p">})</span>
+  <span class="p">}</span>
+
+  <span class="nf">addJob</span><span class="p">(</span><span class="nx">job</span><span class="p">:</span> <span class="nb">Omit</span><span class="o">&lt;</span><span class="nx">Job</span><span class="p">,</span> <span class="dl">'</span><span class="s1">createdAt</span><span class="dl">'</span><span class="o">&gt;</span><span class="p">):</span> <span class="k">void</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="na">fullJob</span><span class="p">:</span> <span class="nx">Job</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="p">...</span><span class="nx">job</span><span class="p">,</span>
+      <span class="na">createdAt</span><span class="p">:</span> <span class="k">new</span> <span class="nc">Date</span><span class="p">()</span>
+    <span class="p">}</span>
+    
+    <span class="k">this</span><span class="p">.</span><span class="nx">jobQueue</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="nx">fullJob</span><span class="p">)</span>
+    
+    <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Job added to queue</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">jobId</span><span class="p">:</span> <span class="nx">fullJob</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
+      <span class="na">type</span><span class="p">:</span> <span class="nx">fullJob</span><span class="p">.</span><span class="kd">type</span><span class="p">,</span>
+      <span class="na">priority</span><span class="p">:</span> <span class="nx">fullJob</span><span class="p">.</span><span class="nx">priority</span><span class="p">,</span>
+      <span class="na">queueSize</span><span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">jobQueue</span><span class="p">.</span><span class="nx">length</span>
+    <span class="p">})</span>
+  <span class="p">}</span>
+
+  <span class="k">private</span> <span class="k">async</span> <span class="nf">processJobs</span><span class="p">():</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="k">void</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">isProcessing</span> <span class="o">=</span> <span class="kc">true</span>
+    
+    <span class="k">while </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">isProcessing</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">jobQueue</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">workers</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">const</span> <span class="nx">job</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">jobQueue</span><span class="p">.</span><span class="nf">shift</span><span class="p">()</span><span class="o">!</span>
+        <span class="kd">const</span> <span class="nx">worker</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">workers</span><span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="nf">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="k">this</span><span class="p">.</span><span class="nx">workers</span><span class="p">.</span><span class="nx">length</span><span class="p">)]</span>
+        
+        <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">Dispatching job to worker</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+          <span class="na">jobId</span><span class="p">:</span> <span class="nx">job</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
+          <span class="na">type</span><span class="p">:</span> <span class="nx">job</span><span class="p">.</span><span class="kd">type</span><span class="p">,</span>
+          <span class="na">queueSize</span><span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">jobQueue</span><span class="p">.</span><span class="nx">length</span>
+        <span class="p">})</span>
+        
+        <span class="nx">worker</span><span class="p">.</span><span class="nf">postMessage</span><span class="p">(</span><span class="nx">job</span><span class="p">)</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="c1">// Wait a bit before checking again</span>
+        <span class="k">await</span> <span class="k">new</span> <span class="nc">Promise</span><span class="p">(</span><span class="nx">resolve</span> <span class="o">=&gt;</span> <span class="nf">setTimeout</span><span class="p">(</span><span class="nx">resolve</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="k">private</span> <span class="nf">handleJobResult</span><span class="p">(</span><span class="nx">result</span><span class="p">:</span> <span class="nx">JobResult</span><span class="p">):</span> <span class="k">void</span> <span class="p">{</span>
+    <span class="k">if </span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">success</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Job completed successfully</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+        <span class="na">jobId</span><span class="p">:</span> <span class="nx">result</span><span class="p">.</span><span class="nx">jobId</span><span class="p">,</span>
+        <span class="na">duration</span><span class="p">:</span> <span class="nx">result</span><span class="p">.</span><span class="nx">duration</span><span class="p">,</span>
+        <span class="na">processedAt</span><span class="p">:</span> <span class="nx">result</span><span class="p">.</span><span class="nx">processedAt</span>
+      <span class="p">})</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Job failed</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+        <span class="na">jobId</span><span class="p">:</span> <span class="nx">result</span><span class="p">.</span><span class="nx">jobId</span><span class="p">,</span>
+        <span class="na">error</span><span class="p">:</span> <span class="nx">result</span><span class="p">.</span><span class="nx">error</span><span class="p">,</span>
+        <span class="na">duration</span><span class="p">:</span> <span class="nx">result</span><span class="p">.</span><span class="nx">duration</span><span class="p">,</span>
+        <span class="na">processedAt</span><span class="p">:</span> <span class="nx">result</span><span class="p">.</span><span class="nx">processedAt</span>
+      <span class="p">})</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="k">async</span> <span class="nf">stop</span><span class="p">():</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="k">void</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Stopping worker service</span><span class="dl">'</span><span class="p">)</span>
+    
+    <span class="k">this</span><span class="p">.</span><span class="nx">isProcessing</span> <span class="o">=</span> <span class="kc">false</span>
+    
+    <span class="c1">// Wait for current jobs to finish (with timeout)</span>
+    <span class="kd">const</span> <span class="nx">timeout</span> <span class="o">=</span> <span class="nf">setTimeout</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nf">warning</span><span class="p">(</span><span class="dl">'</span><span class="s1">Timeout waiting for jobs to finish</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">},</span> <span class="mi">30000</span><span class="p">)</span>
+    
+    <span class="k">while </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">jobQueue</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">await</span> <span class="k">new</span> <span class="nc">Promise</span><span class="p">(</span><span class="nx">resolve</span> <span class="o">=&gt;</span> <span class="nf">setTimeout</span><span class="p">(</span><span class="nx">resolve</span><span class="p">,</span> <span class="mi">1000</span><span class="p">))</span>
+    <span class="p">}</span>
+    
+    <span class="nf">clearTimeout</span><span class="p">(</span><span class="nx">timeout</span><span class="p">)</span>
+    
+    <span class="c1">// Terminate workers</span>
+    <span class="k">await</span> <span class="nb">Promise</span><span class="p">.</span><span class="nf">all</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">workers</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="nx">worker</span> <span class="o">=&gt;</span> <span class="nx">worker</span><span class="p">.</span><span class="nf">terminate</span><span class="p">()))</span>
+    
+    <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Worker service stopped</span><span class="dl">'</span><span class="p">)</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+  <span class="p">}</span>
+
+  <span class="nf">getStats</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">workerCount</span><span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">workers</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span>
+      <span class="na">queueSize</span><span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">jobQueue</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span>
+      <span class="na">isProcessing</span><span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">isProcessing</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Worker thread code</span>
+<span class="k">if </span><span class="p">(</span><span class="o">!</span><span class="nx">isMainThread</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">{</span> <span class="nx">workerId</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">workerData</span> <span class="kd">as </span><span class="p">{</span> <span class="nl">workerId</span><span class="p">:</span> <span class="kr">number</span> <span class="p">}</span>
+  <span class="kd">const</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+    <span class="na">ident</span><span class="p">:</span> <span class="s2">`worker-</span><span class="p">${</span><span class="nx">workerId</span><span class="p">}</span><span class="s2">`</span><span class="p">,</span>
+    <span class="na">facility</span><span class="p">:</span> <span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">LOCAL3</span>
+  <span class="p">})</span>
+
+  <span class="nx">parentPort</span><span class="p">?.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">message</span><span class="dl">'</span><span class="p">,</span> <span class="k">async </span><span class="p">(</span><span class="nx">job</span><span class="p">:</span> <span class="nx">Job</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">startTime</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nf">now</span><span class="p">()</span>
+    
+    <span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">Processing job</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+      <span class="nx">workerId</span><span class="p">,</span>
+      <span class="na">jobId</span><span class="p">:</span> <span class="nx">job</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
+      <span class="na">type</span><span class="p">:</span> <span class="nx">job</span><span class="p">.</span><span class="kd">type</span>
+    <span class="p">})</span>
+    
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="c1">// Simulate different job types</span>
+      <span class="kd">let</span> <span class="na">result</span><span class="p">:</span> <span class="kr">any</span>
+      
+      <span class="k">switch </span><span class="p">(</span><span class="nx">job</span><span class="p">.</span><span class="kd">type</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="dl">'</span><span class="s1">email</span><span class="dl">'</span><span class="p">:</span>
+          <span class="nx">result</span> <span class="o">=</span> <span class="k">await</span> <span class="nf">processEmail</span><span class="p">(</span><span class="nx">job</span><span class="p">.</span><span class="nx">data</span><span class="p">)</span>
+          <span class="k">break</span>
+        <span class="k">case</span> <span class="dl">'</span><span class="s1">image</span><span class="dl">'</span><span class="p">:</span>
+          <span class="nx">result</span> <span class="o">=</span> <span class="k">await</span> <span class="nf">processImage</span><span class="p">(</span><span class="nx">job</span><span class="p">.</span><span class="nx">data</span><span class="p">)</span>
+          <span class="k">break</span>
+        <span class="k">case</span> <span class="dl">'</span><span class="s1">report</span><span class="dl">'</span><span class="p">:</span>
+          <span class="nx">result</span> <span class="o">=</span> <span class="k">await</span> <span class="nf">processReport</span><span class="p">(</span><span class="nx">job</span><span class="p">.</span><span class="nx">data</span><span class="p">)</span>
+          <span class="k">break</span>
+        <span class="na">default</span><span class="p">:</span>
+          <span class="k">throw</span> <span class="k">new</span> <span class="nc">Error</span><span class="p">(</span><span class="s2">`Unknown job type: </span><span class="p">${</span><span class="nx">job</span><span class="p">.</span><span class="kd">type</span><span class="p">}</span><span class="s2">`</span><span class="p">)</span>
+      <span class="p">}</span>
+      
+      <span class="kd">const</span> <span class="na">jobResult</span><span class="p">:</span> <span class="nx">JobResult</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="na">jobId</span><span class="p">:</span> <span class="nx">job</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
+        <span class="na">success</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="nx">result</span><span class="p">,</span>
+        <span class="na">processedAt</span><span class="p">:</span> <span class="k">new</span> <span class="nc">Date</span><span class="p">(),</span>
+        <span class="na">duration</span><span class="p">:</span> <span class="nb">Date</span><span class="p">.</span><span class="nf">now</span><span class="p">()</span> <span class="o">-</span> <span class="nx">startTime</span>
+      <span class="p">}</span>
+      
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Job processed successfully</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+        <span class="nx">workerId</span><span class="p">,</span>
+        <span class="na">jobId</span><span class="p">:</span> <span class="nx">job</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
+        <span class="na">type</span><span class="p">:</span> <span class="nx">job</span><span class="p">.</span><span class="kd">type</span><span class="p">,</span>
+        <span class="na">duration</span><span class="p">:</span> <span class="nx">jobResult</span><span class="p">.</span><span class="nx">duration</span>
+      <span class="p">})</span>
+      
+      <span class="nx">parentPort</span><span class="p">?.</span><span class="nf">postMessage</span><span class="p">(</span><span class="nx">jobResult</span><span class="p">)</span>
+    <span class="p">}</span> <span class="k">catch </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="na">jobResult</span><span class="p">:</span> <span class="nx">JobResult</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="na">jobId</span><span class="p">:</span> <span class="nx">job</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
+        <span class="na">success</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+        <span class="na">error</span><span class="p">:</span> <span class="nx">error</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span> <span class="p">:</span> <span class="nc">String</span><span class="p">(</span><span class="nx">error</span><span class="p">),</span>
+        <span class="na">processedAt</span><span class="p">:</span> <span class="k">new</span> <span class="nc">Date</span><span class="p">(),</span>
+        <span class="na">duration</span><span class="p">:</span> <span class="nb">Date</span><span class="p">.</span><span class="nf">now</span><span class="p">()</span> <span class="o">-</span> <span class="nx">startTime</span>
+      <span class="p">}</span>
+      
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Job processing failed</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+        <span class="nx">workerId</span><span class="p">,</span>
+        <span class="na">jobId</span><span class="p">:</span> <span class="nx">job</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
+        <span class="na">type</span><span class="p">:</span> <span class="nx">job</span><span class="p">.</span><span class="kd">type</span><span class="p">,</span>
+        <span class="na">error</span><span class="p">:</span> <span class="nx">jobResult</span><span class="p">.</span><span class="nx">error</span><span class="p">,</span>
+        <span class="na">duration</span><span class="p">:</span> <span class="nx">jobResult</span><span class="p">.</span><span class="nx">duration</span>
+      <span class="p">})</span>
+      
+      <span class="nx">parentPort</span><span class="p">?.</span><span class="nf">postMessage</span><span class="p">(</span><span class="nx">jobResult</span><span class="p">)</span>
+    <span class="p">}</span>
+  <span class="p">})</span>
+
+  <span class="k">async</span> <span class="kd">function</span> <span class="nf">processEmail</span><span class="p">(</span><span class="nx">data</span><span class="p">:</span> <span class="kr">any</span><span class="p">):</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="kr">any</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="c1">// Simulate email processing</span>
+    <span class="k">await</span> <span class="k">new</span> <span class="nc">Promise</span><span class="p">(</span><span class="nx">resolve</span> <span class="o">=&gt;</span> <span class="nf">setTimeout</span><span class="p">(</span><span class="nx">resolve</span><span class="p">,</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span> <span class="o">+</span> <span class="mi">500</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">{</span> <span class="na">sent</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="na">recipient</span><span class="p">:</span> <span class="nx">data</span><span class="p">.</span><span class="nx">to</span> <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="k">async</span> <span class="kd">function</span> <span class="nf">processImage</span><span class="p">(</span><span class="nx">data</span><span class="p">:</span> <span class="kr">any</span><span class="p">):</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="kr">any</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="c1">// Simulate image processing</span>
+    <span class="k">await</span> <span class="k">new</span> <span class="nc">Promise</span><span class="p">(</span><span class="nx">resolve</span> <span class="o">=&gt;</span> <span class="nf">setTimeout</span><span class="p">(</span><span class="nx">resolve</span><span class="p">,</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">2000</span> <span class="o">+</span> <span class="mi">1000</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">{</span> <span class="na">processed</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="na">size</span><span class="p">:</span> <span class="nx">data</span><span class="p">.</span><span class="nx">size</span><span class="p">,</span> <span class="na">format</span><span class="p">:</span> <span class="dl">'</span><span class="s1">jpeg</span><span class="dl">'</span> <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="k">async</span> <span class="kd">function</span> <span class="nf">processReport</span><span class="p">(</span><span class="nx">data</span><span class="p">:</span> <span class="kr">any</span><span class="p">):</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="kr">any</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="c1">// Simulate report generation</span>
+    <span class="k">await</span> <span class="k">new</span> <span class="nc">Promise</span><span class="p">(</span><span class="nx">resolve</span> <span class="o">=&gt;</span> <span class="nf">setTimeout</span><span class="p">(</span><span class="nx">resolve</span><span class="p">,</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">3000</span> <span class="o">+</span> <span class="mi">2000</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">{</span> <span class="na">generated</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="na">pages</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span> <span class="o">+</span> <span class="mi">10</span> <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Main application</span>
+<span class="k">if </span><span class="p">(</span><span class="nx">isMainThread</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">async</span> <span class="kd">function</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">service</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">WorkerService</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    
+    <span class="k">await</span> <span class="nx">service</span><span class="p">.</span><span class="nf">start</span><span class="p">()</span>
+    
+    <span class="c1">// Add some sample jobs</span>
+    <span class="k">for </span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="mi">20</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="nx">types</span> <span class="o">=</span> <span class="p">[</span><span class="dl">'</span><span class="s1">email</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">image</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">report</span><span class="dl">'</span><span class="p">]</span>
+      <span class="kd">const</span> <span class="nx">priorities</span> <span class="o">=</span> <span class="p">[</span><span class="dl">'</span><span class="s1">low</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">medium</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">high</span><span class="dl">'</span><span class="p">]</span>
+      
+      <span class="nx">service</span><span class="p">.</span><span class="nf">addJob</span><span class="p">({</span>
+        <span class="na">id</span><span class="p">:</span> <span class="s2">`job-</span><span class="p">${</span><span class="nx">i</span><span class="p">}</span><span class="s2">`</span><span class="p">,</span>
+        <span class="na">type</span><span class="p">:</span> <span class="nx">types</span><span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="nf">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">types</span><span class="p">.</span><span class="nx">length</span><span class="p">)],</span>
+        <span class="na">data</span><span class="p">:</span> <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="nx">i</span><span class="p">,</span> <span class="na">content</span><span class="p">:</span> <span class="s2">`Sample data </span><span class="p">${</span><span class="nx">i</span><span class="p">}</span><span class="s2">`</span> <span class="p">},</span>
+        <span class="na">priority</span><span class="p">:</span> <span class="nx">priorities</span><span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="nf">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">priorities</span><span class="p">.</span><span class="nx">length</span><span class="p">)]</span> <span class="kd">as </span><span class="kr">any</span>
+      <span class="p">})</span>
+    <span class="p">}</span>
+    
+    <span class="c1">// Monitor progress</span>
+    <span class="kd">const</span> <span class="nx">monitor</span> <span class="o">=</span> <span class="nf">setInterval</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="nx">stats</span> <span class="o">=</span> <span class="nx">service</span><span class="p">.</span><span class="nf">getStats</span><span class="p">()</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Stats:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">stats</span><span class="p">)</span>
+      
+      <span class="k">if </span><span class="p">(</span><span class="nx">stats</span><span class="p">.</span><span class="nx">queueSize</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nf">clearInterval</span><span class="p">(</span><span class="nx">monitor</span><span class="p">)</span>
+        <span class="nf">setTimeout</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">service</span><span class="p">.</span><span class="nf">stop</span><span class="p">(),</span> <span class="mi">2000</span><span class="p">)</span>
+      <span class="p">}</span>
+    <span class="p">},</span> <span class="mi">2000</span><span class="p">)</span>
+  <span class="p">}</span>
+  
+  <span class="nf">main</span><span class="p">().</span><span class="k">catch</span><span class="p">(</span><span class="nx">error</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Failed to start application:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">error</span><span class="p">)</span>
+    <span class="nx">process</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+  <span class="p">})</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="cli-application-examples">CLI Application Examples</h2>
+
+<h3 id="command-line-tool">Command Line Tool</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#!/usr/bin/env node
+</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">Command</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">commander</span><span class="dl">'</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">readFileSync</span><span class="p">,</span> <span class="nx">writeFileSync</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">fs</span><span class="dl">'</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">Syslog</span><span class="p">,</span> <span class="nx">SyslogFacility</span><span class="p">,</span> <span class="nx">SyslogLevel</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span>
+
+<span class="kd">const</span> <span class="nx">program</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Command</span><span class="p">()</span>
+<span class="kd">const</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+  <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">mycli</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">facility</span><span class="p">:</span> <span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">LOCAL1</span><span class="p">,</span>
+  <span class="na">options</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">pid</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">ndelay</span><span class="dl">'</span><span class="p">]</span>
+<span class="p">})</span>
+
+<span class="nx">program</span>
+  <span class="p">.</span><span class="nf">name</span><span class="p">(</span><span class="dl">'</span><span class="s1">mycli</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">description</span><span class="p">(</span><span class="dl">'</span><span class="s1">My CLI application with logging</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">version</span><span class="p">(</span><span class="dl">'</span><span class="s1">1.0.0</span><span class="dl">'</span><span class="p">)</span>
+
+<span class="nx">program</span>
+  <span class="p">.</span><span class="nf">command</span><span class="p">(</span><span class="dl">'</span><span class="s1">process</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">description</span><span class="p">(</span><span class="dl">'</span><span class="s1">Process a file</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">argument</span><span class="p">(</span><span class="dl">'</span><span class="s1">&lt;file&gt;</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">file to process</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">option</span><span class="p">(</span><span class="dl">'</span><span class="s1">-o, --output &lt;file&gt;</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">output file</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">option</span><span class="p">(</span><span class="dl">'</span><span class="s1">-v, --verbose</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">verbose output</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">option</span><span class="p">(</span><span class="dl">'</span><span class="s1">-l, --level &lt;level&gt;</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">log level</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">info</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">action</span><span class="p">((</span><span class="nx">file</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Processing file started</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> 
+      <span class="nx">file</span><span class="p">,</span>
+      <span class="na">output</span><span class="p">:</span> <span class="nx">options</span><span class="p">.</span><span class="nx">output</span><span class="p">,</span>
+      <span class="na">verbose</span><span class="p">:</span> <span class="nx">options</span><span class="p">.</span><span class="nx">verbose</span>
+    <span class="p">})</span>
+    
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="c1">// Set log level if specified</span>
+      <span class="k">if </span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">level</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">level</span> <span class="o">!==</span> <span class="dl">'</span><span class="s1">info</span><span class="dl">'</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="s2">`Log level set to </span><span class="p">${</span><span class="nx">options</span><span class="p">.</span><span class="nx">level</span><span class="p">}</span><span class="s2">`</span><span class="p">)</span>
+      <span class="p">}</span>
+      
+      <span class="c1">// Read file</span>
+      <span class="k">if </span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">verbose</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">Reading file</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="nx">file</span> <span class="p">})</span>
+      <span class="p">}</span>
+      
+      <span class="kd">const</span> <span class="nx">content</span> <span class="o">=</span> <span class="nf">readFileSync</span><span class="p">(</span><span class="nx">file</span><span class="p">,</span> <span class="dl">'</span><span class="s1">utf8</span><span class="dl">'</span><span class="p">)</span>
+      <span class="kd">const</span> <span class="nx">lines</span> <span class="o">=</span> <span class="nx">content</span><span class="p">.</span><span class="nf">split</span><span class="p">(</span><span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">).</span><span class="nf">filter</span><span class="p">(</span><span class="nx">line</span> <span class="o">=&gt;</span> <span class="nx">line</span><span class="p">.</span><span class="nf">trim</span><span class="p">())</span>
+      
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">File read successfully</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+        <span class="nx">file</span><span class="p">,</span>
+        <span class="na">lines</span><span class="p">:</span> <span class="nx">lines</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span>
+        <span class="na">size</span><span class="p">:</span> <span class="nx">content</span><span class="p">.</span><span class="nx">length</span>
+      <span class="p">})</span>
+      
+      <span class="c1">// Process content</span>
+      <span class="kd">const</span> <span class="nx">processed</span> <span class="o">=</span> <span class="nx">lines</span><span class="p">.</span><span class="nf">map</span><span class="p">((</span><span class="nx">line</span><span class="p">,</span> <span class="nx">index</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">if </span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">verbose</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">Processing line</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> 
+            <span class="na">lineNumber</span><span class="p">:</span> <span class="nx">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> 
+            <span class="na">content</span><span class="p">:</span> <span class="nx">line</span><span class="p">.</span><span class="nf">substring</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">...</span><span class="dl">'</span> 
+          <span class="p">})</span>
+        <span class="p">}</span>
+        
+        <span class="c1">// Example processing: convert to uppercase and add line number</span>
+        <span class="k">return</span> <span class="s2">`</span><span class="p">${</span><span class="nx">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">}</span><span class="s2">: </span><span class="p">${</span><span class="nx">line</span><span class="p">.</span><span class="nf">toUpperCase</span><span class="p">()}</span><span class="s2">`</span>
+      <span class="p">})</span>
+      
+      <span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">processed</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="c1">// Write output</span>
+      <span class="k">if </span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">output</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nf">writeFileSync</span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">output</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span>
+        <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Output written</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> 
+          <span class="na">output</span><span class="p">:</span> <span class="nx">options</span><span class="p">.</span><span class="nx">output</span><span class="p">,</span>
+          <span class="na">size</span><span class="p">:</span> <span class="nx">result</span><span class="p">.</span><span class="nx">length</span> 
+        <span class="p">})</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">result</span><span class="p">)</span>
+        <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Output printed to console</span><span class="dl">'</span><span class="p">)</span>
+      <span class="p">}</span>
+      
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">File processing completed successfully</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+        <span class="nx">file</span><span class="p">,</span>
+        <span class="na">linesProcessed</span><span class="p">:</span> <span class="nx">lines</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span>
+        <span class="na">outputSize</span><span class="p">:</span> <span class="nx">result</span><span class="p">.</span><span class="nx">length</span>
+      <span class="p">})</span>
+      
+    <span class="p">}</span> <span class="k">catch </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">File processing failed</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+        <span class="nx">file</span><span class="p">,</span>
+        <span class="na">error</span><span class="p">:</span> <span class="nx">error</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span> <span class="p">:</span> <span class="nc">String</span><span class="p">(</span><span class="nx">error</span><span class="p">),</span>
+        <span class="na">stack</span><span class="p">:</span> <span class="nx">error</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">stack</span> <span class="p">:</span> <span class="kc">undefined</span>
+      <span class="p">})</span>
+      <span class="nx">process</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">}</span>
+  <span class="p">})</span>
+
+<span class="nx">program</span>
+  <span class="p">.</span><span class="nf">command</span><span class="p">(</span><span class="dl">'</span><span class="s1">monitor</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">description</span><span class="p">(</span><span class="dl">'</span><span class="s1">Monitor system resources</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">option</span><span class="p">(</span><span class="dl">'</span><span class="s1">-i, --interval &lt;seconds&gt;</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">monitoring interval</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">5</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">option</span><span class="p">(</span><span class="dl">'</span><span class="s1">-c, --count &lt;number&gt;</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">number of iterations</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">10</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">action</span><span class="p">((</span><span class="nx">options</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">interval</span> <span class="o">=</span> <span class="nf">parseInt</span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">interval</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+    <span class="kd">const</span> <span class="nx">count</span> <span class="o">=</span> <span class="nf">parseInt</span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">count</span><span class="p">)</span>
+    
+    <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Starting system monitoring</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">interval</span><span class="p">:</span> <span class="nx">interval</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">,</span>
+      <span class="nx">count</span>
+    <span class="p">})</span>
+    
+    <span class="kd">let</span> <span class="nx">iteration</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="kd">const</span> <span class="nx">monitor</span> <span class="o">=</span> <span class="nf">setInterval</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="nx">iteration</span><span class="o">++</span>
+      
+      <span class="kd">const</span> <span class="nx">memUsage</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nf">memoryUsage</span><span class="p">()</span>
+      <span class="kd">const</span> <span class="nx">cpuUsage</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nf">cpuUsage</span><span class="p">()</span>
+      
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">System metrics</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+        <span class="nx">iteration</span><span class="p">,</span>
+        <span class="na">memory</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">rss</span><span class="p">:</span> <span class="s2">`</span><span class="p">${</span><span class="nb">Math</span><span class="p">.</span><span class="nf">round</span><span class="p">(</span><span class="nx">memUsage</span><span class="p">.</span><span class="nx">rss</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">/</span> <span class="mi">1024</span><span class="p">)}</span><span class="s2">MB`</span><span class="p">,</span>
+          <span class="na">heapTotal</span><span class="p">:</span> <span class="s2">`</span><span class="p">${</span><span class="nb">Math</span><span class="p">.</span><span class="nf">round</span><span class="p">(</span><span class="nx">memUsage</span><span class="p">.</span><span class="nx">heapTotal</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">/</span> <span class="mi">1024</span><span class="p">)}</span><span class="s2">MB`</span><span class="p">,</span>
+          <span class="na">heapUsed</span><span class="p">:</span> <span class="s2">`</span><span class="p">${</span><span class="nb">Math</span><span class="p">.</span><span class="nf">round</span><span class="p">(</span><span class="nx">memUsage</span><span class="p">.</span><span class="nx">heapUsed</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">/</span> <span class="mi">1024</span><span class="p">)}</span><span class="s2">MB`</span><span class="p">,</span>
+          <span class="na">external</span><span class="p">:</span> <span class="s2">`</span><span class="p">${</span><span class="nb">Math</span><span class="p">.</span><span class="nf">round</span><span class="p">(</span><span class="nx">memUsage</span><span class="p">.</span><span class="nx">external</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">/</span> <span class="mi">1024</span><span class="p">)}</span><span class="s2">MB`</span>
+        <span class="p">},</span>
+        <span class="na">cpu</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">user</span><span class="p">:</span> <span class="nx">cpuUsage</span><span class="p">.</span><span class="nx">user</span><span class="p">,</span>
+          <span class="na">system</span><span class="p">:</span> <span class="nx">cpuUsage</span><span class="p">.</span><span class="nx">system</span>
+        <span class="p">},</span>
+        <span class="na">uptime</span><span class="p">:</span> <span class="s2">`</span><span class="p">${</span><span class="nb">Math</span><span class="p">.</span><span class="nf">round</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nf">uptime</span><span class="p">())}</span><span class="s2">s`</span>
+      <span class="p">})</span>
+      
+      <span class="k">if </span><span class="p">(</span><span class="nx">iteration</span> <span class="o">&gt;=</span> <span class="nx">count</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nf">clearInterval</span><span class="p">(</span><span class="nx">monitor</span><span class="p">)</span>
+        <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">System monitoring completed</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+          <span class="na">totalIterations</span><span class="p">:</span> <span class="nx">iteration</span>
+        <span class="p">})</span>
+      <span class="p">}</span>
+    <span class="p">},</span> <span class="nx">interval</span><span class="p">)</span>
+  <span class="p">})</span>
+
+<span class="c1">// Global error handling</span>
+<span class="nx">process</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">uncaughtException</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">critical</span><span class="p">(</span><span class="dl">'</span><span class="s1">Uncaught exception</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">error</span><span class="p">:</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+    <span class="na">stack</span><span class="p">:</span> <span class="nx">error</span><span class="p">.</span><span class="nx">stack</span>
+  <span class="p">})</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+  <span class="nx">process</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">})</span>
+
+<span class="nx">process</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">unhandledRejection</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">reason</span><span class="p">,</span> <span class="nx">promise</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Unhandled rejection</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">reason</span><span class="p">:</span> <span class="nx">reason</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">?</span> <span class="nx">reason</span><span class="p">.</span><span class="nx">message</span> <span class="p">:</span> <span class="nc">String</span><span class="p">(</span><span class="nx">reason</span><span class="p">),</span>
+    <span class="na">stack</span><span class="p">:</span> <span class="nx">reason</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">?</span> <span class="nx">reason</span><span class="p">.</span><span class="nx">stack</span> <span class="p">:</span> <span class="kc">undefined</span>
+  <span class="p">})</span>
+<span class="p">})</span>
+
+<span class="c1">// Graceful shutdown</span>
+<span class="nx">process</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">SIGTERM</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">SIGTERM received, shutting down</span><span class="dl">'</span><span class="p">)</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+  <span class="nx">process</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="p">})</span>
+
+<span class="nx">process</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">SIGINT</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">SIGINT received, shutting down</span><span class="dl">'</span><span class="p">)</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+  <span class="nx">process</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="p">})</span>
+
+<span class="nx">program</span><span class="p">.</span><span class="nf">parse</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h2 id="testing-examples">Testing Examples</h2>
+
+<h3 id="unit-testing-with-vitest">Unit Testing with Vitest</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">describe</span><span class="p">,</span> <span class="nx">it</span><span class="p">,</span> <span class="nx">expect</span><span class="p">,</span> <span class="nx">vi</span><span class="p">,</span> <span class="nx">beforeEach</span><span class="p">,</span> <span class="nx">afterEach</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">vitest</span><span class="dl">'</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">Syslog</span><span class="p">,</span> <span class="nx">SyslogFacility</span><span class="p">,</span> <span class="nx">SyslogLevel</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../src/index</span><span class="dl">'</span>
+
+<span class="c1">// Mock the native module</span>
+<span class="nx">vi</span><span class="p">.</span><span class="nf">mock</span><span class="p">(</span><span class="dl">'</span><span class="s1">../binding.node</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">({</span>
+  <span class="na">init</span><span class="p">:</span> <span class="nx">vi</span><span class="p">.</span><span class="nf">fn</span><span class="p">(),</span>
+  <span class="na">log</span><span class="p">:</span> <span class="nx">vi</span><span class="p">.</span><span class="nf">fn</span><span class="p">(),</span>
+  <span class="na">close</span><span class="p">:</span> <span class="nx">vi</span><span class="p">.</span><span class="nf">fn</span><span class="p">(),</span>
+  <span class="na">setLogLevel</span><span class="p">:</span> <span class="nx">vi</span><span class="p">.</span><span class="nf">fn</span><span class="p">()</span>
+<span class="p">}))</span>
+
+<span class="nf">describe</span><span class="p">(</span><span class="dl">'</span><span class="s1">Syslog</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="na">logger</span><span class="p">:</span> <span class="nx">Syslog</span>
+
+  <span class="nf">beforeEach</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+      <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">test-app</span><span class="dl">'</span><span class="p">,</span>
+      <span class="na">facility</span><span class="p">:</span> <span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">LOCAL0</span><span class="p">,</span>
+      <span class="na">logLevel</span><span class="p">:</span> <span class="nx">SyslogLevel</span><span class="p">.</span><span class="nx">DEBUG</span>
+    <span class="p">})</span>
+  <span class="p">})</span>
+
+  <span class="nf">afterEach</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">logger</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+  <span class="p">})</span>
+
+  <span class="nf">describe</span><span class="p">(</span><span class="dl">'</span><span class="s1">constructor</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nf">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">should create logger with valid options</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="nf">expect</span><span class="p">(</span><span class="nx">logger</span><span class="p">).</span><span class="nf">toBeDefined</span><span class="p">()</span>
+    <span class="p">})</span>
+
+    <span class="nf">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">should throw error with invalid facility</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="nf">expect</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+        <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">test</span><span class="dl">'</span><span class="p">,</span>
+        <span class="na">facility</span><span class="p">:</span> <span class="dl">'</span><span class="s1">invalid</span><span class="dl">'</span> <span class="kd">as </span><span class="kr">any</span>
+      <span class="p">})).</span><span class="nf">toThrow</span><span class="p">(</span><span class="dl">'</span><span class="s1">Invalid facility: invalid</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">})</span>
+
+    <span class="nf">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">should throw error with invalid log level</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="nf">expect</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+        <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">test</span><span class="dl">'</span><span class="p">,</span>
+        <span class="na">logLevel</span><span class="p">:</span> <span class="dl">'</span><span class="s1">invalid</span><span class="dl">'</span> <span class="kd">as </span><span class="kr">any</span>
+      <span class="p">})).</span><span class="nf">toThrow</span><span class="p">(</span><span class="dl">'</span><span class="s1">Invalid log level: invalid</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">})</span>
+
+    <span class="nf">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">should require ident parameter</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="nf">expect</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({}</span> <span class="kd">as </span><span class="kr">any</span><span class="p">)).</span><span class="nf">toThrow</span><span class="p">(</span><span class="dl">'</span><span class="s1">ident is required</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">})</span>
+  <span class="p">})</span>
+
+  <span class="nf">describe</span><span class="p">(</span><span class="dl">'</span><span class="s1">logging methods</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nf">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">should log emergency messages</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="p">{</span> <span class="nx">log</span> <span class="p">}</span> <span class="o">=</span> <span class="nf">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">../binding.node</span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">emerg</span><span class="p">(</span><span class="dl">'</span><span class="s1">Emergency message</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">context</span><span class="p">:</span> <span class="dl">'</span><span class="s1">test</span><span class="dl">'</span> <span class="p">})</span>
+      
+      <span class="nf">expect</span><span class="p">(</span><span class="nx">log</span><span class="p">).</span><span class="nf">toHaveBeenCalledWith</span><span class="p">(</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="nb">Number</span><span class="p">),</span> <span class="c1">// LOG_EMERG</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">stringContaining</span><span class="p">(</span><span class="dl">'</span><span class="s1">Emergency message</span><span class="dl">'</span><span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">})</span>
+
+    <span class="nf">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">should log alert messages</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="p">{</span> <span class="nx">log</span> <span class="p">}</span> <span class="o">=</span> <span class="nf">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">../binding.node</span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">alert</span><span class="p">(</span><span class="dl">'</span><span class="s1">Alert message</span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="nf">expect</span><span class="p">(</span><span class="nx">log</span><span class="p">).</span><span class="nf">toHaveBeenCalledWith</span><span class="p">(</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="nb">Number</span><span class="p">),</span> <span class="c1">// LOG_ALERT</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">stringContaining</span><span class="p">(</span><span class="dl">'</span><span class="s1">Alert message</span><span class="dl">'</span><span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">})</span>
+
+    <span class="nf">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">should log critical messages</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="p">{</span> <span class="nx">log</span> <span class="p">}</span> <span class="o">=</span> <span class="nf">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">../binding.node</span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">crit</span><span class="p">(</span><span class="dl">'</span><span class="s1">Critical message</span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="nf">expect</span><span class="p">(</span><span class="nx">log</span><span class="p">).</span><span class="nf">toHaveBeenCalledWith</span><span class="p">(</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="nb">Number</span><span class="p">),</span> <span class="c1">// LOG_CRIT</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">stringContaining</span><span class="p">(</span><span class="dl">'</span><span class="s1">Critical message</span><span class="dl">'</span><span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">})</span>
+
+    <span class="nf">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">should log error messages</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="p">{</span> <span class="nx">log</span> <span class="p">}</span> <span class="o">=</span> <span class="nf">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">../binding.node</span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Error message</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">code</span><span class="p">:</span> <span class="dl">'</span><span class="s1">TEST_ERROR</span><span class="dl">'</span> <span class="p">})</span>
+      
+      <span class="nf">expect</span><span class="p">(</span><span class="nx">log</span><span class="p">).</span><span class="nf">toHaveBeenCalledWith</span><span class="p">(</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="nb">Number</span><span class="p">),</span> <span class="c1">// LOG_ERR</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">stringContaining</span><span class="p">(</span><span class="dl">'</span><span class="s1">Error message</span><span class="dl">'</span><span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">})</span>
+
+    <span class="nf">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">should log warning messages</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="p">{</span> <span class="nx">log</span> <span class="p">}</span> <span class="o">=</span> <span class="nf">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">../binding.node</span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">warning</span><span class="p">(</span><span class="dl">'</span><span class="s1">Warning message</span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="nf">expect</span><span class="p">(</span><span class="nx">log</span><span class="p">).</span><span class="nf">toHaveBeenCalledWith</span><span class="p">(</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="nb">Number</span><span class="p">),</span> <span class="c1">// LOG_WARNING</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">stringContaining</span><span class="p">(</span><span class="dl">'</span><span class="s1">Warning message</span><span class="dl">'</span><span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">})</span>
+
+    <span class="nf">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">should log notice messages</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="p">{</span> <span class="nx">log</span> <span class="p">}</span> <span class="o">=</span> <span class="nf">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">../binding.node</span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">notice</span><span class="p">(</span><span class="dl">'</span><span class="s1">Notice message</span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="nf">expect</span><span class="p">(</span><span class="nx">log</span><span class="p">).</span><span class="nf">toHaveBeenCalledWith</span><span class="p">(</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="nb">Number</span><span class="p">),</span> <span class="c1">// LOG_NOTICE</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">stringContaining</span><span class="p">(</span><span class="dl">'</span><span class="s1">Notice message</span><span class="dl">'</span><span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">})</span>
+
+    <span class="nf">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">should log info messages</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="p">{</span> <span class="nx">log</span> <span class="p">}</span> <span class="o">=</span> <span class="nf">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">../binding.node</span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Info message</span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="nf">expect</span><span class="p">(</span><span class="nx">log</span><span class="p">).</span><span class="nf">toHaveBeenCalledWith</span><span class="p">(</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="nb">Number</span><span class="p">),</span> <span class="c1">// LOG_INFO</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">stringContaining</span><span class="p">(</span><span class="dl">'</span><span class="s1">Info message</span><span class="dl">'</span><span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">})</span>
+
+    <span class="nf">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">should log debug messages</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="p">{</span> <span class="nx">log</span> <span class="p">}</span> <span class="o">=</span> <span class="nf">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">../binding.node</span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">Debug message</span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="nf">expect</span><span class="p">(</span><span class="nx">log</span><span class="p">).</span><span class="nf">toHaveBeenCalledWith</span><span class="p">(</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="nb">Number</span><span class="p">),</span> <span class="c1">// LOG_DEBUG</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">stringContaining</span><span class="p">(</span><span class="dl">'</span><span class="s1">Debug message</span><span class="dl">'</span><span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">})</span>
+  <span class="p">})</span>
+
+  <span class="nf">describe</span><span class="p">(</span><span class="dl">'</span><span class="s1">log level filtering</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nf">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">should filter debug messages when log level is info</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="p">{</span> <span class="nx">log</span> <span class="p">}</span> <span class="o">=</span> <span class="nf">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">../binding.node</span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="kd">const</span> <span class="nx">infoLogger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+        <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">test</span><span class="dl">'</span><span class="p">,</span>
+        <span class="na">logLevel</span><span class="p">:</span> <span class="nx">SyslogLevel</span><span class="p">.</span><span class="nx">INFO</span>
+      <span class="p">})</span>
+      
+      <span class="nx">infoLogger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">This should not appear</span><span class="dl">'</span><span class="p">)</span>
+      <span class="nx">infoLogger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">This should appear</span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="nf">expect</span><span class="p">(</span><span class="nx">log</span><span class="p">).</span><span class="nf">toHaveBeenCalledTimes</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+      <span class="nf">expect</span><span class="p">(</span><span class="nx">log</span><span class="p">).</span><span class="nf">toHaveBeenCalledWith</span><span class="p">(</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="nb">Number</span><span class="p">),</span> <span class="c1">// LOG_INFO</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">stringContaining</span><span class="p">(</span><span class="dl">'</span><span class="s1">This should appear</span><span class="dl">'</span><span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">})</span>
+
+    <span class="nf">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">should check if debug is enabled</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="nx">infoLogger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+        <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">test</span><span class="dl">'</span><span class="p">,</span>
+        <span class="na">logLevel</span><span class="p">:</span> <span class="nx">SyslogLevel</span><span class="p">.</span><span class="nx">INFO</span>
+      <span class="p">})</span>
+      
+      <span class="nf">expect</span><span class="p">(</span><span class="nx">infoLogger</span><span class="p">.</span><span class="nf">isDebugEnabled</span><span class="p">()).</span><span class="nf">toBe</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+      
+      <span class="kd">const</span> <span class="nx">debugLogger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+        <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">test</span><span class="dl">'</span><span class="p">,</span>
+        <span class="na">logLevel</span><span class="p">:</span> <span class="nx">SyslogLevel</span><span class="p">.</span><span class="nx">DEBUG</span>
+      <span class="p">})</span>
+      
+      <span class="nf">expect</span><span class="p">(</span><span class="nx">debugLogger</span><span class="p">.</span><span class="nf">isDebugEnabled</span><span class="p">()).</span><span class="nf">toBe</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+    <span class="p">})</span>
+  <span class="p">})</span>
+
+  <span class="nf">describe</span><span class="p">(</span><span class="dl">'</span><span class="s1">context handling</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nf">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">should handle context objects</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="p">{</span> <span class="nx">log</span> <span class="p">}</span> <span class="o">=</span> <span class="nf">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">../binding.node</span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Test message</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+        <span class="na">userId</span><span class="p">:</span> <span class="mi">123</span><span class="p">,</span>
+        <span class="na">action</span><span class="p">:</span> <span class="dl">'</span><span class="s1">login</span><span class="dl">'</span><span class="p">,</span>
+        <span class="na">ip</span><span class="p">:</span> <span class="dl">'</span><span class="s1">192.168.1.1</span><span class="dl">'</span>
+      <span class="p">})</span>
+      
+      <span class="nf">expect</span><span class="p">(</span><span class="nx">log</span><span class="p">).</span><span class="nf">toHaveBeenCalledWith</span><span class="p">(</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="nb">Number</span><span class="p">),</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">stringContaining</span><span class="p">(</span><span class="dl">'</span><span class="s1">Test message</span><span class="dl">'</span><span class="p">),</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">stringContaining</span><span class="p">(</span><span class="dl">'</span><span class="s1">userId=123</span><span class="dl">'</span><span class="p">),</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">stringContaining</span><span class="p">(</span><span class="dl">'</span><span class="s1">action=login</span><span class="dl">'</span><span class="p">),</span>
+        <span class="nx">expect</span><span class="p">.</span><span class="nf">stringContaining</span><span class="p">(</span><span class="dl">'</span><span class="s1">ip=192.168.1.1</span><span class="dl">'</span><span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">})</span>
+
+    <span class="nf">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">should handle circular references in context</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="p">{</span> <span class="nx">log</span> <span class="p">}</span> <span class="o">=</span> <span class="nf">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">../binding.node</span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="kd">const</span> <span class="na">context</span><span class="p">:</span> <span class="kr">any</span> <span class="o">=</span> <span class="p">{</span> <span class="na">userId</span><span class="p">:</span> <span class="mi">123</span> <span class="p">}</span>
+      <span class="nx">context</span><span class="p">.</span><span class="nx">circular</span> <span class="o">=</span> <span class="nx">context</span>
+      
+      <span class="nf">expect</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Test message</span><span class="dl">'</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span>
+      <span class="p">}).</span><span class="nx">not</span><span class="p">.</span><span class="nf">toThrow</span><span class="p">()</span>
+    <span class="p">})</span>
+  <span class="p">})</span>
+
+  <span class="nf">describe</span><span class="p">(</span><span class="dl">'</span><span class="s1">cleanup</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nf">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">should close syslog connection</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="p">{</span> <span class="nx">close</span> <span class="p">}</span> <span class="o">=</span> <span class="nf">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">../binding.node</span><span class="dl">'</span><span class="p">)</span>
+      
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+      
+      <span class="nf">expect</span><span class="p">(</span><span class="nx">close</span><span class="p">).</span><span class="nf">toHaveBeenCalled</span><span class="p">()</span>
+    <span class="p">})</span>
+  <span class="p">})</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<p>These examples demonstrate various real-world usage patterns for node-syslog in different application types and scenarios.</p>

@@ -1,0 +1,531 @@
+<h1 id="getting-started-guide">Getting Started Guide</h1>
+
+<p>This guide will help you get up and running with node-syslog quickly. You’ll learn how to install, configure, and use the library in your Node.js applications.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<p>Before you begin, ensure you have:</p>
+
+<ul>
+  <li><strong>Node.js</strong> version 22.x LTS or higher</li>
+  <li><strong>Linux</strong> operating system (ARM64 or AMD64)</li>
+  <li><strong>npm</strong> or <strong>pnpm</strong> package manager</li>
+  <li>(Optional) <strong>rsyslog</strong> or <strong>syslog-ng</strong> for log management</li>
+</ul>
+
+<h2 id="installation">Installation</h2>
+
+<h3 id="basic-installation">Basic Installation</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm <span class="nb">install </span>node-syslog
+</code></pre></div></div>
+
+<h3 id="using-pnpm-recommended-for-development">Using pnpm (Recommended for Development)</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pnpm add node-syslog
+</code></pre></div></div>
+
+<h3 id="verify-installation">Verify Installation</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>node <span class="nt">-e</span> <span class="s2">"console.log(require('node-syslog'))"</span>
+</code></pre></div></div>
+
+<p>If the installation was successful, you should see the module exports without errors.</p>
+
+<h2 id="basic-usage">Basic Usage</h2>
+
+<h3 id="import-the-library">Import the Library</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// ES6 import</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">Syslog</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span>
+
+<span class="c1">// CommonJS require</span>
+<span class="kd">const</span> <span class="p">{</span> <span class="nx">Syslog</span> <span class="p">}</span> <span class="o">=</span> <span class="nf">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h3 id="create-a-simple-logger">Create a Simple Logger</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Syslog</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span>
+
+<span class="c1">// Create logger with basic configuration</span>
+<span class="kd">const</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+  <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">myapp</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">facility</span><span class="p">:</span> <span class="dl">'</span><span class="s1">local0</span><span class="dl">'</span>
+<span class="p">})</span>
+
+<span class="c1">// Log a message</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Hello, syslog!</span><span class="dl">'</span><span class="p">)</span>
+
+<span class="c1">// Close when done</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h3 id="run-your-first-program">Run Your First Program</h3>
+
+<p>Save this as <code class="language-plaintext highlighter-rouge">example.js</code>:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="p">{</span> <span class="nx">Syslog</span> <span class="p">}</span> <span class="o">=</span> <span class="nf">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span><span class="p">)</span>
+
+<span class="kd">const</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+  <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">example</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">facility</span><span class="p">:</span> <span class="dl">'</span><span class="s1">local0</span><span class="dl">'</span>
+<span class="p">})</span>
+
+<span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">This is my first syslog message!</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">warning</span><span class="p">(</span><span class="dl">'</span><span class="s1">Something might be wrong</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">An error occurred</span><span class="dl">'</span><span class="p">)</span>
+
+<span class="nx">logger</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>Run it:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>node example.js
+</code></pre></div></div>
+
+<p>Check your system logs:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># For systems using journalctl</span>
+journalctl <span class="nt">-f</span> | <span class="nb">grep </span>example
+
+<span class="c"># For traditional syslog</span>
+<span class="nb">tail</span> <span class="nt">-f</span> /var/log/syslog | <span class="nb">grep </span>example
+</code></pre></div></div>
+
+<h2 id="configuration-options">Configuration Options</h2>
+
+<h3 id="full-configuration-example">Full Configuration Example</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Syslog</span><span class="p">,</span> <span class="nx">SyslogFacility</span><span class="p">,</span> <span class="nx">SyslogLevel</span><span class="p">,</span> <span class="nx">SyslogOption</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span>
+
+<span class="kd">const</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+  <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">production-app</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">facility</span><span class="p">:</span> <span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">DAEMON</span><span class="p">,</span>
+  <span class="na">options</span><span class="p">:</span> <span class="p">[</span>
+    <span class="nx">SyslogOption</span><span class="p">.</span><span class="nx">PID</span><span class="p">,</span>      <span class="c1">// Include process ID</span>
+    <span class="nx">SyslogOption</span><span class="p">.</span><span class="nx">NDELAY</span><span class="p">,</span>   <span class="c1">// Open connection immediately</span>
+    <span class="nx">SyslogOption</span><span class="p">.</span><span class="nx">LOG_PID</span>   <span class="c1">// Log the PID with each message</span>
+  <span class="p">],</span>
+  <span class="na">logLevel</span><span class="p">:</span> <span class="nx">SyslogLevel</span><span class="p">.</span><span class="nx">INFO</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h3 id="configuration-parameters">Configuration Parameters</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ident</code></td>
+      <td>string</td>
+      <td>Required</td>
+      <td>Identifier for log messages</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">facility</code></td>
+      <td>SyslogFacilityType</td>
+      <td>‘user’</td>
+      <td>Syslog facility (kern, user, mail, daemon, etc.)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">options</code></td>
+      <td>SyslogOptionType[]</td>
+      <td>[]</td>
+      <td>Syslog options (pid, ndelay, nowait, etc.)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">logLevel</code></td>
+      <td>SyslogLevelType</td>
+      <td>‘info’</td>
+      <td>Minimum log level to output</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="available-facilities">Available Facilities</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">SyslogFacility</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span>
+
+<span class="c1">// Common facilities</span>
+<span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">KERN</span>      <span class="c1">// Kernel messages</span>
+<span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">USER</span>      <span class="c1">// User-level messages (default)</span>
+<span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">MAIL</span>      <span class="c1">// Mail system</span>
+<span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">DAEMON</span>    <span class="c1">// System daemons</span>
+<span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">AUTH</span>      <span class="c1">// Security/authorization</span>
+<span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">SYSLOG</span>    <span class="c1">// Internal syslog messages</span>
+<span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">LPR</span>       <span class="c1">// Line printer subsystem</span>
+<span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">NEWS</span>      <span class="c1">// Network news subsystem</span>
+<span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">UUCP</span>      <span class="c1">// UUCP subsystem</span>
+<span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">CRON</span>      <span class="c1">// Clock daemon</span>
+<span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">AUTHPRIV</span>  <span class="c1">// Security/authorization (private)</span>
+<span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">FTP</span>       <span class="c1">// FTP daemon</span>
+<span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">LOCAL0</span>    <span class="c1">// Local use 0</span>
+<span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">LOCAL1</span>    <span class="c1">// Local use 1</span>
+<span class="c1">// ... LOCAL2 through LOCAL7</span>
+</code></pre></div></div>
+
+<h3 id="available-log-levels">Available Log Levels</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">SyslogLevel</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span>
+
+<span class="c1">// From most to least severe</span>
+<span class="nx">SyslogLevel</span><span class="p">.</span><span class="nx">EMERG</span>     <span class="c1">// Emergency: system is unusable</span>
+<span class="nx">SyslogLevel</span><span class="p">.</span><span class="nx">ALERT</span>     <span class="c1">// Alert: action must be taken immediately</span>
+<span class="nx">SyslogLevel</span><span class="p">.</span><span class="nx">CRIT</span>      <span class="c1">// Critical: critical conditions</span>
+<span class="nx">SyslogLevel</span><span class="p">.</span><span class="nx">ERR</span>       <span class="c1">// Error: error conditions</span>
+<span class="nx">SyslogLevel</span><span class="p">.</span><span class="nx">WARNING</span>   <span class="c1">// Warning: warning conditions</span>
+<span class="nx">SyslogLevel</span><span class="p">.</span><span class="nx">NOTICE</span>    <span class="c1">// Notice: normal but significant condition</span>
+<span class="nx">SyslogLevel</span><span class="p">.</span><span class="nx">INFO</span>      <span class="c1">// Informational: informational messages</span>
+<span class="nx">SyslogLevel</span><span class="p">.</span><span class="nx">DEBUG</span>     <span class="c1">// Debug: debug-level messages</span>
+</code></pre></div></div>
+
+<h2 id="logging-methods">Logging Methods</h2>
+
+<h3 id="basic-logging">Basic Logging</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">logger</span><span class="p">.</span><span class="nf">emerg</span><span class="p">(</span><span class="dl">'</span><span class="s1">System is unusable!</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">alert</span><span class="p">(</span><span class="dl">'</span><span class="s1">Immediate action required!</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">crit</span><span class="p">(</span><span class="dl">'</span><span class="s1">Critical system failure</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Database connection failed</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">warning</span><span class="p">(</span><span class="dl">'</span><span class="s1">High memory usage detected</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">notice</span><span class="p">(</span><span class="dl">'</span><span class="s1">Server configuration updated</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">User logged in successfully</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">Processing request details</span><span class="dl">'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h3 id="structured-logging">Structured Logging</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Log with additional context</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">User action completed</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">userId</span><span class="p">:</span> <span class="mi">12345</span><span class="p">,</span>
+  <span class="na">action</span><span class="p">:</span> <span class="dl">'</span><span class="s1">purchase</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">amount</span><span class="p">:</span> <span class="mf">99.99</span><span class="p">,</span>
+  <span class="na">timestamp</span><span class="p">:</span> <span class="k">new</span> <span class="nc">Date</span><span class="p">().</span><span class="nf">toISOString</span><span class="p">()</span>
+<span class="p">})</span>
+
+<span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">API request failed</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">url</span><span class="p">:</span> <span class="dl">'</span><span class="s1">/api/users</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">method</span><span class="p">:</span> <span class="dl">'</span><span class="s1">POST</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">statusCode</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
+  <span class="na">error</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Database timeout</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">requestId</span><span class="p">:</span> <span class="dl">'</span><span class="s1">req_abc123</span><span class="dl">'</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h3 id="conditional-logging">Conditional Logging</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Only log if level is enabled</span>
+<span class="k">if </span><span class="p">(</span><span class="nx">logger</span><span class="p">.</span><span class="nf">isDebugEnabled</span><span class="p">())</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">Expensive debug operation</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">largeObject</span><span class="p">:</span> <span class="nf">getLargeObject</span><span class="p">(),</span>
+    <span class="na">computationResult</span><span class="p">:</span> <span class="nf">expensiveComputation</span><span class="p">()</span>
+  <span class="p">})</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="real-world-examples">Real-World Examples</h2>
+
+<h3 id="expressjs-web-application">Express.js Web Application</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">express</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">express</span><span class="dl">'</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">Syslog</span><span class="p">,</span> <span class="nx">SyslogFacility</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span>
+
+<span class="kd">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="nf">express</span><span class="p">()</span>
+<span class="kd">const</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+  <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">webapp</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">facility</span><span class="p">:</span> <span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">LOCAL0</span><span class="p">,</span>
+  <span class="na">options</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">pid</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">ndelay</span><span class="dl">'</span><span class="p">]</span>
+<span class="p">})</span>
+
+<span class="c1">// Request logging middleware</span>
+<span class="nx">app</span><span class="p">.</span><span class="nf">use</span><span class="p">((</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">start</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nf">now</span><span class="p">()</span>
+  
+  <span class="nx">res</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">finish</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">duration</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nf">now</span><span class="p">()</span> <span class="o">-</span> <span class="nx">start</span>
+    <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">HTTP Request</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">method</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">method</span><span class="p">,</span>
+      <span class="na">url</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span>
+      <span class="na">statusCode</span><span class="p">:</span> <span class="nx">res</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">,</span>
+      <span class="na">duration</span><span class="p">:</span> <span class="s2">`</span><span class="p">${</span><span class="nx">duration</span><span class="p">}</span><span class="s2">ms`</span><span class="p">,</span>
+      <span class="na">userAgent</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">User-Agent</span><span class="dl">'</span><span class="p">),</span>
+      <span class="na">ip</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">ip</span>
+    <span class="p">})</span>
+  <span class="p">})</span>
+  
+  <span class="nf">next</span><span class="p">()</span>
+<span class="p">})</span>
+
+<span class="c1">// Error handling</span>
+<span class="nx">app</span><span class="p">.</span><span class="nf">use</span><span class="p">((</span><span class="nx">err</span><span class="p">:</span> <span class="nb">Error</span><span class="p">,</span> <span class="nx">req</span><span class="p">:</span> <span class="nx">express</span><span class="p">.</span><span class="nx">Request</span><span class="p">,</span> <span class="nx">res</span><span class="p">:</span> <span class="nx">express</span><span class="p">.</span><span class="nx">Response</span><span class="p">,</span> <span class="nx">next</span><span class="p">:</span> <span class="nx">express</span><span class="p">.</span><span class="nx">NextFunction</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Unhandled error</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">error</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+    <span class="na">stack</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">stack</span><span class="p">,</span>
+    <span class="na">url</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span>
+    <span class="na">method</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">method</span>
+  <span class="p">})</span>
+  
+  <span class="nx">res</span><span class="p">.</span><span class="nf">status</span><span class="p">(</span><span class="mi">500</span><span class="p">).</span><span class="nf">json</span><span class="p">({</span> <span class="na">error</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Internal server error</span><span class="dl">'</span> <span class="p">})</span>
+<span class="p">})</span>
+
+<span class="kd">const</span> <span class="nx">PORT</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">3000</span>
+<span class="nx">app</span><span class="p">.</span><span class="nf">listen</span><span class="p">(</span><span class="nx">PORT</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Server started</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">port</span><span class="p">:</span> <span class="nx">PORT</span> <span class="p">})</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h3 id="cli-application">CLI Application</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#!/usr/bin/env node
+</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">Command</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">commander</span><span class="dl">'</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">Syslog</span><span class="p">,</span> <span class="nx">SyslogFacility</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span>
+
+<span class="kd">const</span> <span class="nx">program</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Command</span><span class="p">()</span>
+<span class="kd">const</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+  <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">mycli</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">facility</span><span class="p">:</span> <span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">LOCAL1</span>
+<span class="p">})</span>
+
+<span class="nx">program</span>
+  <span class="p">.</span><span class="nf">name</span><span class="p">(</span><span class="dl">'</span><span class="s1">mycli</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">description</span><span class="p">(</span><span class="dl">'</span><span class="s1">My CLI application</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">version</span><span class="p">(</span><span class="dl">'</span><span class="s1">1.0.0</span><span class="dl">'</span><span class="p">)</span>
+
+<span class="nx">program</span>
+  <span class="p">.</span><span class="nf">command</span><span class="p">(</span><span class="dl">'</span><span class="s1">process</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">argument</span><span class="p">(</span><span class="dl">'</span><span class="s1">&lt;file&gt;</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">file to process</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">option</span><span class="p">(</span><span class="dl">'</span><span class="s1">-v, --verbose</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">verbose output</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">action</span><span class="p">((</span><span class="nx">file</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Processing file</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="nx">file</span> <span class="p">})</span>
+    
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="c1">// Your processing logic here</span>
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">File processed successfully</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="nx">file</span> <span class="p">})</span>
+    <span class="p">}</span> <span class="k">catch </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">File processing failed</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+        <span class="nx">file</span><span class="p">,</span>
+        <span class="na">error</span><span class="p">:</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span>
+      <span class="p">})</span>
+      <span class="nx">process</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">}</span>
+  <span class="p">})</span>
+
+<span class="nx">program</span><span class="p">.</span><span class="nf">parse</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h3 id="background-service">Background Service</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Syslog</span><span class="p">,</span> <span class="nx">SyslogFacility</span><span class="p">,</span> <span class="nx">SyslogLevel</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span>
+
+<span class="kd">class</span> <span class="nc">BackgroundService</span> <span class="p">{</span>
+  <span class="k">private</span> <span class="nx">logger</span><span class="p">:</span> <span class="nx">Syslog</span>
+  <span class="k">private</span> <span class="nx">running</span> <span class="o">=</span> <span class="kc">false</span>
+
+  <span class="nf">constructor</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+      <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">background-service</span><span class="dl">'</span><span class="p">,</span>
+      <span class="na">facility</span><span class="p">:</span> <span class="nx">SyslogFacility</span><span class="p">.</span><span class="nx">DAEMON</span><span class="p">,</span>
+      <span class="na">options</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">pid</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">ndelay</span><span class="dl">'</span><span class="p">],</span>
+      <span class="na">logLevel</span><span class="p">:</span> <span class="nx">SyslogLevel</span><span class="p">.</span><span class="nx">INFO</span>
+    <span class="p">})</span>
+  <span class="p">}</span>
+
+  <span class="k">async</span> <span class="nf">start</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">running</span> <span class="o">=</span> <span class="kc">true</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Background service started</span><span class="dl">'</span><span class="p">)</span>
+    
+    <span class="k">while </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">running</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">try</span> <span class="p">{</span>
+        <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nf">processTasks</span><span class="p">()</span>
+      <span class="p">}</span> <span class="k">catch </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Task processing failed</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+          <span class="na">error</span><span class="p">:</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+          <span class="na">stack</span><span class="p">:</span> <span class="nx">error</span><span class="p">.</span><span class="nx">stack</span>
+        <span class="p">})</span>
+        
+        <span class="c1">// Wait before retrying</span>
+        <span class="k">await</span> <span class="k">new</span> <span class="nc">Promise</span><span class="p">(</span><span class="nx">resolve</span> <span class="o">=&gt;</span> <span class="nf">setTimeout</span><span class="p">(</span><span class="nx">resolve</span><span class="p">,</span> <span class="mi">5000</span><span class="p">))</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="k">async</span> <span class="nf">stop</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">running</span> <span class="o">=</span> <span class="kc">false</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Background service stopped</span><span class="dl">'</span><span class="p">)</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+  <span class="p">}</span>
+
+  <span class="k">private</span> <span class="k">async</span> <span class="nf">processTasks</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// Your background processing logic</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">Processing background tasks</span><span class="dl">'</span><span class="p">)</span>
+    
+    <span class="c1">// Simulate work</span>
+    <span class="k">await</span> <span class="k">new</span> <span class="nc">Promise</span><span class="p">(</span><span class="nx">resolve</span> <span class="o">=&gt;</span> <span class="nf">setTimeout</span><span class="p">(</span><span class="nx">resolve</span><span class="p">,</span> <span class="mi">1000</span><span class="p">))</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Handle graceful shutdown</span>
+<span class="kd">const</span> <span class="nx">service</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">BackgroundService</span><span class="p">()</span>
+
+<span class="nx">process</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">SIGTERM</span><span class="dl">'</span><span class="p">,</span> <span class="k">async </span><span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">await</span> <span class="nx">service</span><span class="p">.</span><span class="nf">stop</span><span class="p">()</span>
+  <span class="nx">process</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="p">})</span>
+
+<span class="nx">process</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">SIGINT</span><span class="dl">'</span><span class="p">,</span> <span class="k">async </span><span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">await</span> <span class="nx">service</span><span class="p">.</span><span class="nf">stop</span><span class="p">()</span>
+  <span class="nx">process</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="p">})</span>
+
+<span class="nx">service</span><span class="p">.</span><span class="nf">start</span><span class="p">().</span><span class="k">catch</span><span class="p">(</span><span class="nx">error</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Failed to start service:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">error</span><span class="p">)</span>
+  <span class="nx">process</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h2 id="best-practices">Best Practices</h2>
+
+<h3 id="1-always-close-the-logger">1. Always Close the Logger</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Good - explicit cleanup</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+
+<span class="c1">// Better - use try/finally</span>
+<span class="k">try</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Doing work</span><span class="dl">'</span><span class="p">)</span>
+  <span class="c1">// ... your code</span>
+<span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+  <span class="nx">logger</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="c1">// Best - automatic cleanup with process hooks</span>
+<span class="nx">process</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">exit</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">logger</span><span class="p">.</span><span class="nf">close</span><span class="p">())</span>
+<span class="nx">process</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">SIGINT</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">logger</span><span class="p">.</span><span class="nf">close</span><span class="p">())</span>
+<span class="nx">process</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">SIGTERM</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">logger</span><span class="p">.</span><span class="nf">close</span><span class="p">())</span>
+</code></pre></div></div>
+
+<h3 id="2-use-appropriate-log-levels">2. Use Appropriate Log Levels</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Use appropriate levels for different situations</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">Detailed debugging info</span><span class="dl">'</span><span class="p">)</span>        <span class="c1">// Development only</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">Normal application flow</span><span class="dl">'</span><span class="p">)</span>        <span class="c1">// Production info</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">warning</span><span class="p">(</span><span class="dl">'</span><span class="s1">Something unusual but not error</span><span class="dl">'</span><span class="p">)</span>  <span class="c1">// Attention needed</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Error that doesn</span><span class="dl">'</span><span class="nx">t</span> <span class="nx">stop</span> <span class="nx">execution</span><span class="dl">'</span><span class="s1">)   // Errors
+logger.crit(</span><span class="dl">'</span><span class="nx">Critical</span> <span class="nx">error</span> <span class="nx">affecting</span> <span class="nx">functionality</span><span class="dl">'</span><span class="s1">) // Critical
+logger.emerg(</span><span class="dl">'</span><span class="nx">System</span> <span class="nx">unusable</span><span class="dl">'</span><span class="s1">)               // Emergency
+</span></code></pre></div></div>
+
+<h3 id="3-include-context-in-messages">3. Include Context in Messages</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Good - includes context</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Database connection failed</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">host</span><span class="p">:</span> <span class="dl">'</span><span class="s1">localhost</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">port</span><span class="p">:</span> <span class="mi">5432</span><span class="p">,</span>
+  <span class="na">database</span><span class="p">:</span> <span class="dl">'</span><span class="s1">myapp</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">attempt</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+  <span class="na">maxRetries</span><span class="p">:</span> <span class="mi">5</span>
+<span class="p">})</span>
+
+<span class="c1">// Less useful - no context</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Database connection failed</span><span class="dl">'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h3 id="4-avoid-sensitive-data">4. Avoid Sensitive Data</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Bad - logs sensitive information</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">User login</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">username</span><span class="p">:</span> <span class="dl">'</span><span class="s1">admin</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">password</span><span class="p">:</span> <span class="dl">'</span><span class="s1">secret123</span><span class="dl">'</span><span class="p">,</span>  <span class="c1">// Never log passwords!</span>
+  <span class="na">creditCard</span><span class="p">:</span> <span class="dl">'</span><span class="s1">4111-1111-1111-1111</span><span class="dl">'</span>  <span class="c1">// Never log PII!</span>
+<span class="p">})</span>
+
+<span class="c1">// Good - sanitizes sensitive data</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="dl">'</span><span class="s1">User login</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">username</span><span class="p">:</span> <span class="dl">'</span><span class="s1">admin</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">password</span><span class="p">:</span> <span class="dl">'</span><span class="s1">[REDACTED]</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">creditCard</span><span class="p">:</span> <span class="dl">'</span><span class="s1">[REDACTED]</span><span class="dl">'</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+
+<h3 id="common-issues">Common Issues</h3>
+
+<h4 id="1-module-not-found-error">1. “Module not found” Error</h4>
+
+<p><strong>Problem</strong>: <code class="language-plaintext highlighter-rouge">Error: Cannot find module 'node-syslog'</code></p>
+
+<p><strong>Solution</strong>: Ensure you’re running on Linux and the native module compiled correctly:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Rebuild native module</span>
+npm rebuild node-syslog
+
+<span class="c"># Check platform</span>
+node <span class="nt">-e</span> <span class="s2">"console.log(process.platform, process.arch)"</span>
+</code></pre></div></div>
+
+<h4 id="2-permission-denied">2. Permission Denied</h4>
+
+<p><strong>Problem</strong>: Can’t write to syslog</p>
+
+<p><strong>Solution</strong>: Check syslog configuration and permissions:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Check if syslog is running</span>
+systemctl status rsyslog
+
+<span class="c"># Test syslog manually</span>
+logger <span class="s2">"Test message from </span><span class="si">$(</span><span class="nb">whoami</span><span class="si">)</span><span class="s2">"</span>
+</code></pre></div></div>
+
+<h4 id="3-messages-not-appearing">3. Messages Not Appearing</h4>
+
+<p><strong>Problem</strong>: No messages in system logs</p>
+
+<p><strong>Solution</strong>: Check syslog configuration and filters:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># View all messages</span>
+journalctl <span class="nt">-f</span>
+
+<span class="c"># Filter by your application</span>
+journalctl <span class="nt">-f</span> | <span class="nb">grep </span>your-app-ident
+
+<span class="c"># Check syslog configuration</span>
+<span class="nb">cat</span> /etc/rsyslog.conf | <span class="nb">grep</span> <span class="nt">-v</span> <span class="s2">"^#"</span>
+</code></pre></div></div>
+
+<h3 id="debug-mode">Debug Mode</h3>
+
+<p>Enable debug logging to troubleshoot issues:</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Syslog</span><span class="p">,</span> <span class="nx">SyslogLevel</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-syslog</span><span class="dl">'</span>
+
+<span class="kd">const</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Syslog</span><span class="p">({</span>
+  <span class="na">ident</span><span class="p">:</span> <span class="dl">'</span><span class="s1">debug-app</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">facility</span><span class="p">:</span> <span class="dl">'</span><span class="s1">local0</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">logLevel</span><span class="p">:</span> <span class="nx">SyslogLevel</span><span class="p">.</span><span class="nx">DEBUG</span>  <span class="c1">// Enable all levels including debug</span>
+<span class="p">})</span>
+
+<span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">Debug mode enabled</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="dl">'</span><span class="s1">Configuration:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">logger</span><span class="p">.</span><span class="nf">getConfig</span><span class="p">())</span>
+</code></pre></div></div>
+
+<h2 id="next-steps">Next Steps</h2>
+
+<p>Now that you have the basics down, explore these topics:</p>
+
+<ul>
+  <li><a href="/node-syslog/api/">API Reference</a> - Complete API documentation</li>
+  <li><a href="/node-syslog/installation/">Installation Guide</a> - Advanced installation options</li>
+  <li><a href="/node-syslog/migration/">Migration Guide</a> - Migrating from the old node-syslog</li>
+  <li><a href="/node-syslog/examples/">Examples</a> - More usage examples</li>
+</ul>
+
+<p>If you run into issues, check the <a href="#troubleshooting">troubleshooting section</a> or open an issue on <a href="https://github.com/schamane/node-syslog/issues">GitHub</a>.</p>

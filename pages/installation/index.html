@@ -1,0 +1,267 @@
+<h1 id="installation-guide">Installation Guide</h1>
+
+<p>This guide covers installing and setting up node-syslog in your project.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+  <li><strong>Node.js</strong> 22.0.0 or higher</li>
+  <li><strong>Linux</strong> operating system (x64/ARM64)</li>
+  <li><strong>C++ compiler</strong> and development tools (for source compilation)</li>
+</ul>
+
+<h2 id="platform-support">Platform Support</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Platform</th>
+      <th>Architecture</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Linux</td>
+      <td>x64 (AMD64)</td>
+      <td>✅ Supported</td>
+    </tr>
+    <tr>
+      <td>Linux</td>
+      <td>ARM64</td>
+      <td>✅ Supported</td>
+    </tr>
+    <tr>
+      <td>macOS</td>
+      <td>Any</td>
+      <td>❌ Not supported</td>
+    </tr>
+    <tr>
+      <td>Windows</td>
+      <td>Any</td>
+      <td>❌ Not supported</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="installation-methods">Installation Methods</h2>
+
+<h3 id="method-1-npm-recommended">Method 1: NPM (Recommended)</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm <span class="nb">install </span>node-syslog
+</code></pre></div></div>
+
+<h3 id="method-2-pnpm">Method 2: pnpm</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pnpm add node-syslog
+</code></pre></div></div>
+
+<h3 id="method-3-yarn">Method 3: Yarn</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn add node-syslog
+</code></pre></div></div>
+
+<h2 id="binary-vs-source-installation">Binary vs Source Installation</h2>
+
+<h3 id="binary-installation-default">Binary Installation (Default)</h3>
+
+<p>The package includes precompiled binaries for supported platforms:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm <span class="nb">install </span>node-syslog
+<span class="c"># Downloads appropriate binary automatically</span>
+</code></pre></div></div>
+
+<h3 id="source-installation-fallback">Source Installation (Fallback)</h3>
+
+<p>If no binary is available for your platform, the package falls back to source compilation:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Ensure you have build tools installed</span>
+<span class="nb">sudo </span>apt-get <span class="nb">install </span>build-essential python3  <span class="c"># Ubuntu/Debian</span>
+<span class="nb">sudo </span>yum <span class="nb">install </span>gcc-c++ python3              <span class="c"># CentOS/RHEL</span>
+<span class="nb">sudo </span>dnf <span class="nb">install </span>gcc-c++ python3              <span class="c"># Fedora</span>
+
+<span class="c"># Install the package (will compile from source)</span>
+npm <span class="nb">install </span>node-syslog
+</code></pre></div></div>
+
+<h2 id="development-dependencies">Development Dependencies</h2>
+
+<p>For development, you’ll need additional tools:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Install development dependencies</span>
+npm <span class="nb">install</span> <span class="nt">--dev</span>
+
+<span class="c"># or with pnpm</span>
+pnpm <span class="nb">install</span> <span class="nt">--dev</span>
+</code></pre></div></div>
+
+<p>Required development tools:</p>
+<ul>
+  <li>Node.js 22+</li>
+  <li>TypeScript compiler</li>
+  <li>Native build tools (node-gyp)</li>
+  <li>C++ compiler with N-API support</li>
+</ul>
+
+<h2 id="verification">Verification</h2>
+
+<p>After installation, verify the package works:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Create a test file</span>
+<span class="nb">echo</span> <span class="s1">'import { info } from "node-syslog"; info("Installation test");'</span> <span class="o">&gt;</span> test.js
+
+<span class="c"># Run the test</span>
+node test.js
+</code></pre></div></div>
+
+<p>Check syslog for the test message:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># On most systems</span>
+<span class="nb">tail</span> <span class="nt">-f</span> /var/log/syslog
+
+<span class="c"># Or on systemd systems</span>
+journalctl <span class="nt">-f</span>
+</code></pre></div></div>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+
+<h3 id="common-issues">Common Issues</h3>
+
+<h4 id="1-unsupported-platform-error">1. “Unsupported Platform” Error</h4>
+
+<p><strong>Problem:</strong> Package doesn’t support your OS/architecture</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Error: Failed to load native syslog module. This package only supports Linux x64/ARM64.
+</code></pre></div></div>
+
+<p><strong>Solution:</strong> Use a supported platform or consider alternative logging libraries.</p>
+
+<h4 id="2-native-module-compilation-failed">2. Native Module Compilation Failed</h4>
+
+<p><strong>Problem:</strong> Source compilation fails during installation</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Error: node-gyp failed to rebuild
+</code></pre></div></div>
+
+<p><strong>Solution:</strong> Install required build tools:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Ubuntu/Debian</span>
+<span class="nb">sudo </span>apt-get update
+<span class="nb">sudo </span>apt-get <span class="nb">install </span>build-essential python3
+
+<span class="c"># CentOS/RHEL</span>
+<span class="nb">sudo </span>yum groupinstall <span class="s2">"Development Tools"</span>
+<span class="nb">sudo </span>yum <span class="nb">install </span>python3
+
+<span class="c"># Fedora</span>
+<span class="nb">sudo </span>dnf groupinstall <span class="s2">"Development Tools"</span>
+<span class="nb">sudo </span>dnf <span class="nb">install </span>python3
+</code></pre></div></div>
+
+<h4 id="3-permission-denied">3. Permission Denied</h4>
+
+<p><strong>Problem:</strong> Cannot write to syslog</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Error: Permission denied when writing to syslog
+</code></pre></div></div>
+
+<p><strong>Solution:</strong> Check syslog configuration and permissions:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Test syslog access</span>
+logger <span class="s2">"Test message from </span><span class="si">$(</span><span class="nb">whoami</span><span class="si">)</span><span class="s2">"</span>
+
+<span class="c"># Check if your user can write to syslog</span>
+<span class="nb">sudo </span>usermod <span class="nt">-a</span> <span class="nt">-G</span> adm <span class="nv">$USER</span>  <span class="c"># Add to adm group</span>
+<span class="c"># Log out and log back in</span>
+</code></pre></div></div>
+
+<h4 id="4-missing-dependencies">4. Missing Dependencies</h4>
+
+<p><strong>Problem:</strong> Missing system dependencies</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Error: Cannot find syslog.h
+</code></pre></div></div>
+
+<p><strong>Solution:</strong> Install development headers:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Ubuntu/Debian</span>
+<span class="nb">sudo </span>apt-get <span class="nb">install </span>libc6-dev
+
+<span class="c"># CentOS/RHEL</span>
+<span class="nb">sudo </span>yum <span class="nb">install </span>glibc-devel
+
+<span class="c"># Fedora</span>
+<span class="nb">sudo </span>dnf <span class="nb">install </span>glibc-devel
+</code></pre></div></div>
+
+<h3 id="debug-mode">Debug Mode</h3>
+
+<p>Enable debug logging for troubleshooting:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Set debug environment variable</span>
+<span class="nb">export </span><span class="nv">DEBUG</span><span class="o">=</span>node-syslog:<span class="k">*</span>
+
+<span class="c"># Run your application</span>
+node your-app.js
+</code></pre></div></div>
+
+<h3 id="clean-installation">Clean Installation</h3>
+
+<p>For a fresh installation:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Remove existing installation</span>
+npm uninstall node-syslog
+
+<span class="c"># Clear npm cache</span>
+npm cache clean <span class="nt">--force</span>
+
+<span class="c"># Reinstall</span>
+npm <span class="nb">install </span>node-syslog
+</code></pre></div></div>
+
+<h2 id="docker-installation">Docker Installation</h2>
+
+<h3 id="dockerfile-example">Dockerfile Example</h3>
+
+<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> node:22-alpine</span>
+
+<span class="c"># Install build dependencies</span>
+<span class="k">RUN </span>apk add <span class="nt">--no-cache</span> <span class="se">\
+</span>    python3 <span class="se">\
+</span>    make <span class="se">\
+</span>    g++ <span class="se">\
+</span>    libc-dev
+
+<span class="k">WORKDIR</span><span class="s"> /app</span>
+<span class="k">COPY</span><span class="s"> package*.json ./</span>
+<span class="k">RUN </span>npm <span class="nb">install </span>node-syslog
+
+<span class="k">COPY</span><span class="s"> . .</span>
+<span class="k">RUN </span>npm run build
+
+<span class="k">CMD</span><span class="s"> ["node", "your-app.js"]</span>
+</code></pre></div></div>
+
+<h3 id="docker-compose">Docker Compose</h3>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s1">'</span><span class="s">3.8'</span>
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">app</span><span class="pi">:</span>
+    <span class="na">build</span><span class="pi">:</span> <span class="s">.</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">./logs:/var/log</span>
+    <span class="na">environment</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">NODE_ENV=production</span>
+</code></pre></div></div>
+
+<h2 id="next-steps">Next Steps</h2>
+
+<p>After successful installation:</p>
+
+<ol>
+  <li>Read the <a href="/node-syslog/api/">API Reference</a></li>
+  <li>Check the <a href="./examples.md">Examples</a></li>
+  <li>Review the <a href="./migration.md">Migration Guide</a> if upgrading from node-syslog v1</li>
+</ol>
+
+<h2 id="support">Support</h2>
+
+<p>If you encounter issues not covered here:</p>
+
+<ul>
+  <li>Check <a href="https://github.com/yourusername/node-syslog/issues">GitHub Issues</a></li>
+  <li>Start a <a href="https://github.com/yourusername/node-syslog/discussions">Discussion</a></li>
+  <li>Review <a href="/node-syslog/docs/troubleshooting/">Troubleshooting Guide</a></li>
+</ul>
