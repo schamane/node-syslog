@@ -95,10 +95,6 @@ jobs:
     - name: Build Jekyll site
       run: bundle exec jekyll build --baseurl="/node-syslog"
       working-directory: docs
-      
-    - name: Fix Jekyll generator meta tag
-      run: ./fix-generator.sh
-      working-directory: docs
         
     - name: Add .nojekyll to build output
       run: |
@@ -121,12 +117,6 @@ jobs:
             exit 1
           fi
         done
-        
-        # Check for Jekyll processing artifacts
-        if grep -r 'meta name="generator" content="Jekyll v' _site/ | grep -v "v4.4.1"; then
-          echo "❌ Found incorrect Jekyll version references"
-          exit 1
-        fi
         
         echo "✅ Build validation complete"
       working-directory: docs
