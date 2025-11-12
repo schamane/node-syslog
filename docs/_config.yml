@@ -2,7 +2,7 @@
 title: node-syslog
 description: Modern Node.js syslog library with fluent TypeScript API
 url: "https://schamane.github.io/node-syslog"
-baseurl: ""
+baseurl: "/node-syslog"
 
 # SEO plugin configuration
 twitter:
