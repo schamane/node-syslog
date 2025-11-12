@@ -14,9 +14,8 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: read
+  contents: write
   pages: write
-  id-token: write
 
 jobs:
   build:
@@ -53,8 +52,44 @@ jobs:
         bundler-cache: true
         working-directory: docs
         
+    - name: Validate Build Environment
+      run: |
+        echo "🔍 Validating build environment..."
+        
+        # Check Ruby version
+        RUBY_VERSION=$(ruby -e 'puts RUBY_VERSION')
+        echo "Ruby version: $RUBY_VERSION"
+        
+        # Check Bundler version
+        BUNDLER_VERSION=$(bundle --version)
+        echo "Bundler version: $BUNDLER_VERSION"
+        
+        # Verify all gems are installed
+        if bundle check; then
+          echo "✅ All dependencies satisfied"
+        else
+          echo "❌ Missing dependencies"
+          exit 1
+        fi
+      working-directory: docs
+        
     - name: Install Jekyll dependencies
       run: bundle install
+      working-directory: docs
+        
+    - name: Verify Jekyll Version
+      run: |
+        echo "Checking Jekyll version..."
+        JEKYLL_VERSION=$(bundle exec jekyll --version | cut -d' ' -f2)
+        echo "Installed Jekyll version: $JEKYLL_VERSION"
+        EXPECTED_VERSION="4.4.1"
+        
+        if [[ "$JEKYLL_VERSION" == "$EXPECTED_VERSION" ]]; then
+          echo "✅ Jekyll version matches expected: $EXPECTED_VERSION"
+        else
+          echo "❌ Jekyll version mismatch. Expected: $EXPECTED_VERSION, Got: $JEKYLL_VERSION"
+          exit 1
+        fi
       working-directory: docs
         
     - name: Build Jekyll site
@@ -65,47 +100,44 @@ jobs:
       run: ./fix-generator.sh
       working-directory: docs
         
-    - name: Verify build output
+    - name: Validate Jekyll Build
       run: |
-        echo "Checking Jekyll build output..."
-        ls -la docs/_site/
-        echo "Checking API documentation..."
-        ls -la docs/_site/api/
-        echo "Verifying no file conflicts..."
-        if [ -f "docs/_site/api/index.html" ]; then
-          echo "✅ API index.html found"
-        else
-          echo "❌ API index.html missing"
+        echo "🔍 Validating Jekyll build output..."
+        
+        # Check essential files exist
+        REQUIRED_FILES=("index.html" "api/index.html" ".nojekyll")
+        for file in "${REQUIRED_FILES[@]}"; do
+          if [[ -f "_site/$file" ]]; then
+            echo "✅ $file found"
+          else
+            echo "❌ $file missing"
+            exit 1
+          fi
+        done
+        
+        # Check for Jekyll processing artifacts
+        if grep -r "Jekyll v" _site/ | grep -v "v4.4.1"; then
+          echo "❌ Found incorrect Jekyll version references"
           exit 1
         fi
         
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
+        echo "✅ Build validation complete"
+      working-directory: docs
         
     - name: Add .nojekyll to build output
       run: |
         # Ensure .nojekyll file exists in build output to disable GitHub Pages Jekyll processing
-        touch docs/_site/.nojekyll
+        touch _site/.nojekyll
         echo "✅ Added .nojekyll to disable GitHub Pages Jekyll processing"
+      working-directory: docs
         
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: docs/_site
-      if: always()
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.ref == 'refs/heads/main'
-    
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      
     - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+      if: github.ref == 'refs/heads/main'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/_site
+        publish_branch: gh-pages
+        keep_files: false
+
+  
