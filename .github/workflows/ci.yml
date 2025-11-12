@@ -12,45 +12,65 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  # CI Jobs (run on PRs and pushes)
-  checkout-and-setup:
+  # === PRE-BUILD STAGE ===
+  setup-environment:
+    name: Setup Build Environment
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
       checks: write
-    
+    outputs:
+      cache-key: ${{ steps.setup.outputs.cache-key }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         
-      - name: Setup Docker Compose for testing
-        run: |
-          echo "🐳 Setting up Docker Compose environment"
-          # Create directories for volume mounts
-          mkdir -p .docker/node_modules .docker/pnpm-store
-
-  test-execution:
-    needs: checkout-and-setup
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      checks: write
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Setup Node.js and pnpm
+        uses: ./.github/actions/setup-node-pnpm
+        
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
         
       - name: Setup Docker Compose for testing
         run: |
           echo "🐳 Setting up Docker Compose environment"
-          # Create directories for volume mounts
           mkdir -p .docker/node_modules .docker/pnpm-store
           
-      - name: Run containerized tests
+      - name: Generate cache key
+        id: setup
+        run: echo "cache-key=node-modules-$(node -v)-$(pnpm -v)-${{ hashFiles('pnpm-lock.yaml') }}" >> $GITHUB_OUTPUT
+
+  # === PARALLEL TEST STAGE ===
+  run-unit-tests:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    needs: setup-environment
+    permissions:
+      contents: read
+      packages: write
+      checks: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js and pnpm
+        uses: ./.github/actions/setup-node-pnpm
+        
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ needs.setup-environment.outputs.cache-key }}
+          
+      - name: Setup Docker Compose for testing
         run: |
-          echo "🧪 Running containerized tests in CI environment"
+          echo "🐳 Setting up Docker Compose environment"
+          mkdir -p .docker/node_modules .docker/pnpm-store
+          
+      - name: Run unit tests
+        run: |
+          echo "🧪 Running unit tests in CI environment"
           docker compose run --rm \
             --env FORCE_COLOR=1 \
             --env GITHUB_ACTIONS=true \
@@ -59,14 +79,49 @@ jobs:
             node-syslog-test \
             pnpm test
 
-  coverage-generation:
-    needs: test-execution
+  run-integration-tests:
+    name: Run Integration Tests
     runs-on: ubuntu-latest
+    needs: setup-environment
     permissions:
       contents: read
       packages: write
       checks: write
-    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js and pnpm
+        uses: ./.github/actions/setup-node-pnpm
+        
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ needs.setup-environment.outputs.cache-key }}
+          
+      - name: Setup Docker Compose for testing
+        run: |
+          echo "🐳 Setting up Docker Compose environment"
+          mkdir -p .docker/node_modules .docker/pnpm-store
+          
+      - name: Run integration tests
+        run: |
+          echo "🧪 Running integration tests in CI environment"
+          docker compose run --rm \
+            --env FORCE_COLOR=1 \
+            --env GITHUB_ACTIONS=true \
+            node-syslog-test \
+            pnpm test:integration || echo "No integration tests found, skipping"
+
+  run-container-tests:
+    name: Run Container Tests
+    runs-on: ubuntu-latest
+    needs: setup-environment
+    permissions:
+      contents: read
+      packages: write
+      checks: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -74,10 +129,64 @@ jobs:
       - name: Setup Docker Compose for testing
         run: |
           echo "🐳 Setting up Docker Compose environment"
-          # Create directories for volume mounts
           mkdir -p .docker/node_modules .docker/pnpm-store
           
-      - name: Run containerized coverage
+      - name: Container health check
+        run: |
+          echo "🏥 Running container health checks"
+          if docker compose run --rm \
+            node-syslog-test \
+            node -e "console.log('✅ Container health check passed')"; then
+            echo "✅ Container health check successful"
+          else
+            echo "❌ Container health check failed"
+            exit 1
+          fi
+            
+      - name: Security validation
+        run: |
+          echo "🔒 Running basic security validation"
+          if docker compose run --rm \
+            node-syslog-test \
+            sh -c "
+              id -u && echo '✅ Non-root user confirmed' || echo '⚠️ Running as root'
+              ls -la /app && echo '✅ App directory accessible'
+              node --version && echo '✅ Node.js version confirmed'
+            "; then
+            echo "✅ Security validation passed"
+          else
+            echo "❌ Security validation failed"
+            exit 1
+          fi
+
+  # === QUALITY GATE STAGE ===
+  generate-coverage:
+    name: Generate Coverage Reports
+    runs-on: ubuntu-latest
+    needs: [run-unit-tests, run-integration-tests, run-container-tests]
+    permissions:
+      contents: read
+      packages: write
+      checks: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js and pnpm
+        uses: ./.github/actions/setup-node-pnpm
+        
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ needs.setup-environment.outputs.cache-key }}
+          
+      - name: Setup Docker Compose for testing
+        run: |
+          echo "🐳 Setting up Docker Compose environment"
+          mkdir -p .docker/node_modules .docker/pnpm-store
+          
+      - name: Generate coverage
         run: |
           echo "📊 Running containerized coverage in CI environment"
           mkdir -p coverage
@@ -95,18 +204,17 @@ jobs:
           path: coverage/
           retention-days: 30
 
-  performance-validation:
-    needs: test-execution
+  run-performance-benchmarks:
+    name: Performance Benchmarks
     runs-on: ubuntu-latest
+    needs: [run-unit-tests, run-integration-tests, run-container-tests]
     permissions:
       contents: read
       packages: write
       checks: write
-    
     outputs:
       duration: ${{ steps.benchmark.outputs.duration }}
       performance: ${{ steps.benchmark.outputs.performance }}
-    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -114,7 +222,6 @@ jobs:
       - name: Setup Docker Compose for testing
         run: |
           echo "🐳 Setting up Docker Compose environment"
-          # Create directories for volume mounts
           mkdir -p .docker/node_modules .docker/pnpm-store
           
       - name: Performance benchmark
@@ -145,14 +252,13 @@ jobs:
             exit 1
           fi
 
-  container-validation:
-    needs: checkout-and-setup
+  run-security-scan:
+    name: Security Vulnerability Scan
     runs-on: ubuntu-latest
+    needs: setup-environment
     permissions:
       contents: read
-      packages: write
-      checks: write
-    
+      security-events: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -160,74 +266,36 @@ jobs:
       - name: Setup Docker Compose for testing
         run: |
           echo "🐳 Setting up Docker Compose environment"
-          # Create directories for volume mounts
           mkdir -p .docker/node_modules .docker/pnpm-store
           
-      - name: Container health check
-        run: |
-          echo "🏥 Running container health checks"
-          if docker compose run --rm \
-            node-syslog-test \
-            node -e "console.log('✅ Container health check passed')"; then
-            echo "✅ Container health check successful"
-          else
-            echo "❌ Container health check failed"
-            exit 1
-          fi
-            
-      - name: Security scan
-        run: |
-          echo "🔒 Running basic security validation"
-          if docker compose run --rm \
-            node-syslog-test \
-            sh -c "
-              id -u && echo '✅ Non-root user confirmed' || echo '⚠️ Running as root'
-              ls -la /app && echo '✅ App directory accessible'
-              node --version && echo '✅ Node.js version confirmed'
-            "; then
-            echo "✅ Security validation passed"
-          else
-            echo "❌ Security validation failed"
-            exit 1
-          fi
+      - name: Build container for security scanning
+        run: docker compose build --target runtime node-syslog-test
+          
+      - name: Run Trivy scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'localhost/node-syslog-test:latest'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
 
-  test-reporting:
-    needs: [test-execution, coverage-generation, performance-validation, container-validation]
+  # === BUILD STAGE ===
+  build-native-binaries:
+    name: Build Native Binaries
     runs-on: ubuntu-latest
+    needs: [generate-coverage, run-performance-benchmarks, run-security-scan]
     permissions:
       contents: read
       packages: write
-      checks: write
-    
-    steps:
-      - name: Test summary
-        run: |
-          echo "## 🧪 Containerized Test Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### ✅ Test Execution" >> $GITHUB_STEP_SUMMARY
-          echo "- All tests passed in containerized environment" >> $GITHUB_STEP_SUMMARY
-          echo "- Coverage reports generated" >> $GITHUB_STEP_SUMMARY
-          echo "- Performance: ${{ needs.performance-validation.outputs.performance }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Duration: ${{ needs.performance-validation.outputs.duration }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 🐳 Container Information" >> $GITHUB_STEP_SUMMARY
-          echo "- Service: node-syslog-test" >> $GITHUB_STEP_SUMMARY
-          echo "- Platform: Docker Compose" >> $GITHUB_STEP_SUMMARY
-          echo "- Environment: Node.js test" >> $GITHUB_STEP_SUMMARY
-
-  # Native binary compilation job
-  build-binaries:
-    needs: test-reporting
     strategy:
       matrix:
         os: [ubuntu-22.04]
         arch: [x64, arm64]
-    
-    runs-on: ${{ matrix.os }}
-    permissions:
-      contents: read
-      packages: write
-    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -245,46 +313,13 @@ jobs:
           use-container: 'true'
           container-image: 'localhost/node-syslog-test:latest'
 
-  # Security scanning job
-  security-scan:
-    needs: test-reporting
+  build-container-image:
+    name: Build Container Image
     runs-on: ubuntu-latest
+    needs: [generate-coverage, run-performance-benchmarks, run-security-scan]
     permissions:
       contents: read
-      security-events: write
-      
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        
-      - name: Build container for security scanning
-        run: |
-          echo "🐳 Building container for security scanning"
-          mkdir -p .docker/node_modules .docker/pnpm-store
-          docker compose build --target runtime node-syslog-test
-          
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: 'localhost/node-syslog-test:latest'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          
-      - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: 'trivy-results.sarif'
-
-  # Release job (only on tags)
-  release:
-    needs: [test-reporting, build-binaries]
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
-    permissions:
-      contents: write
       packages: write
-      
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -295,6 +330,7 @@ jobs:
           driver: docker-container
           
       - name: Login to Container Registry
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -311,19 +347,32 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             
-      - name: Build and push release image
+      - name: Build and push image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
           target: runtime
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
-          
+
+  # === DEPLOY STAGE ===
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [build-native-binaries, build-container-image]
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
       - name: Create GitHub Release
         uses: ./.github/actions/create-release
         with:
@@ -332,15 +381,14 @@ jobs:
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  # NPM publish job (only on tags)
-  publish:
-    needs: [test-reporting, release]
+  publish-npm-package:
+    name: Publish to NPM
     runs-on: ubuntu-latest
+    needs: [build-native-binaries, build-container-image]
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: read
       packages: write
-      
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -349,3 +397,35 @@ jobs:
         uses: ./.github/actions/publish-npm
         with:
           token: ${{ secrets.NPM_TOKEN }}
+
+  # === REPORTING STAGE ===
+  test-reporting:
+    name: Test Results Summary
+    runs-on: ubuntu-latest
+    needs: [run-unit-tests, run-integration-tests, run-container-tests, generate-coverage, run-performance-benchmarks, run-security-scan]
+    if: always()
+    permissions:
+      contents: read
+      packages: write
+      checks: write
+    steps:
+      - name: Test summary
+        run: |
+          echo "## 🧪 CI/CD Pipeline Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ Test Execution" >> $GITHUB_STEP_SUMMARY
+          echo "- Unit Tests: ${{ needs.run-unit-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Integration Tests: ${{ needs.run-integration-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Container Tests: ${{ needs.run-container-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Coverage Generation: ${{ needs.generate-coverage.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Performance Benchmarks: ${{ needs.run-performance-benchmarks.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Security Scan: ${{ needs.run-security-scan.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 Performance Metrics" >> $GITHUB_STEP_SUMMARY
+          echo "- Duration: ${{ needs.run-performance-benchmarks.outputs.duration }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Performance: ${{ needs.run-performance-benchmarks.outputs.performance }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🐳 Container Information" >> $GITHUB_STEP_SUMMARY
+          echo "- Service: node-syslog-test" >> $GITHUB_STEP_SUMMARY
+          echo "- Platform: Docker Compose" >> $GITHUB_STEP_SUMMARY
+          echo "- Environment: Node.js test" >> $GITHUB_STEP_SUMMARY

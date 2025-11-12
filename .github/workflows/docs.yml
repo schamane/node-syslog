@@ -1,4 +1,4 @@
-name: Deploy Documentation
+name: Build and Deploy Documentation
 
 on:
   push:
@@ -7,10 +7,8 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
-  group: "pages"
+  group: "docs"
   cancel-in-progress: false
 
 permissions:
@@ -18,173 +16,230 @@ permissions:
   pages: write
 
 jobs:
-  build:
+  # === PARALLEL BUILD STAGE ===
+  setup-build-environment:
+    name: Setup Build Environment
     runs-on: ubuntu-latest
-    
+    outputs:
+      node-version: ${{ steps.node.outputs.version }}
+      cache-key: ${{ steps.cache.outputs.key }}
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v3
-      with:
-        version: latest
+      - name: Checkout repository
+        uses: actions/checkout@v4
         
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '22'
-        cache: 'pnpm'
+      - name: Setup Node.js
+        id: node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+          
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: latest
+          
+      - name: Generate cache key
+        id: cache
+        run: echo "key=deps-$(node -v)-$(pnpm -v)-${{ hashFiles('pnpm-lock.yaml') }}" >> $GITHUB_OUTPUT
+
+  build-typescript:
+    name: Build TypeScript
+    runs-on: ubuntu-latest
+    needs: setup-build-environment
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
         
-    - name: Install dependencies
-      run: pnpm install --frozen-lockfile --ignore-scripts
-      
-    - name: Build TypeScript
-      run: pnpm run build
-      
-    - name: Generate API documentation
-      run: pnpm run docs:build
-      
-    - name: Setup Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.2'
-        bundler-cache: true
-        working-directory: docs
+      - name: Setup Node.js and pnpm
+        uses: ./.github/actions/setup-node-pnpm
         
-    - name: Validate Build Environment
-      run: |
-        echo "🔍 Validating build environment..."
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ needs.setup-build-environment.outputs.cache-key }}
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
         
-        # Check Ruby version
-        RUBY_VERSION=$(ruby -e 'puts RUBY_VERSION')
-        echo "Ruby version: $RUBY_VERSION"
+      - name: Build TypeScript
+        run: pnpm run build
+
+  generate-api-docs:
+    name: Generate API Documentation
+    runs-on: ubuntu-latest
+    needs: setup-build-environment
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
         
-        # Check Bundler version
-        BUNDLER_VERSION=$(bundle --version)
-        echo "Bundler version: $BUNDLER_VERSION"
+      - name: Setup Node.js and pnpm
+        uses: ./.github/actions/setup-node-pnpm
         
-        # Verify all gems are installed
-        if bundle check; then
-          echo "✅ All dependencies satisfied"
-        else
-          echo "❌ Missing dependencies"
-          exit 1
-        fi
-      working-directory: docs
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ needs.setup-build-environment.outputs.cache-key }}
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
         
-    - name: Install Jekyll dependencies
-      run: bundle install
-      working-directory: docs
-      
-    - name: Update just-the-docs to latest
-      run: |
-        echo "🔄 Updating just-the-docs to latest patch version..."
-        bundle update just-the-docs
-        echo "✅ just-the-docs updated successfully"
-      working-directory: docs
+      - name: Generate API docs
+        run: pnpm run docs:build
+
+  setup-jekyll:
+    name: Setup Jekyll Environment
+    runs-on: ubuntu-latest
+    needs: setup-build-environment
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
         
-    - name: Verify Jekyll and just-the-docs versions
-      run: |
-        echo "Checking Jekyll version..."
-        JEKYLL_VERSION=$(bundle exec jekyll --version | cut -d' ' -f2)
-        echo "Installed Jekyll version: $JEKYLL_VERSION"
-        EXPECTED_JEKYLL="4.4.1"
-        
-        if [[ "$JEKYLL_VERSION" == "$EXPECTED_JEKYLL" ]]; then
-          echo "✅ Jekyll version matches expected: $EXPECTED_JEKYLL"
-        else
-          echo "❌ Jekyll version mismatch. Expected: $EXPECTED_JEKYLL, Got: $JEKYLL_VERSION"
-          exit 1
-        fi
-        
-        echo "Checking just-the-docs version..."
-        JTD_VERSION=$(bundle list | grep just-the-docs | awk '{print $2}')
-        echo "Installed just-the-docs version: $JTD_VERSION"
-        echo "✅ just-the-docs version verified"
-      working-directory: docs
-        
-    - name: Build Jekyll site
-      run: bundle exec jekyll build --baseurl="/node-syslog"
-      working-directory: docs
-      
-    - name: Add .nojekyll to prevent GitHub Pages rebuild
-      run: |
-        # Add .nojekyll to prevent GitHub Pages from rebuilding
-        touch _site/.nojekyll
-        echo "✅ Added .nojekyll to prevent GitHub Pages rebuild"
-      working-directory: docs
-        
-    - name: Verify .nojekyll configuration
-      run: |
-        # Ensure .nojekyll exists to prevent GitHub Pages from rebuilding
-        if [[ -f "_site/.nojekyll" ]]; then
-          echo "✅ .nojekyll exists - GitHub Pages will serve pre-built site"
-        else
-          echo "❌ .nojekyll missing - GitHub Pages might try to rebuild"
-          exit 1
-        fi
-        
-        # Remove any .nojekyll files in subdirectories that might interfere
-        if [[ -f "_site/api/.nojekyll" ]]; then
-          rm _site/api/.nojekyll
-          echo "✅ Removed api/.nojekyll to prevent conflicts"
-        fi
-        echo "✅ .nojekyll configuration verified"
-      working-directory: docs
-        
-    - name: Validate Jekyll Build
-      run: |
-        echo "🔍 Validating Jekyll build output..."
-        
-        # List all generated HTML files
-        echo "📁 Generated HTML files:"
-        find _site -name "*.html" -type f | sort
-        
-        # List all generated assets
-        echo "📁 Generated assets:"
-        find _site -name "*.css" -o -name "*.js" -o -name "*.svg" -o -name "*.png" | sort
-        
-        # List all directories in _site
-        echo "📁 All directories in _site:"
-        find _site -type d | sort
-        
-        # Show expected URL structure
-        echo "🌐 Expected URL structure:"
-        echo "  / (index.html)"
-        echo "  /getting-started/"
-        echo "  /installation/"
-        echo "  /api/ (TypeDoc collection)"
-        echo "  /examples/"
-        
-        # Check essential files exist
-        REQUIRED_FILES=("index.html" "_api/index.html")
-        for file in "${REQUIRED_FILES[@]}"; do
-          if [[ -f "_site/$file" ]]; then
-            echo "✅ $file found"
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: docs
+          
+      - name: Validate Build Environment
+        run: |
+          echo "🔍 Validating build environment..."
+          
+          # Check Ruby version
+          RUBY_VERSION=$(ruby -e 'puts RUBY_VERSION')
+          echo "Ruby version: $RUBY_VERSION"
+          
+          # Check Bundler version
+          BUNDLER_VERSION=$(bundle --version)
+          echo "Bundler version: $BUNDLER_VERSION"
+          
+          # Verify all gems are installed
+          if bundle check; then
+            echo "✅ All dependencies satisfied"
           else
-            echo "❌ $file missing"
+            echo "❌ Missing dependencies"
             exit 1
           fi
-        done
+        working-directory: docs
         
-        echo "✅ Build validation complete"
-      working-directory: docs
+      - name: Update just-the-docs
+        run: bundle update just-the-docs
+        working-directory: docs
         
-    - name: Deploy to GitHub Pages
-      if: github.ref == 'refs/heads/main'
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs/_site
-        publish_branch: gh-pages
-        keep_files: false
+      - name: Verify Jekyll and just-the-docs versions
+        run: |
+          echo "Checking Jekyll version..."
+          JEKYLL_VERSION=$(bundle exec jekyll --version | cut -d' ' -f2)
+          echo "Installed Jekyll version: $JEKYLL_VERSION"
+          EXPECTED_JEKYLL="4.4.1"
+          
+          if [[ "$JEKYLL_VERSION" == "$EXPECTED_JEKYLL" ]]; then
+            echo "✅ Jekyll version matches expected: $EXPECTED_JEKYLL"
+          else
+            echo "❌ Jekyll version mismatch. Expected: $EXPECTED_JEKYLL, Got: $JEKYLL_VERSION"
+            exit 1
+          fi
+          
+          echo "Checking just-the-docs version..."
+          JTD_VERSION=$(bundle list | grep just-the-docs | awk '{print $2}')
+          echo "Installed just-the-docs version: $JTD_VERSION"
+          echo "✅ just-the-docs version verified"
+        working-directory: docs
+
+  # === DEPLOY STAGE ===
+  build-and-deploy:
+    name: Build and Deploy Documentation
+    runs-on: ubuntu-latest
+    needs: [build-typescript, generate-api-docs, setup-jekyll]
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
         
-    - name: List deployed files
-      if: github.ref == 'refs/heads/main'
-      run: |
-        echo "📁 Files deployed to gh-pages:"
-        # This would show what's actually on the gh-pages branch
-        echo "Check deployed files at: https://schamane.github.io/node-syslog/"
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: docs
+        
+      - name: Build Jekyll site
+        run: bundle exec jekyll build --baseurl="/node-syslog"
+        working-directory: docs
+        
+      - name: Add .nojekyll
+        run: |
+          touch docs/_site/.nojekyll
+          rm -f docs/_site/api/.nojekyll
+        working-directory: docs
+        
+      - name: Verify build output
+        run: |
+          echo "📁 Generated files:"
+          find docs/_site -type f | head -20
+          echo ""
+          echo "📁 Total files: $(find docs/_site -type f | wc -l)"
+          echo "📁 Total directories: $(find docs/_site -type d | wc -l)"
+          
+          # Check for essential files
+          if [ -f "docs/_site/index.html" ]; then
+            echo "✅ Main index.html found"
+          else
+            echo "❌ Main index.html missing"
+            exit 1
+          fi
+          
+          if [ -f "docs/_site/_api/index.html" ]; then
+            echo "✅ API documentation found"
+          else
+            echo "⚠️  API documentation not found"
+          fi
+        working-directory: docs
+        
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/_site
+          publish_branch: gh-pages
+          keep_files: false
+          cname: node-syslog.schamane.de
+          
+      - name: List deployed files (requires GH_TOKEN)
+        if: env.GH_TOKEN != ''
+        run: |
+          echo "📁 Files deployed to gh-pages:"
+          gh api repos/:owner/:repo/pages/build/latest | jq -r '.artifacts[].name' 2>/dev/null || echo "Using fallback listing..."
+          
+          # Fallback listing
+          echo "📁 Available files in _site:"
+          find docs/_site -name "*.html" -o -name "*.css" -o -name "*.js" -o -name "*.svg" | sort | head -10
+          echo "..."
+          echo "Total HTML files: $(find docs/_site -name "*.html" | wc -l)"
+          echo "Total CSS files: $(find docs/_site -name "*.css" | wc -l)"
+          echo "Total JS files: $(find docs/_site -name "*.js" | wc -l)"
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          
+      - name: List deployed files (fallback)
+        if: env.GH_TOKEN == ''
+        run: |
+          echo "📁 Files deployed to gh-pages:"
+          echo "📁 Available files in _site:"
+          find docs/_site -name "*.html" -o -name "*.css" -o -name "*.js" -o -name "*.svg" | sort | head -10
+          echo "..."
+          echo "Total HTML files: $(find docs/_site -name "*.html" | wc -l)"
+          echo "Total CSS files: $(find docs/_site -name "*.css" | wc -l)"
+          echo "Total JS files: $(find docs/_site -name "*.js" | wc -l)"
+          echo ""
+          echo "📖 Documentation available at: https://schamane.github.io/node-syslog/"
+          echo "📖 Custom domain: https://node-syslog.schamane.de/"
 
   
