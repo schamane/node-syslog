@@ -4,8 +4,8 @@ source "https://rubygems.org"
 ruby ">= 2.6.0"
 
 # Use exact versions for reproducible builds
-gem "jekyll", "~> 4.2.0"
-gem "just-the-docs", "~> 0.6.0"
+gem "jekyll", "4.4.1"
+gem "just-the-docs", "~> 0.10.0"
 
 group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.15.0"
