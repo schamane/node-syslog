@@ -21,6 +21,15 @@ pnpm add node-syslog
 
 **Note:** This package only supports Linux x64/ARM64 systems.
 
+## Legacy Version Support
+
+This version requires **Node.js 22.0.0+**. If you need support for older Node.js versions:
+
+- **Node.js 18+**: Use `npm install node-syslog@1.x` (legacy version)
+- **Node.js < 18**: Consider migrating to `modern-syslog` for broader compatibility
+
+See the [migration guide](https://schamane.github.io/node-syslog/migration/) for detailed instructions.
+
 ## Documentation
 
 Full documentation is available at: https://schamane.github.io/node-syslog/

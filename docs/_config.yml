@@ -14,8 +14,8 @@ social:
   links:
     - https://github.com/schamane/node-syslog
 
-# Theme - using custom theme instead of just-the-docs
-# theme: just-the-docs
+# Theme - using just-the-docs for better documentation presentation
+theme: just-the-docs
 
 # Build settings
 markdown: kramdown

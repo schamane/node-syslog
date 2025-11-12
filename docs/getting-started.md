@@ -17,6 +17,15 @@ Before you begin, ensure you have:
 - **npm** or **pnpm** package manager
 - (Optional) **rsyslog** or **syslog-ng** for log management
 
+### Legacy Version Support
+
+This version requires **Node.js 22.0.0+**. If you need support for older Node.js versions:
+
+- **Node.js 18+**: Use `npm install node-syslog@1.x` (legacy version)
+- **Node.js < 18**: Consider migrating to `modern-syslog` for broader compatibility
+
+See the [migration guide]({{ site.baseurl }}/migration/) for detailed instructions on upgrading from legacy versions.
+
 ## Installation
 
 ### Basic Installation

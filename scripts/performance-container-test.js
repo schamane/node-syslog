@@ -112,9 +112,7 @@ class PerformanceContainerTestRunner {
     const buildStartTime = performance.now();
     console.log('🔨 Building optimized container image...');
     
-    const composeFile = this.useOptimized ? 
-      'docker-compose.optimized.yml' : 
-      'docker-compose.yml';
+    const composeFile = 'compose.yaml';
     
     // Use composeFile in environment
     
@@ -173,9 +171,7 @@ class PerformanceContainerTestRunner {
         CONTAINER_START_TIME: testStartTime.toString()
       };
 
-      const composeFile = this.useOptimized ? 
-        'docker-compose.optimized.yml' : 
-        'docker-compose.yml';
+      const composeFile = 'compose.yaml';
 
       const composeArgs = [
         'run',

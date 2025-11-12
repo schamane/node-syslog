@@ -94,8 +94,8 @@ class ContainerTestRunner {
    */
   validateEnvironment() {
     const requiredFiles = [
-      'Dockerfile.optimized',
-      'docker-compose.optimized.yml',
+      'Dockerfile',
+      'compose.yaml',
       'package.json'
     ];
 
@@ -121,7 +121,7 @@ class ContainerTestRunner {
     console.log('🔨 Building test container image...');
     
     return new Promise((resolve, reject) => {
-      const composeArgs = ['-f', 'docker-compose.optimized.yml', 'build'];
+      const composeArgs = ['-f', 'compose.yaml', 'build'];
       
       const child = spawn(this.composeCommand, composeArgs, {
         stdio: 'inherit',
@@ -166,7 +166,7 @@ class ContainerTestRunner {
       };
 
       const composeArgs = [
-        '-f', 'docker-compose.optimized.yml',
+        '-f', 'compose.yaml',
         'run',
         '--rm',
         'node-syslog-test',

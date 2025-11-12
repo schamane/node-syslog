@@ -17,6 +17,11 @@ lib/binding
 .env.test.local
 .env.production.local
 
+# Planning and configuration directories
+.plan/
+.opencode/
+.docker/
+
 # IDE files
 .vscode
 .idea
@@ -33,8 +38,7 @@ Thumbs.db
 .gitignore
 
 # Documentation
-docs/_site
-docs/.sass-cache
+docs/
 .jekyll-cache
 
 # Logs
