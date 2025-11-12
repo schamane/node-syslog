@@ -1,0 +1,492 @@
+{"0": {
+    "doc": "API Reference",
+    "title": "API Reference",
+    "content": "Complete API documentation for the node-syslog library. ",
+    "url": "/node-syslog/api-overview/",
+    
+    "relUrl": "/api-overview/"
+  },"1": {
+    "doc": "API Reference",
+    "title": "Core Classes",
+    "content": "Syslog . The main class for syslog functionality. import { Syslog } from 'node-syslog' const logger = new Syslog({ ident: 'myapp', facility: 'local0', options: ['pid', 'odelay'] }) . Constructor . constructor(options: SyslogOptions) . Creates a new syslog instance with the specified options. Parameters: . | options - Configuration options for the syslog instance | . Example: . const logger = new Syslog({ ident: 'myapp', facility: SyslogFacility.LOCAL0, options: [SyslogOption.PID, SyslogOption.NDELAY], logLevel: SyslogLevel.INFO }) . Methods . emerg(message: string, context?: object): void . Log an emergency message. logger.emerg('System is unusable!', { service: 'database' }) . alert(message: string, context?: object): void . Log an alert message. logger.alert('Immediate action required!', { threshold: '90%' }) . crit(message: string, context?: object): void . Log a critical message. logger.crit('Critical system failure', { component: 'auth' }) . error(message: string, context?: object): void . Log an error message. logger.error('Database connection failed', { host: 'localhost', port: 5432, error: 'ECONNREFUSED' }) . warning(message: string, context?: object): void . Log a warning message. logger.warning('High memory usage', { usage: '85%', threshold: '80%' }) . notice(message: string, context?: object): void . Log a notice message. logger.notice('Server configuration updated', { config: 'nginx.conf', version: '1.20.2' }) . info(message: string, context?: object): void . Log an info message. logger.info('User logged in successfully', { userId: 12345, ip: '192.168.1.100' }) . debug(message: string, context?: object): void . Log a debug message. logger.debug('Processing request', { requestId: 'req_abc123', method: 'POST', url: '/api/users' }) . close(): void . Close the syslog connection and clean up resources. logger.close() . isDebugEnabled(): boolean . Check if debug logging is enabled. if (logger.isDebugEnabled()) { logger.debug('Expensive debug operation', { data: getLargeObject() }) } . ",
+    "url": "/node-syslog/api-overview/#core-classes",
+    
+    "relUrl": "/api-overview/#core-classes"
+  },"2": {
+    "doc": "API Reference",
+    "title": "Types and Constants",
+    "content": "SyslogOptions . Configuration options for creating a Syslog instance. interface SyslogOptions { ident: string // Required: Identifier for log messages facility?: SyslogFacilityType // Optional: Syslog facility (default: 'user') options?: SyslogOptionType[] // Optional: Syslog options (default: []) logLevel?: SyslogLevelType // Optional: Minimum log level (default: 'info') } . SyslogFacility . Syslog facility constants. const SyslogFacility = { KERN: 0, // Kernel messages USER: 1, // User-level messages (default) MAIL: 2, // Mail system DAEMON: 3, // System daemons AUTH: 4, // Security/authorization SYSLOG: 5, // Internal syslog messages LPR: 6, // Line printer subsystem NEWS: 7, // Network news subsystem UUCP: 8, // UUCP subsystem CRON: 9, // Clock daemon AUTHPRIV: 10, // Security/authorization (private) FTP: 11, // FTP daemon LOCAL0: 16, // Local use 0 LOCAL1: 17, // Local use 1 LOCAL2: 18, // Local use 2 LOCAL3: 19, // Local use 3 LOCAL4: 20, // Local use 4 LOCAL5: 21, // Local use 5 LOCAL6: 22, // Local use 6 LOCAL7: 23 // Local use 7 } as const . SyslogLevel . Log level constants. const SyslogLevel = { EMERG: 0, // Emergency: system is unusable ALERT: 1, // Alert: action must be taken immediately CRIT: 2, // Critical: critical conditions ERR: 3, // Error: error conditions WARNING: 4, // Warning: warning conditions NOTICE: 5, // Notice: normal but significant condition INFO: 6, // Informational: informational messages DEBUG: 7 // Debug: debug-level messages } as const . SyslogOption . Syslog option constants. const SyslogOption = { PID: 0x01, // Log the process ID with each message CONS: 0x02, // Write to console if there's an error sending to syslog ODELAY: 0x04, // Delay connection until first message is logged NDELAY: 0x08, // Connect immediately NOWAIT: 0x10, // Don't wait for child processes that log messages PERROR: 0x20 // Log to stderr as well } as const . ",
+    "url": "/node-syslog/api-overview/#types-and-constants",
+    
+    "relUrl": "/api-overview/#types-and-constants"
+  },"3": {
+    "doc": "API Reference",
+    "title": "Convenience Functions",
+    "content": "For quick logging without creating an instance: . import { info, error, warning, debug } from 'node-syslog' // Uses default configuration info('Application started') error('Something went wrong') warning('Warning message') debug('Debug information') . ",
+    "url": "/node-syslog/api-overview/#convenience-functions",
+    
+    "relUrl": "/api-overview/#convenience-functions"
+  },"4": {
+    "doc": "API Reference",
+    "title": "Error Handling",
+    "content": "The library throws descriptive errors for common issues: . import { SyslogError } from 'node-syslog' try { const logger = new Syslog({ ident: 'myapp', facility: 'invalid' as any // This will throw }) } catch (error) { if (error instanceof SyslogError) { console.error('Syslog configuration error:', error.message) } } . Common Errors . | SyslogError: Invalid facility: invalid - Invalid facility name | SyslogError: Invalid option: invalid - Invalid option name | SyslogError: Invalid log level: invalid - Invalid log level name | SyslogError: ident is required - Missing ident parameter | . ",
+    "url": "/node-syslog/api-overview/#error-handling",
+    
+    "relUrl": "/api-overview/#error-handling"
+  },"5": {
+    "doc": "API Reference",
+    "title": "Performance Considerations",
+    "content": "Memory Usage . The library is designed for minimal memory usage: . | Zero allocations in the hot logging path | Static buffers for message formatting | Efficient string concatenation | . CPU Performance . Typical performance characteristics: . | Latency: &lt; 1μs overhead vs raw syslog(3) | Throughput: &gt; 500,000 messages/second | Event Loop Impact: &lt; 0.01% at 10,000 logs/second | . Best Practices . | Reuse logger instances - Avoid creating new instances for each log message | Check log levels - Use isDebugEnabled() to skip expensive operations | Batch context - Include relevant context in a single log call | Avoid string concatenation - Let the library handle message formatting | . // Good - reuse instance const logger = new Syslog({ ident: 'myapp' }) // Good - check debug level if (logger.isDebugEnabled()) { logger.debug('Expensive operation', { data: expensiveComputation() }) } // Good - structured context logger.error('Request failed', { url: req.url, method: req.method, statusCode: res.statusCode, duration: Date.now() - startTime }) // Avoid - creating instances repeatedly for (const item of items) { const logger = new Syslog({ ident: 'loop' }) // Bad! logger.info('Processing item') } . ",
+    "url": "/node-syslog/api-overview/#performance-considerations",
+    
+    "relUrl": "/api-overview/#performance-considerations"
+  },"6": {
+    "doc": "Debugging Guide",
+    "title": "Containerized Testing Debugging Guide",
+    "content": "This guide provides comprehensive instructions for debugging containerized tests in the node-syslog project using VS Code. ",
+    "url": "/node-syslog/debugging-guide/#containerized-testing-debugging-guide",
+    
+    "relUrl": "/debugging-guide/#containerized-testing-debugging-guide"
+  },"7": {
+    "doc": "Debugging Guide",
+    "title": "Overview",
+    "content": "The project includes a fully configured containerized testing environment with integrated debugging support. This allows you to: . | Run tests in isolated container environments | Set breakpoints and debug code running inside containers | Maintain consistency between local and CI/CD environments | Debug native C++ addon issues | . ",
+    "url": "/node-syslog/debugging-guide/#overview",
+    
+    "relUrl": "/debugging-guide/#overview"
+  },"8": {
+    "doc": "Debugging Guide",
+    "title": "Prerequisites",
+    "content": ". | Container Engine: Install Podman (recommended) or Docker # Podman (recommended) brew install podman # Docker (alternative) brew install --cask docker . | VS Code Extensions: Install the recommended extensions from .vscode/extensions.json . | Remote - Containers | Vitest Explorer | Docker | TypeScript and JavaScript Language Features | . | . ",
+    "url": "/node-syslog/debugging-guide/#prerequisites",
+    
+    "relUrl": "/debugging-guide/#prerequisites"
+  },"9": {
+    "doc": "Debugging Guide",
+    "title": "Quick Start",
+    "content": "1. Basic Debugging . | Open the project in VS Code | Set breakpoints in your test files or source code | Press F5 or go to Run and Debug panel | Select “Debug Tests in Container” configuration | Start debugging | . 2. Attaching to Running Container . | Start a container with debug port exposed: # Using VS Code task Ctrl+Shift+P → \"Tasks: Run Task\" → \"Start Container with Debug Port\" # Or manually node scripts/debug-container-test.js test --debug . | Set breakpoints in your code | Use “Attach to Container Node Process” debug configuration | Start debugging | . ",
+    "url": "/node-syslog/debugging-guide/#quick-start",
+    
+    "relUrl": "/debugging-guide/#quick-start"
+  },"10": {
+    "doc": "Debugging Guide",
+    "title": "Debug Configurations",
+    "content": "Available Debug Configurations . | Configuration | Purpose | Use Case | . | Debug Tests in Container | Run tests with debugging | General test debugging | . | Debug Test Coverage in Container | Run coverage with debugging | Coverage analysis | . | Debug Native Tests in Container | Debug native addon | C++ addon issues | . | Attach to Container Node Process | Attach to running container | Long-running sessions | . | Debug Container with Inspector | Start with inspector enabled | Advanced debugging | . | Debug Vitest Directly (Local) | Local debugging (no container) | Quick local tests | . | Debug Container Test Script | Debug the container script itself | Script development | . Configuration Details . Debug Tests in Container . { \"name\": \"Debug Tests in Container\", \"type\": \"node\", \"request\": \"launch\", \"program\": \"${workspaceFolder}/scripts/debug-container-test.js\", \"args\": [\"test\", \"--debug\"], \"env\": { \"NODE_ENV\": \"development\" } } . Attach to Container Node Process . { \"name\": \"Attach to Container Node Process\", \"type\": \"node\", \"request\": \"attach\", \"address\": \"localhost\", \"port\": 9229, \"localRoot\": \"${workspaceFolder}\", \"remoteRoot\": \"/app\" } . ",
+    "url": "/node-syslog/debugging-guide/#debug-configurations",
+    
+    "relUrl": "/debugging-guide/#debug-configurations"
+  },"11": {
+    "doc": "Debugging Guide",
+    "title": "VS Code Tasks",
+    "content": "Available Tasks . | Container Test: Run tests in container | Container Test Coverage: Run coverage in container | Start Container with Debug Port: Start container with debugging enabled | Build Debug Container: Build container image for debugging | . Running Tasks . | Ctrl+Shift+P → “Tasks: Run Task” | Select the desired task | Monitor output in the terminal panel | . ",
+    "url": "/node-syslog/debugging-guide/#vs-code-tasks",
+    
+    "relUrl": "/debugging-guide/#vs-code-tasks"
+  },"12": {
+    "doc": "Debugging Guide",
+    "title": "Debugging Scenarios",
+    "content": "1. Debugging Test Failures . When tests fail in the container: . | Run with debug configuration: Debug Tests in Container . | Set breakpoints at the failing test: // test/syslog.test.ts test('should handle syslog operations', () =&gt; { debugger; // Set breakpoint here // Your test code }); . | Inspect variables and step through code | . 2. Debugging Native Addon Issues . For C++ addon problems: . | Use “Debug Native Tests in Container” configuration | Set breakpoints in TypeScript code that calls native functions | Examine error messages and stack traces | Check native module loading | . 3. Performance Debugging . To analyze performance: . | Start with debug port: Start Container with Debug Port . | Attach with “Attach to Container Node Process” | Use VS Code’s performance profiling tools | Analyze CPU and memory usage | . ",
+    "url": "/node-syslog/debugging-guide/#debugging-scenarios",
+    
+    "relUrl": "/debugging-guide/#debugging-scenarios"
+  },"13": {
+    "doc": "Debugging Guide",
+    "title": "Container Debugging Tips",
+    "content": "Environment Variables . The debug container automatically sets: . | CONTAINERIZED=true - Indicates running in container | NODE_ENV=development - Development mode | DEBUG=* - Debug logging (when –debug flag used) | FORCE_COLOR=1 - Preserve terminal colors | . Port Forwarding . The debug configuration uses port 9229 for Node.js inspector: . | Container exposes port 9229 | Host forwards to localhost:9229 | VS Code attaches to this port | . Source Maps . Source maps are automatically configured: . | TypeScript source maps enabled | Resolved to workspace folder | Excludes node_modules for cleaner debugging | . ",
+    "url": "/node-syslog/debugging-guide/#container-debugging-tips",
+    
+    "relUrl": "/debugging-guide/#container-debugging-tips"
+  },"14": {
+    "doc": "Debugging Guide",
+    "title": "Troubleshooting",
+    "content": "Common Issues . 1. “Cannot connect to debug target” . Solution: Ensure container is running with debug port: . node scripts/debug-container-test.js test --debug . 2. “Breakpoints not hit” . Solutions: . | Verify source maps are generated (tsconfig.json sourceMap: true) | Check that breakpoints are set in .ts files, not compiled .js | Ensure NODE_ENV=development is set | . 3. “Container build fails” . Solutions: . | Check Dockerfile syntax | Verify all required files are present | Check container engine is running | . 4. “Tests pass locally but fail in container” . Solutions: . | Check for platform-specific differences | Verify file permissions in container | Examine environment variables | . Debug Commands . Manual Container Debugging . # Build debug container podman-compose build # Run with debug port podman-compose run --rm -p 9229:9229 node-syslog-test node --inspect=0.0.0.0:9229 ./node_modules/.bin/vitest run # Attach with Node.js inspector node inspect localhost:9229 . Container Inspection . # List running containers podman ps # Inspect container podman inspect &lt;container-id&gt; # View container logs podman logs &lt;container-id&gt; . ",
+    "url": "/node-syslog/debugging-guide/#troubleshooting",
+    
+    "relUrl": "/debugging-guide/#troubleshooting"
+  },"15": {
+    "doc": "Debugging Guide",
+    "title": "Advanced Usage",
+    "content": "Custom Debug Configurations . Create custom debug configurations in .vscode/launch.json: . { \"name\": \"Custom Debug Configuration\", \"type\": \"node\", \"request\": \"launch\", \"program\": \"${workspaceFolder}/scripts/debug-container-test.js\", \"args\": [\"test:custom\", \"--debug\", \"--verbose\"], \"env\": { \"CUSTOM_VAR\": \"value\", \"NODE_ENV\": \"development\" } } . Multi-Container Debugging . For complex scenarios requiring multiple containers: . | Modify docker-compose.yml to expose additional ports | Create attach configurations for each service | Use compound debug configurations | . Integration with CI/CD . The same containerized testing environment can be used in CI/CD: . # .github/workflows/test.yml - name: Run Containerized Tests run: node scripts/container-test.js . ",
+    "url": "/node-syslog/debugging-guide/#advanced-usage",
+    
+    "relUrl": "/debugging-guide/#advanced-usage"
+  },"16": {
+    "doc": "Debugging Guide",
+    "title": "Best Practices",
+    "content": ". | Always use containerized debugging for consistency | Set meaningful breakpoints at logical boundaries | Use environment variables to control debug behavior | Clean up containers after debugging sessions | Document custom configurations for team sharing | . ",
+    "url": "/node-syslog/debugging-guide/#best-practices",
+    
+    "relUrl": "/debugging-guide/#best-practices"
+  },"17": {
+    "doc": "Debugging Guide",
+    "title": "Getting Help",
+    "content": ". | Check the VS Code Debugging Documentation | Review Node.js Inspector Documentation | Examine container logs for detailed error information | Use the project’s issue tracker for container-specific problems | . ",
+    "url": "/node-syslog/debugging-guide/#getting-help",
+    
+    "relUrl": "/debugging-guide/#getting-help"
+  },"18": {
+    "doc": "Debugging Guide",
+    "title": "Debugging Guide",
+    "content": " ",
+    "url": "/node-syslog/debugging-guide/",
+    
+    "relUrl": "/debugging-guide/"
+  },"19": {
+    "doc": "Examples",
+    "title": "Examples",
+    "content": "Real-world examples and usage patterns for node-syslog. ",
+    "url": "/node-syslog/examples/",
+    
+    "relUrl": "/examples/"
+  },"20": {
+    "doc": "Examples",
+    "title": "Web Application Examples",
+    "content": "Express.js Server . import express from 'express' import { Syslog, SyslogFacility, SyslogOption } from 'node-syslog' const app = express() const logger = new Syslog({ ident: 'webapp', facility: SyslogFacility.LOCAL0, options: [SyslogOption.PID, SyslogOption.NDELAY] }) // Request logging middleware app.use((req, res, next) =&gt; { const start = Date.now() res.on('finish', () =&gt; { const duration = Date.now() - start logger.info('HTTP Request', { method: req.method, url: req.url, statusCode: res.statusCode, duration: `${duration}ms`, userAgent: req.get('User-Agent'), ip: req.ip, contentLength: res.get('Content-Length') }) }) next() }) // Error handling middleware app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) =&gt; { logger.error('Unhandled error', { error: err.message, stack: err.stack, url: req.url, method: req.method, userAgent: req.get('User-Agent'), ip: req.ip }) res.status(500).json({ error: 'Internal server error', requestId: req.headers['x-request-id'] }) }) // Routes app.get('/health', (req, res) =&gt; { logger.debug('Health check requested') res.json({ status: 'ok', timestamp: new Date().toISOString() }) }) app.post('/api/users', (req, res) =&gt; { logger.info('Creating user', { ip: req.ip, userAgent: req.get('User-Agent') }) try { // User creation logic here const userId = Math.floor(Math.random() * 10000) logger.info('User created successfully', { userId, ip: req.ip }) res.status(201).json({ userId, message: 'User created' }) } catch (error) { logger.error('User creation failed', { error: error instanceof Error ? error.message : String(error), ip: req.ip }) res.status(400).json({ error: 'Failed to create user' }) } }) const PORT = process.env.PORT || 3000 app.listen(PORT, () =&gt; { logger.info('Server started', { port: PORT, nodeVersion: process.version, environment: process.env.NODE_ENV || 'development' }) }) // Graceful shutdown process.on('SIGTERM', () =&gt; { logger.info('SIGTERM received, shutting down gracefully') logger.close() process.exit(0) }) process.on('SIGINT', () =&gt; { logger.info('SIGINT received, shutting down gracefully') logger.close() process.exit(0) }) . Fastify Server . import fastify from 'fastify' import { Syslog, SyslogFacility } from 'node-syslog' const app = fastify({ logger: false // We'll use our own logger }) const logger = new Syslog({ ident: 'fastify-app', facility: SyslogFacility.LOCAL1 }) // Request logging hook app.addHook('onRequest', async (request, reply) =&gt; { request.startTime = Date.now() }) app.addHook('onResponse', async (request, reply) =&gt; { const duration = Date.now() - (request.startTime as number) logger.info('HTTP Request', { method: request.method, url: request.url, statusCode: reply.statusCode, duration: `${duration}ms`, userAgent: request.headers['user-agent'], ip: request.ip, contentLength: reply.getHeader('content-length') }) }) // Error handling hook app.addHook('onError', async (request, reply, error) =&gt; { logger.error('Request error', { error: error.message, stack: error.stack, url: request.url, method: request.method, statusCode: reply.statusCode }) }) // Routes app.get('/health', async (request, reply) =&gt; { logger.debug('Health check requested') return { status: 'ok', timestamp: new Date().toISOString(), uptime: process.uptime() } }) app.post('/api/data', async (request, reply) =&gt; { logger.info('Processing data', { ip: request.ip, contentType: request.headers['content-type'] }) try { const data = request.body as any // Validate data if (!data || typeof data !== 'object') { logger.warning('Invalid data received', { ip: request.ip }) return reply.status(400).send({ error: 'Invalid data' }) } // Process data const result = { id: Math.floor(Math.random() * 1000), processed: true, timestamp: new Date().toISOString() } logger.info('Data processed successfully', { resultId: result.id, ip: request.ip }) return reply.status(201).send(result) } catch (error) { logger.error('Data processing failed', { error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined, ip: request.ip }) return reply.status(500).send({ error: 'Processing failed' }) } }) const start = async () =&gt; { try { const PORT = process.env.PORT || 3000 await app.listen({ port: PORT, host: '0.0.0.0' }) logger.info('Fastify server started', { port: PORT, nodeVersion: process.version, environment: process.env.NODE_ENV || 'development' }) } catch (err) { logger.error('Failed to start server', { error: err instanceof Error ? err.message : String(err), stack: err instanceof Error ? err.stack : undefined }) process.exit(1) } } start() // Graceful shutdown process.on('SIGTERM', () =&gt; { logger.info('SIGTERM received, shutting down gracefully') logger.close() process.exit(0) }) . ",
+    "url": "/node-syslog/examples/#web-application-examples",
+    
+    "relUrl": "/examples/#web-application-examples"
+  },"21": {
+    "doc": "Examples",
+    "title": "Database Examples",
+    "content": "PostgreSQL with pg . import { Pool, PoolClient } from 'pg' import { Syslog, SyslogFacility } from 'node-syslog' const logger = new Syslog({ ident: 'database-service', facility: SyslogFacility.LOCAL2 }) // Database connection pool const pool = new Pool({ host: process.env.DB_HOST || 'localhost', port: parseInt(process.env.DB_PORT || '5432'), database: process.env.DB_NAME || 'myapp', user: process.env.DB_USER || 'postgres', password: process.env.DB_PASSWORD, max: 20, idleTimeoutMillis: 30000, connectionTimeoutMillis: 2000, }) // Log pool events pool.on('connect', (client) =&gt; { logger.debug('New database client connected', { totalCount: pool.totalCount, idleCount: pool.idleCount, waitingCount: pool.waitingCount }) }) pool.on('error', (err, client) =&gt; { logger.error('Database pool error', { error: err.message, stack: err.stack, totalCount: pool.totalCount }) }) interface User { id: number name: string email: string created_at: Date } class UserService { async createUser(name: string, email: string): Promise&lt;User&gt; { const client = await pool.connect() try { logger.info('Creating user', { name, email }) const result = await client.query( 'INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *', [name, email] ) const user = result.rows[0] logger.info('User created successfully', { userId: user.id, name: user.name, email: user.email }) return user } catch (error) { logger.error('Failed to create user', { error: error instanceof Error ? error.message : String(error), name, email, stack: error instanceof Error ? error.stack : undefined }) throw error } finally { client.release() logger.debug('Database client released', { totalCount: pool.totalCount, idleCount: pool.idleCount, waitingCount: pool.waitingCount }) } } async getUserById(id: number): Promise&lt;User | null&gt; { const client = await pool.connect() try { logger.debug('Fetching user by ID', { userId: id }) const result = await client.query( 'SELECT * FROM users WHERE id = $1', [id] ) const user = result.rows[0] || null if (user) { logger.debug('User found', { userId: id, name: user.name }) } else { logger.warning('User not found', { userId: id }) } return user } catch (error) { logger.error('Failed to fetch user', { error: error instanceof Error ? error.message : String(error), userId: id, stack: error instanceof Error ? error.stack : undefined }) throw error } finally { client.release() } } async updateUser(id: number, updates: Partial&lt;User&gt;): Promise&lt;User&gt; { const client = await pool.connect() try { logger.info('Updating user', { userId: id, updates }) const fields = Object.keys(updates).filter(key =&gt; updates[key as keyof User] !== undefined) const values = fields.map(field =&gt; updates[field as keyof User]) const setClause = fields.map((field, index) =&gt; `${field} = $${index + 2}`).join(', ') const query = `UPDATE users SET ${setClause}, updated_at = NOW() WHERE id = $1 RETURNING *` const result = await client.query(query, [id, ...values]) const user = result.rows[0] if (user) { logger.info('User updated successfully', { userId: id, updatedFields: fields }) } else { logger.warning('User not found for update', { userId: id }) } return user } catch (error) { logger.error('Failed to update user', { error: error instanceof Error ? error.message : String(error), userId: id, updates, stack: error instanceof Error ? error.stack : undefined }) throw error } finally { client.release() } } } // Usage example async function main() { const userService = new UserService() try { // Create a user const user = await userService.createUser('John Doe', 'john@example.com') console.log('Created user:', user) // Fetch the user const fetchedUser = await userService.getUserById(user.id) console.log('Fetched user:', fetchedUser) // Update the user const updatedUser = await userService.updateUser(user.id, { name: 'John Smith' }) console.log('Updated user:', updatedUser) } catch (error) { logger.error('Application error', { error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined }) } finally { await pool.end() logger.close() } } main().catch(error =&gt; { logger.error('Failed to start application', { error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined }) process.exit(1) }) . ",
+    "url": "/node-syslog/examples/#database-examples",
+    
+    "relUrl": "/examples/#database-examples"
+  },"22": {
+    "doc": "Examples",
+    "title": "Background Service Examples",
+    "content": "Worker Thread Service . import { Worker, isMainThread, parentPort, workerData } from 'worker_threads' import { Syslog, SyslogFacility, SyslogLevel } from 'node-syslog' interface Job { id: string type: string data: any priority: 'low' | 'medium' | 'high' createdAt: Date } interface JobResult { jobId: string success: boolean result?: any error?: string processedAt: Date duration: number } class WorkerService { private logger: Syslog private workers: Worker[] = [] private jobQueue: Job[] = [] private isProcessing = false constructor(private workerCount: number = 4) { this.logger = new Syslog({ ident: 'worker-service', facility: SyslogFacility.DAEMON, options: ['pid', 'ndelay'], logLevel: SyslogLevel.INFO }) } async start(): Promise&lt;void&gt; { this.logger.info('Starting worker service', { workerCount: this.workerCount }) // Create worker threads for (let i = 0; i &lt; this.workerCount; i++) { const worker = new Worker(__filename, { workerData: { workerId: i } }) worker.on('message', (result: JobResult) =&gt; { this.handleJobResult(result) }) worker.on('error', (error) =&gt; { this.logger.error('Worker error', { workerId: i, error: error.message, stack: error.stack }) }) worker.on('exit', (code) =&gt; { if (code !== 0) { this.logger.error('Worker stopped unexpectedly', { workerId: i, exitCode: code }) } }) this.workers.push(worker) this.logger.info('Worker created', { workerId: i }) } // Start processing jobs this.processJobs() this.logger.info('Worker service started successfully', { workerCount: this.workers.length }) } addJob(job: Omit&lt;Job, 'createdAt'&gt;): void { const fullJob: Job = { ...job, createdAt: new Date() } this.jobQueue.push(fullJob) this.logger.info('Job added to queue', { jobId: fullJob.id, type: fullJob.type, priority: fullJob.priority, queueSize: this.jobQueue.length }) } private async processJobs(): Promise&lt;void&gt; { this.isProcessing = true while (this.isProcessing) { if (this.jobQueue.length &gt; 0 &amp;&amp; this.workers.length &gt; 0) { const job = this.jobQueue.shift()! const worker = this.workers[Math.floor(Math.random() * this.workers.length)] this.logger.debug('Dispatching job to worker', { jobId: job.id, type: job.type, queueSize: this.jobQueue.length }) worker.postMessage(job) } else { // Wait a bit before checking again await new Promise(resolve =&gt; setTimeout(resolve, 100)) } } } private handleJobResult(result: JobResult): void { if (result.success) { this.logger.info('Job completed successfully', { jobId: result.jobId, duration: result.duration, processedAt: result.processedAt }) } else { this.logger.error('Job failed', { jobId: result.jobId, error: result.error, duration: result.duration, processedAt: result.processedAt }) } } async stop(): Promise&lt;void&gt; { this.logger.info('Stopping worker service') this.isProcessing = false // Wait for current jobs to finish (with timeout) const timeout = setTimeout(() =&gt; { this.logger.warning('Timeout waiting for jobs to finish') }, 30000) while (this.jobQueue.length &gt; 0) { await new Promise(resolve =&gt; setTimeout(resolve, 1000)) } clearTimeout(timeout) // Terminate workers await Promise.all(this.workers.map(worker =&gt; worker.terminate())) this.logger.info('Worker service stopped') this.logger.close() } getStats() { return { workerCount: this.workers.length, queueSize: this.jobQueue.length, isProcessing: this.isProcessing } } } // Worker thread code if (!isMainThread) { const { workerId } = workerData as { workerId: number } const logger = new Syslog({ ident: `worker-${workerId}`, facility: SyslogFacility.LOCAL3 }) parentPort?.on('message', async (job: Job) =&gt; { const startTime = Date.now() logger.debug('Processing job', { workerId, jobId: job.id, type: job.type }) try { // Simulate different job types let result: any switch (job.type) { case 'email': result = await processEmail(job.data) break case 'image': result = await processImage(job.data) break case 'report': result = await processReport(job.data) break default: throw new Error(`Unknown job type: ${job.type}`) } const jobResult: JobResult = { jobId: job.id, success: true, result, processedAt: new Date(), duration: Date.now() - startTime } logger.info('Job processed successfully', { workerId, jobId: job.id, type: job.type, duration: jobResult.duration }) parentPort?.postMessage(jobResult) } catch (error) { const jobResult: JobResult = { jobId: job.id, success: false, error: error instanceof Error ? error.message : String(error), processedAt: new Date(), duration: Date.now() - startTime } logger.error('Job processing failed', { workerId, jobId: job.id, type: job.type, error: jobResult.error, duration: jobResult.duration }) parentPort?.postMessage(jobResult) } }) async function processEmail(data: any): Promise&lt;any&gt; { // Simulate email processing await new Promise(resolve =&gt; setTimeout(resolve, Math.random() * 1000 + 500)) return { sent: true, recipient: data.to } } async function processImage(data: any): Promise&lt;any&gt; { // Simulate image processing await new Promise(resolve =&gt; setTimeout(resolve, Math.random() * 2000 + 1000)) return { processed: true, size: data.size, format: 'jpeg' } } async function processReport(data: any): Promise&lt;any&gt; { // Simulate report generation await new Promise(resolve =&gt; setTimeout(resolve, Math.random() * 3000 + 2000)) return { generated: true, pages: Math.floor(Math.random() * 50) + 10 } } } // Main application if (isMainThread) { async function main() { const service = new WorkerService(4) await service.start() // Add some sample jobs for (let i = 1; i &lt;= 20; i++) { const types = ['email', 'image', 'report'] const priorities = ['low', 'medium', 'high'] service.addJob({ id: `job-${i}`, type: types[Math.floor(Math.random() * types.length)], data: { id: i, content: `Sample data ${i}` }, priority: priorities[Math.floor(Math.random() * priorities.length)] as any }) } // Monitor progress const monitor = setInterval(() =&gt; { const stats = service.getStats() console.log('Stats:', stats) if (stats.queueSize === 0) { clearInterval(monitor) setTimeout(() =&gt; service.stop(), 2000) } }, 2000) } main().catch(error =&gt; { console.error('Failed to start application:', error) process.exit(1) }) } . ",
+    "url": "/node-syslog/examples/#background-service-examples",
+    
+    "relUrl": "/examples/#background-service-examples"
+  },"23": {
+    "doc": "Examples",
+    "title": "CLI Application Examples",
+    "content": "Command Line Tool . #!/usr/bin/env node import { Command } from 'commander' import { readFileSync, writeFileSync } from 'fs' import { Syslog, SyslogFacility, SyslogLevel } from 'node-syslog' const program = new Command() const logger = new Syslog({ ident: 'mycli', facility: SyslogFacility.LOCAL1, options: ['pid', 'ndelay'] }) program .name('mycli') .description('My CLI application with logging') .version('1.0.0') program .command('process') .description('Process a file') .argument('&lt;file&gt;', 'file to process') .option('-o, --output &lt;file&gt;', 'output file') .option('-v, --verbose', 'verbose output') .option('-l, --level &lt;level&gt;', 'log level', 'info') .action((file, options) =&gt; { logger.info('Processing file started', { file, output: options.output, verbose: options.verbose }) try { // Set log level if specified if (options.level &amp;&amp; options.level !== 'info') { logger.info(`Log level set to ${options.level}`) } // Read file if (options.verbose) { logger.debug('Reading file', { file }) } const content = readFileSync(file, 'utf8') const lines = content.split('\\n').filter(line =&gt; line.trim()) logger.info('File read successfully', { file, lines: lines.length, size: content.length }) // Process content const processed = lines.map((line, index) =&gt; { if (options.verbose) { logger.debug('Processing line', { lineNumber: index + 1, content: line.substring(0, 50) + '...' }) } // Example processing: convert to uppercase and add line number return `${index + 1}: ${line.toUpperCase()}` }) const result = processed.join('\\n') // Write output if (options.output) { writeFileSync(options.output, result) logger.info('Output written', { output: options.output, size: result.length }) } else { console.log(result) logger.info('Output printed to console') } logger.info('File processing completed successfully', { file, linesProcessed: lines.length, outputSize: result.length }) } catch (error) { logger.error('File processing failed', { file, error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined }) process.exit(1) } }) program .command('monitor') .description('Monitor system resources') .option('-i, --interval &lt;seconds&gt;', 'monitoring interval', '5') .option('-c, --count &lt;number&gt;', 'number of iterations', '10') .action((options) =&gt; { const interval = parseInt(options.interval) * 1000 const count = parseInt(options.count) logger.info('Starting system monitoring', { interval: interval / 1000, count }) let iteration = 0 const monitor = setInterval(() =&gt; { iteration++ const memUsage = process.memoryUsage() const cpuUsage = process.cpuUsage() logger.info('System metrics', { iteration, memory: { rss: `${Math.round(memUsage.rss / 1024 / 1024)}MB`, heapTotal: `${Math.round(memUsage.heapTotal / 1024 / 1024)}MB`, heapUsed: `${Math.round(memUsage.heapUsed / 1024 / 1024)}MB`, external: `${Math.round(memUsage.external / 1024 / 1024)}MB` }, cpu: { user: cpuUsage.user, system: cpuUsage.system }, uptime: `${Math.round(process.uptime())}s` }) if (iteration &gt;= count) { clearInterval(monitor) logger.info('System monitoring completed', { totalIterations: iteration }) } }, interval) }) // Global error handling process.on('uncaughtException', (error) =&gt; { logger.critical('Uncaught exception', { error: error.message, stack: error.stack }) logger.close() process.exit(1) }) process.on('unhandledRejection', (reason, promise) =&gt; { logger.error('Unhandled rejection', { reason: reason instanceof Error ? reason.message : String(reason), stack: reason instanceof Error ? reason.stack : undefined }) }) // Graceful shutdown process.on('SIGTERM', () =&gt; { logger.info('SIGTERM received, shutting down') logger.close() process.exit(0) }) process.on('SIGINT', () =&gt; { logger.info('SIGINT received, shutting down') logger.close() process.exit(0) }) program.parse() . ",
+    "url": "/node-syslog/examples/#cli-application-examples",
+    
+    "relUrl": "/examples/#cli-application-examples"
+  },"24": {
+    "doc": "Examples",
+    "title": "Testing Examples",
+    "content": "Unit Testing with Vitest . import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest' import { Syslog, SyslogFacility, SyslogLevel } from '../src/index' // Mock the native module vi.mock('../binding.node', () =&gt; ({ init: vi.fn(), log: vi.fn(), close: vi.fn(), setLogLevel: vi.fn() })) describe('Syslog', () =&gt; { let logger: Syslog beforeEach(() =&gt; { logger = new Syslog({ ident: 'test-app', facility: SyslogFacility.LOCAL0, logLevel: SyslogLevel.DEBUG }) }) afterEach(() =&gt; { logger.close() }) describe('constructor', () =&gt; { it('should create logger with valid options', () =&gt; { expect(logger).toBeDefined() }) it('should throw error with invalid facility', () =&gt; { expect(() =&gt; new Syslog({ ident: 'test', facility: 'invalid' as any })).toThrow('Invalid facility: invalid') }) it('should throw error with invalid log level', () =&gt; { expect(() =&gt; new Syslog({ ident: 'test', logLevel: 'invalid' as any })).toThrow('Invalid log level: invalid') }) it('should require ident parameter', () =&gt; { expect(() =&gt; new Syslog({} as any)).toThrow('ident is required') }) }) describe('logging methods', () =&gt; { it('should log emergency messages', () =&gt; { const { log } = require('../binding.node') logger.emerg('Emergency message', { context: 'test' }) expect(log).toHaveBeenCalledWith( expect.any(Number), // LOG_EMERG expect.stringContaining('Emergency message') ) }) it('should log alert messages', () =&gt; { const { log } = require('../binding.node') logger.alert('Alert message') expect(log).toHaveBeenCalledWith( expect.any(Number), // LOG_ALERT expect.stringContaining('Alert message') ) }) it('should log critical messages', () =&gt; { const { log } = require('../binding.node') logger.crit('Critical message') expect(log).toHaveBeenCalledWith( expect.any(Number), // LOG_CRIT expect.stringContaining('Critical message') ) }) it('should log error messages', () =&gt; { const { log } = require('../binding.node') logger.error('Error message', { code: 'TEST_ERROR' }) expect(log).toHaveBeenCalledWith( expect.any(Number), // LOG_ERR expect.stringContaining('Error message') ) }) it('should log warning messages', () =&gt; { const { log } = require('../binding.node') logger.warning('Warning message') expect(log).toHaveBeenCalledWith( expect.any(Number), // LOG_WARNING expect.stringContaining('Warning message') ) }) it('should log notice messages', () =&gt; { const { log } = require('../binding.node') logger.notice('Notice message') expect(log).toHaveBeenCalledWith( expect.any(Number), // LOG_NOTICE expect.stringContaining('Notice message') ) }) it('should log info messages', () =&gt; { const { log } = require('../binding.node') logger.info('Info message') expect(log).toHaveBeenCalledWith( expect.any(Number), // LOG_INFO expect.stringContaining('Info message') ) }) it('should log debug messages', () =&gt; { const { log } = require('../binding.node') logger.debug('Debug message') expect(log).toHaveBeenCalledWith( expect.any(Number), // LOG_DEBUG expect.stringContaining('Debug message') ) }) }) describe('log level filtering', () =&gt; { it('should filter debug messages when log level is info', () =&gt; { const { log } = require('../binding.node') const infoLogger = new Syslog({ ident: 'test', logLevel: SyslogLevel.INFO }) infoLogger.debug('This should not appear') infoLogger.info('This should appear') expect(log).toHaveBeenCalledTimes(1) expect(log).toHaveBeenCalledWith( expect.any(Number), // LOG_INFO expect.stringContaining('This should appear') ) }) it('should check if debug is enabled', () =&gt; { const infoLogger = new Syslog({ ident: 'test', logLevel: SyslogLevel.INFO }) expect(infoLogger.isDebugEnabled()).toBe(false) const debugLogger = new Syslog({ ident: 'test', logLevel: SyslogLevel.DEBUG }) expect(debugLogger.isDebugEnabled()).toBe(true) }) }) describe('context handling', () =&gt; { it('should handle context objects', () =&gt; { const { log } = require('../binding.node') logger.info('Test message', { userId: 123, action: 'login', ip: '192.168.1.1' }) expect(log).toHaveBeenCalledWith( expect.any(Number), expect.stringContaining('Test message'), expect.stringContaining('userId=123'), expect.stringContaining('action=login'), expect.stringContaining('ip=192.168.1.1') ) }) it('should handle circular references in context', () =&gt; { const { log } = require('../binding.node') const context: any = { userId: 123 } context.circular = context expect(() =&gt; { logger.info('Test message', context) }).not.toThrow() }) }) describe('cleanup', () =&gt; { it('should close syslog connection', () =&gt; { const { close } = require('../binding.node') logger.close() expect(close).toHaveBeenCalled() }) }) }) . These examples demonstrate various real-world usage patterns for node-syslog in different application types and scenarios. ",
+    "url": "/node-syslog/examples/#testing-examples",
+    
+    "relUrl": "/examples/#testing-examples"
+  },"25": {
+    "doc": "Getting Started",
+    "title": "Getting Started Guide",
+    "content": "This guide will help you get up and running with node-syslog quickly. You’ll learn how to install, configure, and use the library in your Node.js applications. ",
+    "url": "/node-syslog/getting-started/#getting-started-guide",
+    
+    "relUrl": "/getting-started/#getting-started-guide"
+  },"26": {
+    "doc": "Getting Started",
+    "title": "Prerequisites",
+    "content": "Before you begin, ensure you have: . | Node.js version 22.x LTS or higher | Linux operating system (ARM64 or AMD64) | npm or pnpm package manager | (Optional) rsyslog or syslog-ng for log management | . Legacy Version Support . This version requires Node.js 22.0.0+. If you need support for older Node.js versions: . | Node.js 18+: Use npm install node-syslog@1.x (legacy version) | Node.js &lt; 18: Consider migrating to modern-syslog for broader compatibility | . See the migration guide for detailed instructions on upgrading from legacy versions. ",
+    "url": "/node-syslog/getting-started/#prerequisites",
+    
+    "relUrl": "/getting-started/#prerequisites"
+  },"27": {
+    "doc": "Getting Started",
+    "title": "Installation",
+    "content": "Basic Installation . npm install node-syslog . Using pnpm (Recommended for Development) . pnpm add node-syslog . Verify Installation . node -e \"console.log(require('node-syslog'))\" . If the installation was successful, you should see the module exports without errors. ",
+    "url": "/node-syslog/getting-started/#installation",
+    
+    "relUrl": "/getting-started/#installation"
+  },"28": {
+    "doc": "Getting Started",
+    "title": "Basic Usage",
+    "content": "Import the Library . // ES6 import import { Syslog } from 'node-syslog' // CommonJS require const { Syslog } = require('node-syslog') . Create a Simple Logger . import { Syslog } from 'node-syslog' // Create logger with basic configuration const logger = new Syslog({ ident: 'myapp', facility: 'local0' }) // Log a message logger.info('Hello, syslog!') // Close when done logger.close() . Run Your First Program . Save this as example.js: . const { Syslog } = require('node-syslog') const logger = new Syslog({ ident: 'example', facility: 'local0' }) logger.info('This is my first syslog message!') logger.warning('Something might be wrong') logger.error('An error occurred') logger.close() . Run it: . node example.js . Check your system logs: . # For systems using journalctl journalctl -f | grep example # For traditional syslog tail -f /var/log/syslog | grep example . ",
+    "url": "/node-syslog/getting-started/#basic-usage",
+    
+    "relUrl": "/getting-started/#basic-usage"
+  },"29": {
+    "doc": "Getting Started",
+    "title": "Configuration Options",
+    "content": "Full Configuration Example . import { Syslog, SyslogFacility, SyslogLevel, SyslogOption } from 'node-syslog' const logger = new Syslog({ ident: 'production-app', facility: SyslogFacility.DAEMON, options: [ SyslogOption.PID, // Include process ID SyslogOption.NDELAY, // Open connection immediately SyslogOption.LOG_PID // Log the PID with each message ], logLevel: SyslogLevel.INFO }) . Configuration Parameters . | Parameter | Type | Default | Description | . | ident | string | Required | Identifier for log messages | . | facility | SyslogFacilityType | ‘user’ | Syslog facility (kern, user, mail, daemon, etc.) | . | options | SyslogOptionType[] | [] | Syslog options (pid, ndelay, nowait, etc.) | . | logLevel | SyslogLevelType | ‘info’ | Minimum log level to output | . Available Facilities . import { SyslogFacility } from 'node-syslog' // Common facilities SyslogFacility.KERN // Kernel messages SyslogFacility.USER // User-level messages (default) SyslogFacility.MAIL // Mail system SyslogFacility.DAEMON // System daemons SyslogFacility.AUTH // Security/authorization SyslogFacility.SYSLOG // Internal syslog messages SyslogFacility.LPR // Line printer subsystem SyslogFacility.NEWS // Network news subsystem SyslogFacility.UUCP // UUCP subsystem SyslogFacility.CRON // Clock daemon SyslogFacility.AUTHPRIV // Security/authorization (private) SyslogFacility.FTP // FTP daemon SyslogFacility.LOCAL0 // Local use 0 SyslogFacility.LOCAL1 // Local use 1 // ... LOCAL2 through LOCAL7 . Available Log Levels . import { SyslogLevel } from 'node-syslog' // From most to least severe SyslogLevel.EMERG // Emergency: system is unusable SyslogLevel.ALERT // Alert: action must be taken immediately SyslogLevel.CRIT // Critical: critical conditions SyslogLevel.ERR // Error: error conditions SyslogLevel.WARNING // Warning: warning conditions SyslogLevel.NOTICE // Notice: normal but significant condition SyslogLevel.INFO // Informational: informational messages SyslogLevel.DEBUG // Debug: debug-level messages . ",
+    "url": "/node-syslog/getting-started/#configuration-options",
+    
+    "relUrl": "/getting-started/#configuration-options"
+  },"30": {
+    "doc": "Getting Started",
+    "title": "Logging Methods",
+    "content": "Basic Logging . logger.emerg('System is unusable!') logger.alert('Immediate action required!') logger.crit('Critical system failure') logger.error('Database connection failed') logger.warning('High memory usage detected') logger.notice('Server configuration updated') logger.info('User logged in successfully') logger.debug('Processing request details') . Structured Logging . // Log with additional context logger.info('User action completed', { userId: 12345, action: 'purchase', amount: 99.99, timestamp: new Date().toISOString() }) logger.error('API request failed', { url: '/api/users', method: 'POST', statusCode: 500, error: 'Database timeout', requestId: 'req_abc123' }) . Conditional Logging . // Only log if level is enabled if (logger.isDebugEnabled()) { logger.debug('Expensive debug operation', { largeObject: getLargeObject(), computationResult: expensiveComputation() }) } . ",
+    "url": "/node-syslog/getting-started/#logging-methods",
+    
+    "relUrl": "/getting-started/#logging-methods"
+  },"31": {
+    "doc": "Getting Started",
+    "title": "Real-World Examples",
+    "content": "Express.js Web Application . import express from 'express' import { Syslog, SyslogFacility } from 'node-syslog' const app = express() const logger = new Syslog({ ident: 'webapp', facility: SyslogFacility.LOCAL0, options: ['pid', 'ndelay'] }) // Request logging middleware app.use((req, res, next) =&gt; { const start = Date.now() res.on('finish', () =&gt; { const duration = Date.now() - start logger.info('HTTP Request', { method: req.method, url: req.url, statusCode: res.statusCode, duration: `${duration}ms`, userAgent: req.get('User-Agent'), ip: req.ip }) }) next() }) // Error handling app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) =&gt; { logger.error('Unhandled error', { error: err.message, stack: err.stack, url: req.url, method: req.method }) res.status(500).json({ error: 'Internal server error' }) }) const PORT = process.env.PORT || 3000 app.listen(PORT, () =&gt; { logger.info('Server started', { port: PORT }) }) . CLI Application . #!/usr/bin/env node import { Command } from 'commander' import { Syslog, SyslogFacility } from 'node-syslog' const program = new Command() const logger = new Syslog({ ident: 'mycli', facility: SyslogFacility.LOCAL1 }) program .name('mycli') .description('My CLI application') .version('1.0.0') program .command('process') .argument('&lt;file&gt;', 'file to process') .option('-v, --verbose', 'verbose output') .action((file, options) =&gt; { logger.info('Processing file', { file }) try { // Your processing logic here logger.info('File processed successfully', { file }) } catch (error) { logger.error('File processing failed', { file, error: error.message }) process.exit(1) } }) program.parse() . Background Service . import { Syslog, SyslogFacility, SyslogLevel } from 'node-syslog' class BackgroundService { private logger: Syslog private running = false constructor() { this.logger = new Syslog({ ident: 'background-service', facility: SyslogFacility.DAEMON, options: ['pid', 'ndelay'], logLevel: SyslogLevel.INFO }) } async start() { this.running = true this.logger.info('Background service started') while (this.running) { try { await this.processTasks() } catch (error) { this.logger.error('Task processing failed', { error: error.message, stack: error.stack }) // Wait before retrying await new Promise(resolve =&gt; setTimeout(resolve, 5000)) } } } async stop() { this.running = false this.logger.info('Background service stopped') this.logger.close() } private async processTasks() { // Your background processing logic this.logger.debug('Processing background tasks') // Simulate work await new Promise(resolve =&gt; setTimeout(resolve, 1000)) } } // Handle graceful shutdown const service = new BackgroundService() process.on('SIGTERM', async () =&gt; { await service.stop() process.exit(0) }) process.on('SIGINT', async () =&gt; { await service.stop() process.exit(0) }) service.start().catch(error =&gt; { console.error('Failed to start service:', error) process.exit(1) }) . ",
+    "url": "/node-syslog/getting-started/#real-world-examples",
+    
+    "relUrl": "/getting-started/#real-world-examples"
+  },"32": {
+    "doc": "Getting Started",
+    "title": "Best Practices",
+    "content": "1. Always Close the Logger . // Good - explicit cleanup logger.close() // Better - use try/finally try { logger.info('Doing work') // ... your code } finally { logger.close() } // Best - automatic cleanup with process hooks process.on('exit', () =&gt; logger.close()) process.on('SIGINT', () =&gt; logger.close()) process.on('SIGTERM', () =&gt; logger.close()) . 2. Use Appropriate Log Levels . // Use appropriate levels for different situations logger.debug('Detailed debugging info') // Development only logger.info('Normal application flow') // Production info logger.warning('Something unusual but not error') // Attention needed logger.error('Error that doesn't stop execution') // Errors logger.crit('Critical error affecting functionality') // Critical logger.emerg('System unusable') // Emergency . 3. Include Context in Messages . // Good - includes context logger.error('Database connection failed', { host: 'localhost', port: 5432, database: 'myapp', attempt: 3, maxRetries: 5 }) // Less useful - no context logger.error('Database connection failed') . 4. Avoid Sensitive Data . // Bad - logs sensitive information logger.info('User login', { username: 'admin', password: 'secret123', // Never log passwords! creditCard: '4111-1111-1111-1111' // Never log PII! }) // Good - sanitizes sensitive data logger.info('User login', { username: 'admin', password: '[REDACTED]', creditCard: '[REDACTED]' }) . ",
+    "url": "/node-syslog/getting-started/#best-practices",
+    
+    "relUrl": "/getting-started/#best-practices"
+  },"33": {
+    "doc": "Getting Started",
+    "title": "Troubleshooting",
+    "content": "Common Issues . 1. “Module not found” Error . Problem: Error: Cannot find module 'node-syslog' . Solution: Ensure you’re running on Linux and the native module compiled correctly: . # Rebuild native module npm rebuild node-syslog # Check platform node -e \"console.log(process.platform, process.arch)\" . 2. Permission Denied . Problem: Can’t write to syslog . Solution: Check syslog configuration and permissions: . # Check if syslog is running systemctl status rsyslog # Test syslog manually logger \"Test message from $(whoami)\" . 3. Messages Not Appearing . Problem: No messages in system logs . Solution: Check syslog configuration and filters: . # View all messages journalctl -f # Filter by your application journalctl -f | grep your-app-ident # Check syslog configuration cat /etc/rsyslog.conf | grep -v \"^#\" . Debug Mode . Enable debug logging to troubleshoot issues: . import { Syslog, SyslogLevel } from 'node-syslog' const logger = new Syslog({ ident: 'debug-app', facility: 'local0', logLevel: SyslogLevel.DEBUG // Enable all levels including debug }) logger.debug('Debug mode enabled') logger.debug('Configuration:', logger.getConfig()) . ",
+    "url": "/node-syslog/getting-started/#troubleshooting",
+    
+    "relUrl": "/getting-started/#troubleshooting"
+  },"34": {
+    "doc": "Getting Started",
+    "title": "Next Steps",
+    "content": "Now that you have the basics down, explore these topics: . | API Reference - Complete API documentation | Installation Guide - Advanced installation options | Migration Guide - Migrating from the old node-syslog | Examples - More usage examples | . If you run into issues, check the troubleshooting section or open an issue on GitHub. ",
+    "url": "/node-syslog/getting-started/#next-steps",
+    
+    "relUrl": "/getting-started/#next-steps"
+  },"35": {
+    "doc": "Getting Started",
+    "title": "Getting Started",
+    "content": " ",
+    "url": "/node-syslog/getting-started/",
+    
+    "relUrl": "/getting-started/"
+  },"36": {
+    "doc": "node-syslog",
+    "title": "node-syslog",
+    "content": "Modern Node.js syslog library with fluent TypeScript API for Linux systems. A modern, TypeScript-native replacement for the deprecated node-syslog package. Built with N-API for cross-platform binary compatibility and featuring a fluent, synchronous API. ",
+    "url": "/node-syslog/",
+    
+    "relUrl": "/"
+  },"37": {
+    "doc": "node-syslog",
+    "title": "✨ Features",
+    "content": ". | Modern TypeScript: Full type safety with strict mode | N-API Native: Pre-built binaries for ARM64/AMD64 Linux | Fluent API: Clean, chainable interface | Zero Dependencies: Runtime footprint &lt; 50KB | Synchronous Only: Direct kernel syslog(3) calls (non-blocking) | Linux Optimized: Designed specifically for Linux syslog systems | . ",
+    "url": "/node-syslog/#-features",
+    
+    "relUrl": "/#-features"
+  },"38": {
+    "doc": "node-syslog",
+    "title": "🚀 Quick Start",
+    "content": "Installation . npm install node-syslog . Basic Usage . import { Syslog } from 'node-syslog' // Create logger instance const logger = new Syslog({ ident: 'myapp', facility: 'local0', options: ['pid', 'odelay'] }) // Log messages logger.info('Server started', { port: 3000 }) logger.error('Connection failed', { code: 'ECONNREFUSED' }) logger.debug('Debug information', { userId: 123 }) // Close when done logger.close() . Advanced Configuration . import { Syslog, SyslogFacility, SyslogLevel, SyslogOption } from 'node-syslog' const logger = new Syslog({ ident: 'production-app', facility: SyslogFacility.DAEMON, options: [SyslogOption.PID, SyslogOption.NDELAY, SyslogOption.LOG_PID], logLevel: SyslogLevel.INFO }) // Structured logging logger.warning('High memory usage', { memoryUsage: process.memoryUsage(), threshold: '500MB' }) . ",
+    "url": "/node-syslog/#-quick-start",
+    
+    "relUrl": "/#-quick-start"
+  },"39": {
+    "doc": "node-syslog",
+    "title": "🏗️ Architecture",
+    "content": "┌─────────────────────────────────────────────┐ │ TypeScript API Layer (src/index.ts) │ │ Fluent class, input validation, types │ ├─────────────────────────────────────────────┤ │ N-API C++ Bridge (src/binding.cpp) │ │ Direct type conversion, no threadpool │ ├─────────────────────────────────────────────┤ │ C Implementation (src/syslog.c) │ │ Direct syslog(3) calls, zero allocations │ └─────────────────────────────────────────────┘ . ",
+    "url": "/node-syslog/#%EF%B8%8F-architecture",
+    
+    "relUrl": "/#️-architecture"
+  },"40": {
+    "doc": "node-syslog",
+    "title": "📚 Documentation",
+    "content": ". | Getting Started Guide | API Reference | Installation Guide | Migration Guide | Examples | . ",
+    "url": "/node-syslog/#-documentation",
+    
+    "relUrl": "/#-documentation"
+  },"41": {
+    "doc": "node-syslog",
+    "title": "🔧 Requirements",
+    "content": ". | Node.js: &gt;= 22.x LTS | Platform: Linux only | Architecture: ARM64 or AMD64 | System: rsyslog or syslog-ng (optional) | . ",
+    "url": "/node-syslog/#-requirements",
+    
+    "relUrl": "/#-requirements"
+  },"42": {
+    "doc": "node-syslog",
+    "title": "📊 Performance",
+    "content": ". | Latency: &lt; 1μs overhead vs raw syslog(3) | Throughput: &gt; 500,000 messages/second | Memory: Zero allocations in hot path | Binary Size: &lt; 50KB per architecture | . ",
+    "url": "/node-syslog/#-performance",
+    
+    "relUrl": "/#-performance"
+  },"43": {
+    "doc": "node-syslog",
+    "title": "🤝 Contributing",
+    "content": "Contributions are welcome! Please see our Contributing Guide for details. ",
+    "url": "/node-syslog/#-contributing",
+    
+    "relUrl": "/#-contributing"
+  },"44": {
+    "doc": "node-syslog",
+    "title": "📄 License",
+    "content": "MIT License - see LICENSE file for details. ",
+    "url": "/node-syslog/#-license",
+    
+    "relUrl": "/#-license"
+  },"45": {
+    "doc": "node-syslog",
+    "title": "🔗 Links",
+    "content": ". | GitHub Repository | npm Package | Issue Tracker | Discussions | . Note: This package is designed for Linux systems only. For cross-platform logging, consider alternatives like Winston or Pino. ",
+    "url": "/node-syslog/#-links",
+    
+    "relUrl": "/#-links"
+  },"46": {
+    "doc": "Installation Guide",
+    "title": "Installation Guide",
+    "content": "This guide covers installing and setting up node-syslog in your project. ",
+    "url": "/node-syslog/installation/",
+    
+    "relUrl": "/installation/"
+  },"47": {
+    "doc": "Installation Guide",
+    "title": "Prerequisites",
+    "content": ". | Node.js 22.0.0 or higher | Linux operating system (x64/ARM64) | C++ compiler and development tools (for source compilation) | . ",
+    "url": "/node-syslog/installation/#prerequisites",
+    
+    "relUrl": "/installation/#prerequisites"
+  },"48": {
+    "doc": "Installation Guide",
+    "title": "Platform Support",
+    "content": "| Platform | Architecture | Status | . | Linux | x64 (AMD64) | ✅ Supported | . | Linux | ARM64 | ✅ Supported | . | macOS | Any | ❌ Not supported | . | Windows | Any | ❌ Not supported | . ",
+    "url": "/node-syslog/installation/#platform-support",
+    
+    "relUrl": "/installation/#platform-support"
+  },"49": {
+    "doc": "Installation Guide",
+    "title": "Installation Methods",
+    "content": "Method 1: NPM (Recommended) . npm install node-syslog . Method 2: pnpm . pnpm add node-syslog . Method 3: Yarn . yarn add node-syslog . ",
+    "url": "/node-syslog/installation/#installation-methods",
+    
+    "relUrl": "/installation/#installation-methods"
+  },"50": {
+    "doc": "Installation Guide",
+    "title": "Binary vs Source Installation",
+    "content": "Binary Installation (Default) . The package includes precompiled binaries for supported platforms: . npm install node-syslog # Downloads appropriate binary automatically . Source Installation (Fallback) . If no binary is available for your platform, the package falls back to source compilation: . # Ensure you have build tools installed sudo apt-get install build-essential python3 # Ubuntu/Debian sudo yum install gcc-c++ python3 # CentOS/RHEL sudo dnf install gcc-c++ python3 # Fedora # Install the package (will compile from source) npm install node-syslog . ",
+    "url": "/node-syslog/installation/#binary-vs-source-installation",
+    
+    "relUrl": "/installation/#binary-vs-source-installation"
+  },"51": {
+    "doc": "Installation Guide",
+    "title": "Development Dependencies",
+    "content": "For development, you’ll need additional tools: . # Install development dependencies npm install --dev # or with pnpm pnpm install --dev . Required development tools: . | Node.js 22+ | TypeScript compiler | Native build tools (node-gyp) | C++ compiler with N-API support | . ",
+    "url": "/node-syslog/installation/#development-dependencies",
+    
+    "relUrl": "/installation/#development-dependencies"
+  },"52": {
+    "doc": "Installation Guide",
+    "title": "Verification",
+    "content": "After installation, verify the package works: . # Create a test file echo 'import { info } from \"node-syslog\"; info(\"Installation test\");' &gt; test.js # Run the test node test.js . Check syslog for the test message: . # On most systems tail -f /var/log/syslog # Or on systemd systems journalctl -f . ",
+    "url": "/node-syslog/installation/#verification",
+    
+    "relUrl": "/installation/#verification"
+  },"53": {
+    "doc": "Installation Guide",
+    "title": "Troubleshooting",
+    "content": "Common Issues . 1. “Unsupported Platform” Error . Problem: Package doesn’t support your OS/architecture . Error: Failed to load native syslog module. This package only supports Linux x64/ARM64. Solution: Use a supported platform or consider alternative logging libraries. 2. Native Module Compilation Failed . Problem: Source compilation fails during installation . Error: node-gyp failed to rebuild . Solution: Install required build tools: . # Ubuntu/Debian sudo apt-get update sudo apt-get install build-essential python3 # CentOS/RHEL sudo yum groupinstall \"Development Tools\" sudo yum install python3 # Fedora sudo dnf groupinstall \"Development Tools\" sudo dnf install python3 . 3. Permission Denied . Problem: Cannot write to syslog . Error: Permission denied when writing to syslog . Solution: Check syslog configuration and permissions: . # Test syslog access logger \"Test message from $(whoami)\" # Check if your user can write to syslog sudo usermod -a -G adm $USER # Add to adm group # Log out and log back in . 4. Missing Dependencies . Problem: Missing system dependencies . Error: Cannot find syslog.h . Solution: Install development headers: . # Ubuntu/Debian sudo apt-get install libc6-dev # CentOS/RHEL sudo yum install glibc-devel # Fedora sudo dnf install glibc-devel . Debug Mode . Enable debug logging for troubleshooting: . # Set debug environment variable export DEBUG=node-syslog:* # Run your application node your-app.js . Clean Installation . For a fresh installation: . # Remove existing installation npm uninstall node-syslog # Clear npm cache npm cache clean --force # Reinstall npm install node-syslog . ",
+    "url": "/node-syslog/installation/#troubleshooting",
+    
+    "relUrl": "/installation/#troubleshooting"
+  },"54": {
+    "doc": "Installation Guide",
+    "title": "Docker Installation",
+    "content": "Dockerfile Example . FROM node:22-alpine # Install build dependencies RUN apk add --no-cache \\ python3 \\ make \\ g++ \\ libc-dev WORKDIR /app COPY package*.json ./ RUN npm install node-syslog COPY . RUN npm run build CMD [\"node\", \"your-app.js\"] . Docker Compose . version: '3.8' services: app: build: . volumes: - ./logs:/var/log environment: - NODE_ENV=production . ",
+    "url": "/node-syslog/installation/#docker-installation",
+    
+    "relUrl": "/installation/#docker-installation"
+  },"55": {
+    "doc": "Installation Guide",
+    "title": "Next Steps",
+    "content": "After successful installation: . | Read the API Reference | Check the Examples | Review the Migration Guide if upgrading from node-syslog v1 | . ",
+    "url": "/node-syslog/installation/#next-steps",
+    
+    "relUrl": "/installation/#next-steps"
+  },"56": {
+    "doc": "Installation Guide",
+    "title": "Support",
+    "content": "If you encounter issues not covered here: . | Check GitHub Issues | Start a Discussion | Review Troubleshooting Guide | . ",
+    "url": "/node-syslog/installation/#support",
+    
+    "relUrl": "/installation/#support"
+  },"57": {
+    "doc": "Migration Guide",
+    "title": "Migration Guide",
+    "content": "This guide helps you migrate from the old node-syslog package to the new modern implementation. ",
+    "url": "/node-syslog/migration/",
+    
+    "relUrl": "/migration/"
+  },"58": {
+    "doc": "Migration Guide",
+    "title": "Overview",
+    "content": "The new node-syslog is a complete rewrite with: . | ✅ Modern TypeScript API with full IntelliSense | ✅ Fluent interface with method chaining | ✅ Better error handling and validation | ✅ Precompiled binaries for easy installation | ✅ Comprehensive test coverage | ❌ Breaking API changes (this guide helps) | . ",
+    "url": "/node-syslog/migration/#overview",
+    
+    "relUrl": "/migration/#overview"
+  },"59": {
+    "doc": "Migration Guide",
+    "title": "Quick Reference",
+    "content": "| Old API | New API | Notes | . | require('node-syslog') | import { Syslog } from 'node-syslog' | ES modules | . | syslog.init() | new Syslog() | Constructor-based | . | syslog.log() | logger.info/error/etc() | Specific methods | . | Constants | Facilities/Levels/Options | Enum-based | . ",
+    "url": "/node-syslog/migration/#quick-reference",
+    
+    "relUrl": "/migration/#quick-reference"
+  },"60": {
+    "doc": "Migration Guide",
+    "title": "Step-by-Step Migration",
+    "content": "1. Update Import . Before: . const syslog = require('node-syslog'); . After: . import { Syslog, SyslogFacility, SyslogLevel, SyslogOption } from 'node-syslog'; // or for convenience functions: import { info, error, warning } from 'node-syslog'; . 2. Replace Initialization . Before: . syslog.init('my-app', syslog.LOG_PID | syslog.LOG_ODELAY, syslog.LOG_LOCAL0); . After: . const logger = new Syslog({ ident: 'my-app', facility: SyslogFacility.LOG_LOCAL0, options: SyslogOption.LOG_PID | SyslogOption.LOG_ODELAY }); . 3. Update Logging Calls . Before: . syslog.log(syslog.LOG_INFO, 'Application started'); syslog.log(syslog.LOG_ERR, 'Database connection failed'); . After (Method 1 - Instance methods): . logger.info('Application started'); logger.error('Database connection failed'); . After (Method 2 - Convenience functions): . import { info, error } from 'node-syslog'; info('Application started'); error('Database connection failed'); . 4. Update Constants . Before: . const facility = syslog.LOG_LOCAL0; const level = syslog.LOG_INFO; const options = syslog.LOG_PID; . After: . const facility = SyslogFacility.LOG_LOCAL0; const level = SyslogLevel.LOG_INFO; const options = SyslogOption.LOG_PID; . ",
+    "url": "/node-syslog/migration/#step-by-step-migration",
+    
+    "relUrl": "/migration/#step-by-step-migration"
+  },"61": {
+    "doc": "Migration Guide",
+    "title": "Complete Migration Examples",
+    "content": "Example 1: Basic Web Server . Before: . const syslog = require('node-syslog'); const express = require('express'); syslog.init('web-server', syslog.LOG_PID, syslog.LOG_DAEMON); const app = express(); app.use((req, res, next) =&gt; { syslog.log(syslog.LOG_INFO, `${req.method} ${req.url}`); next(); }); app.use((err, req, res, next) =&gt; { syslog.log(syslog.LOG_ERR, `Error: ${err.message}`); res.status(500).send('Internal Server Error'); }); app.listen(3000, () =&gt; { syslog.log(syslog.LOG_INFO, 'Server started on port 3000'); }); . After: . import express from 'express'; import { Syslog, SyslogFacility, SyslogOption } from 'node-syslog'; const logger = new Syslog({ ident: 'web-server', facility: SyslogFacility.LOG_DAEMON, options: SyslogOption.LOG_PID }); const app = express(); app.use((req, res, next) =&gt; { logger.info(`${req.method} ${req.url}`); next(); }); app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) =&gt; { logger.error('Request error', { error: err.message, stack: err.stack, url: req.url, method: req.method }); res.status(500).send('Internal Server Error'); }); app.listen(3000, () =&gt; { logger.info('Server started on port 3000'); }); . Example 2: Database Service . Before: . const syslog = require('node-syslog'); const mysql = require('mysql'); syslog.init('db-service', syslog.LOG_PID | syslog.LOG_CONS, syslog.LOG_LOCAL1); function query(sql, params, callback) { syslog.log(syslog.LOG_DEBUG, `Executing query: ${sql}`); mysql.query(sql, params, (err, results) =&gt; { if (err) { syslog.log(syslog.LOG_ERR, `Query failed: ${err.message}`); return callback(err); } syslog.log(syslog.LOG_INFO, `Query returned ${results.length} rows`); callback(null, results); }); } . After: . import mysql from 'mysql'; import { Syslog, SyslogFacility, SyslogOption } from 'node-syslog'; const logger = new Syslog({ ident: 'db-service', facility: SyslogFacility.LOG_LOCAL1, options: SyslogOption.LOG_PID | SyslogOption.LOG_CONS }); interface QueryResult { [key: string]: any; } function query(sql: string, params: any[]): Promise&lt;QueryResult[]&gt; { return new Promise((resolve, reject) =&gt; { logger.debug('Executing query', { sql, params }); mysql.query(sql, params, (err: Error, results: QueryResult[]) =&gt; { if (err) { logger.error('Query failed', { error: err.message, sql, params }); return reject(err); } logger.info('Query completed', { rowCount: results.length, sql }); resolve(results); }); }); } . Example 3: Background Worker . Before: . const syslog = require('node-syslog'); const { Worker } = require('worker_threads'); syslog.init('worker', syslog.LOG_PID, syslog.LOG_LOCAL2); function processJob(job) { syslog.log(syslog.LOG_INFO, `Processing job ${job.id}`); try { // Process job... syslog.log(syslog.LOG_NOTICE, `Job ${job.id} completed successfully`); } catch (error) { syslog.log(syslog.LOG_CRIT, `Job ${job.id} failed: ${error.message}`); } } . After: . import { Worker } from 'worker_threads'; import { Syslog, SyslogFacility } from 'node-syslog'; const logger = new Syslog({ ident: 'worker', facility: SyslogFacility.LOG_LOCAL2 }); interface Job { id: string; type: string; data: any; } async function processJob(job: Job): Promise&lt;void&gt; { logger.info('Processing job', { jobId: job.id, jobType: job.type }); try { // Process job... await performJobWork(job); logger.notice('Job completed successfully', { jobId: job.id }); } catch (error) { logger.critical('Job failed', { jobId: job.id, error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined }); throw error; } } . ",
+    "url": "/node-syslog/migration/#complete-migration-examples",
+    
+    "relUrl": "/migration/#complete-migration-examples"
+  },"62": {
+    "doc": "Migration Guide",
+    "title": "New Features You Should Use",
+    "content": "1. Context Logging . New capability: . logger.error('User authentication failed', { userId: 123, ip: '192.168.1.100', userAgent: 'Mozilla/5.0...', timestamp: new Date().toISOString() }); . 2. Method Chaining . New capability: . logger .debug('Starting request') .info('Processing data') .warning('Rate limit approaching') .error('Request failed'); . 3. TypeScript Support . New capability: . // Full IntelliSense support const logger = new Syslog({ ident: 'my-app', facility: SyslogFacility.LOG_LOCAL0, // Auto-completion options: SyslogOption.LOG_PID | SyslogOption.LOG_CONS // Type-safe }); logger.info('Message'); // Method signatures with types . ",
+    "url": "/node-syslog/migration/#new-features-you-should-use",
+    
+    "relUrl": "/migration/#new-features-you-should-use"
+  },"63": {
+    "doc": "Migration Guide",
+    "title": "Breaking Changes Summary",
+    "content": "Removed Features . | No more global state (each instance is independent) | No more syslog.log() with level constants | No more CommonJS require (use ES imports) | . Added Features . | Fluent interface with method chaining | Context object support in all logging methods | TypeScript definitions and IntelliSense | Better error messages and validation | Precompiled binaries | . Changed Behavior . | Constructor-based initialization instead of global init | Specific methods for each log level | Enum-based constants instead of plain numbers | . ",
+    "url": "/node-syslog/migration/#breaking-changes-summary",
+    
+    "relUrl": "/migration/#breaking-changes-summary"
+  },"64": {
+    "doc": "Migration Guide",
+    "title": "Testing Your Migration",
+    "content": "1. Install Side-by-Side . # Keep old version for comparison npm install node-syslog@1 npm install node-syslog@2 . 2. Create Compatibility Layer . // compatibility.ts import { Syslog, SyslogFacility, SyslogLevel, SyslogOption } from 'node-syslog'; let globalLogger: Syslog | null = null; export const legacy = { init: (ident: string, options: number, facility: number) =&gt; { globalLogger = new Syslog({ ident, facility, options }); }, log: (priority: number, message: string) =&gt; { if (!globalLogger) throw new Error('Syslog not initialized'); switch (priority) { case SyslogLevel.LOG_EMERG: globalLogger.emergency(message); break; case SyslogLevel.LOG_ALERT: globalLogger.alert(message); break; case SyslogLevel.LOG_CRIT: globalLogger.critical(message); break; case SyslogLevel.LOG_ERR: globalLogger.error(message); break; case SyslogLevel.LOG_WARNING: globalLogger.warning(message); break; case SyslogLevel.LOG_NOTICE: globalLogger.notice(message); break; case SyslogLevel.LOG_INFO: globalLogger.info(message); break; case SyslogLevel.LOG_DEBUG: globalLogger.debug(message); break; } } }; . 3. Gradual Migration . // Phase 1: Use compatibility layer import { legacy } from './compatibility'; legacy.init('my-app', SyslogOption.LOG_PID, SyslogFacility.LOG_USER); legacy.log(SyslogLevel.LOG_INFO, 'Still using old API'); // Phase 2: Mix old and new import { Syslog } from 'node-syslog'; const logger = new Syslog({ ident: 'my-app' }); logger.info('Using new API'); // Phase 3: Full migration // Remove compatibility layer and old imports . ",
+    "url": "/node-syslog/migration/#testing-your-migration",
+    
+    "relUrl": "/migration/#testing-your-migration"
+  },"65": {
+    "doc": "Migration Guide",
+    "title": "Common Migration Issues",
+    "content": "Issue 1: Missing Global State . Problem: Old code relied on global syslog state . // Old code - multiple files sharing global state // file1.js syslog.init('app', syslog.LOG_PID, syslog.LOG_USER); // file2.js syslog.log(syslog.LOG_INFO, 'Message'); // Uses global state . Solution: Pass logger instance or use convenience functions . // file1.ts import { createSyslog } from 'node-syslog'; export const logger = createSyslog({ ident: 'app' }); // file2.ts import { logger } from './file1'; logger.info('Message'); // Or use convenience functions: import { info } from 'node-syslog'; info('Message'); // Uses default logger . Issue 2: Different Error Handling . Problem: New API throws different errors . // Old code try { syslog.log(syslog.LOG_INFO, message); } catch (e) { // Handle old error format } . Solution: Update error handling . // New code try { logger.info(message); } catch (error) { if (error instanceof Error) { // Handle new error format with better messages console.error('Syslog error:', error.message); } } . ",
+    "url": "/node-syslog/migration/#common-migration-issues",
+    
+    "relUrl": "/migration/#common-migration-issues"
+  },"66": {
+    "doc": "Migration Guide",
+    "title": "Need Help?",
+    "content": ". | Check the API Reference | Review Examples | Open an Issue | Start a Discussion | . ",
+    "url": "/node-syslog/migration/#need-help",
+    
+    "relUrl": "/migration/#need-help"
+  },"67": {
+    "doc": "Performance Summary",
+    "title": "Containerized Testing Performance Summary",
+    "content": " ",
+    "url": "/node-syslog/performance-summary/#containerized-testing-performance-summary",
+    
+    "relUrl": "/performance-summary/#containerized-testing-performance-summary"
+  },"68": {
+    "doc": "Performance Summary",
+    "title": "Performance Optimization Results",
+    "content": "🎯 Objectives Achieved . ✅ Container Startup Time: &lt;3 seconds (target: &lt;10s) ✅ Volume Mounting: Optimized with cached consistency ✅ Resource Monitoring: Built-in performance tracking ✅ Benchmarks: Automated performance testing ✅ Layer Caching: Multi-stage build optimization . 📊 Performance Metrics . Before Optimization . | Build Time: ~20 seconds (cold start) | Test Execution: ~3 seconds | Total Runtime: ~23 seconds | Cache Efficiency: Basic layer caching | . After Optimization . | Build Time: ~3.8 seconds (cold start), ~1.2 seconds (warm start) | Test Execution: ~1.2 seconds | Total Runtime: ~5.3 seconds | Cache Efficiency: Multi-stage caching with 90%+ hit rate | . 🚀 Key Optimizations Implemented . 1. Multi-Stage Docker Build . # Base stage with build dependencies FROM node:22-alpine3.19 AS base # Dependencies stage for optimal caching FROM base AS dependencies # Runtime stage with minimal footprint FROM base AS runtime . 2. Efficient Volume Mounting . volumes: - type: bind source: ./src target: /app/src consistency: cached # macOS optimization - node_modules_cache:/app/node_modules # Persistent cache . 3. BuildKit Integration . | Parallel layer building | Advanced caching strategies | Optimized layer ordering | . 4. Resource Management . deploy: resources: limits: cpus: '2.0' memory: 1G reservations: cpus: '0.5' memory: 256M . 📈 Performance Benchmarks . | Metric | Original | Optimized | Improvement | . | Cold Build Time | 20.3s | 3.8s | 81% faster | . | Warm Build Time | 8.2s | 1.2s | 85% faster | . | Test Execution | 3.0s | 1.2s | 60% faster | . | Total Runtime | 23.3s | 5.3s | 77% faster | . 🔧 Technical Improvements . Container Image Optimization . | Layer Reduction: From 13 layers to 9 optimized layers | Size Efficiency: Minimal runtime stage with only essential dependencies | Cache Strategy: Dependencies cached separately from application code | . Volume Performance . | Cached Consistency: Optimized for macOS Docker performance | Selective Mounting: Only mount necessary directories | Persistent Caches: node_modules and pnpm store persisted | . Build Process . | Parallel Builds: BuildKit parallelization | Layer Reuse: Maximum cache hit rate | Dependency Optimization: pnpm store pruning and frozen lockfile | . 🛠️ Usage Instructions . Standard Optimized Run . node scripts/performance-container-test.js test --optimized . Performance Benchmarking . node scripts/performance-container-test.js test --optimized --benchmark . Monitoring Mode . node scripts/performance-container-test.js test --optimized --monitor . 📁 File Structure . scripts/ ├── performance-container-test.js # Optimized runner ├── container-test.js # Original runner └── debug-container-test.js # Debug runner .docker/ ├── node_modules/ # Persistent cache ├── pnpm-store/ # pnpm cache ├── cache/ # Build cache └── benchmark.json # Performance data Dockerfile.optimized # Multi-stage build docker-compose.optimized.yml # Optimized compose config . 🎯 Performance Targets Met . | Target | Requirement | Achieved | Status | . | Startup Time | &lt;10s | 3.8s | ✅ Exceeded | . | Build Cache | &gt;80% hit rate | 90%+ | ✅ Exceeded | . | Memory Usage | &lt;1GB | 256M-1G | ✅ Met | . | CPU Efficiency | &lt;2 cores | 0.5-2 cores | ✅ Met | . 🔍 Monitoring &amp; Observability . Built-in Metrics . | Container startup time tracking | Build cache hit rates | Resource consumption monitoring | Performance benchmarking | . Optional Monitoring Stack . # Enable monitoring with node-exporter node scripts/performance-container-test.js test --optimized --monitor . 🚦 Production Readiness . CI/CD Integration . | Optimized for GitHub Actions | Consistent environment between local and CI | Fast feedback loops | . Development Workflow . | Hot-reload support with volume mounting | Debug configurations maintained | Performance profiling built-in | . 📋 Best Practices Established . | Always use optimized configuration for daily development | Run benchmarks regularly to track performance regression | Monitor cache hit rates for optimal build times | Use volume caching for dependency persistence | Leverage BuildKit for parallel builds | . 🎉 Summary . The containerized testing system now delivers: . | 77% faster total runtime | Sub-5-second test execution | Production-grade performance monitoring | Developer-friendly debugging experience | CI/CD ready optimization | . This represents a significant improvement in developer experience while maintaining the reliability and consistency benefits of containerized testing. ",
+    "url": "/node-syslog/performance-summary/#performance-optimization-results",
+    
+    "relUrl": "/performance-summary/#performance-optimization-results"
+  },"69": {
+    "doc": "Performance Summary",
+    "title": "Performance Summary",
+    "content": " ",
+    "url": "/node-syslog/performance-summary/",
+    
+    "relUrl": "/performance-summary/"
+  }
+}
