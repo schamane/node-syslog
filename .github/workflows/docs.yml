@@ -107,6 +107,10 @@ jobs:
       run: |
         echo "🔍 Validating Jekyll build output..."
         
+        # List all generated HTML files
+        echo "📁 Generated HTML files:"
+        find _site -name "*.html" -type f | sort
+        
         # Check essential files exist
         REQUIRED_FILES=("index.html" "api/index.html" ".nojekyll")
         for file in "${REQUIRED_FILES[@]}"; do

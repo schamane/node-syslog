@@ -24,6 +24,7 @@ plugins:
   - jekyll-feed
   - jekyll-sitemap
   - jekyll-seo-tag
+permalink: pretty
 
 # Just the Docs configuration
 color_scheme: light
@@ -47,7 +48,7 @@ ga_tracking: ""
 collections:
   api:
     output: true
-    permalink: /:collection/:name/
+    permalink: /:collection/:name
 
 # Navigation structure
 just_the_docs:
