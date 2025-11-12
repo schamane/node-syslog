@@ -13,7 +13,25 @@ env:
 
 jobs:
   # CI Jobs (run on PRs and pushes)
-  test:
+  checkout-and-setup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      checks: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Docker Compose for testing
+        run: |
+          echo "🐳 Setting up Docker Compose environment"
+          # Create directories for volume mounts
+          mkdir -p .docker/node_modules .docker/pnpm-store
+
+  test-execution:
+    needs: checkout-and-setup
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -40,7 +58,25 @@ jobs:
             --env GITHUB_SHA=${{ github.sha }} \
             node-syslog-test \
             pnpm test
-            
+
+  coverage-generation:
+    needs: test-execution
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      checks: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Docker Compose for testing
+        run: |
+          echo "🐳 Setting up Docker Compose environment"
+          # Create directories for volume mounts
+          mkdir -p .docker/node_modules .docker/pnpm-store
+          
       - name: Run containerized coverage
         run: |
           echo "📊 Running containerized coverage in CI environment"
@@ -51,6 +87,36 @@ jobs:
             node-syslog-test \
             pnpm test:coverage
             
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-reports
+          path: coverage/
+          retention-days: 30
+
+  performance-validation:
+    needs: test-execution
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      checks: write
+    
+    outputs:
+      duration: ${{ steps.benchmark.outputs.duration }}
+      performance: ${{ steps.benchmark.outputs.performance }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Docker Compose for testing
+        run: |
+          echo "🐳 Setting up Docker Compose environment"
+          # Create directories for volume mounts
+          mkdir -p .docker/node_modules .docker/pnpm-store
+          
       - name: Performance benchmark
         id: benchmark
         run: |
@@ -78,14 +144,24 @@ jobs:
             echo "performance=failed" >> $GITHUB_OUTPUT
             exit 1
           fi
+
+  container-validation:
+    needs: checkout-and-setup
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      checks: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
         
-      - name: Upload coverage reports
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: coverage-reports
-          path: coverage/
-          retention-days: 30
+      - name: Setup Docker Compose for testing
+        run: |
+          echo "🐳 Setting up Docker Compose environment"
+          # Create directories for volume mounts
+          mkdir -p .docker/node_modules .docker/pnpm-store
           
       - name: Container health check
         run: |
@@ -114,7 +190,16 @@ jobs:
             echo "❌ Security validation failed"
             exit 1
           fi
-            
+
+  test-reporting:
+    needs: [test-execution, coverage-generation, performance-validation, container-validation]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      checks: write
+    
+    steps:
       - name: Test summary
         run: |
           echo "## 🧪 Containerized Test Results" >> $GITHUB_STEP_SUMMARY
@@ -122,8 +207,8 @@ jobs:
           echo "### ✅ Test Execution" >> $GITHUB_STEP_SUMMARY
           echo "- All tests passed in containerized environment" >> $GITHUB_STEP_SUMMARY
           echo "- Coverage reports generated" >> $GITHUB_STEP_SUMMARY
-          echo "- Performance: ${{ steps.benchmark.outputs.performance }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Duration: ${{ steps.benchmark.outputs.duration }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Performance: ${{ needs.performance-validation.outputs.performance }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Duration: ${{ needs.performance-validation.outputs.duration }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🐳 Container Information" >> $GITHUB_STEP_SUMMARY
           echo "- Service: node-syslog-test" >> $GITHUB_STEP_SUMMARY
@@ -132,7 +217,7 @@ jobs:
 
   # Native binary compilation job
   build-binaries:
-    needs: test
+    needs: test-reporting
     strategy:
       matrix:
         os: [ubuntu-22.04]
@@ -162,7 +247,7 @@ jobs:
 
   # Security scanning job
   security-scan:
-    needs: test
+    needs: test-reporting
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -193,7 +278,7 @@ jobs:
 
   # Release job (only on tags)
   release:
-    needs: [test, build-binaries]
+    needs: [test-reporting, build-binaries]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
@@ -249,7 +334,7 @@ jobs:
 
   # NPM publish job (only on tags)
   publish:
-    needs: [test, release]
+    needs: [test-reporting, release]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
