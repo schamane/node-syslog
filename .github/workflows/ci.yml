@@ -94,13 +94,43 @@ jobs:
           echo "🧪 Running integration tests in CI environment"
           pnpm test:integration || echo "No integration tests found, skipping"
 
+  # === QUALITY GATE STAGE ===
+  generate-coverage:
+    name: Generate Coverage Reports
+    runs-on: ubuntu-latest
+    needs: [run-unit-tests, run-integration-tests]
+    permissions:
+      contents: read
+      packages: write
+      checks: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js and pnpm
+        uses: ./.github/actions/setup-node-pnpm
+        
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ needs.setup-environment.outputs.cache-key }}
+          
+      - name: Generate coverage
+        run: |
+          echo "📊 Running coverage in CI environment"
+          mkdir -p coverage
+          pnpm test:coverage
+          
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-reports
+          path: coverage/
+          retention-days: 30
 
-          else
-            echo "❌ Performance benchmark failed"
-            echo "duration=failed" >> $GITHUB_OUTPUT
-            echo "performance=failed" >> $GITHUB_OUTPUT
-            exit 1
-          fi
+  run-performance-benchmarks:
 
 
 
