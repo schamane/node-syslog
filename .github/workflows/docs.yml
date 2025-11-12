@@ -158,7 +158,7 @@ jobs:
         echo "  /examples/"
         
         # Check essential files exist
-        REQUIRED_FILES=("index.html" "api/index.html")
+        REQUIRED_FILES=("index.html" "_api/index.html")
         for file in "${REQUIRED_FILES[@]}"; do
           if [[ -f "_site/$file" ]]; then
             echo "✅ $file found"
