@@ -1,6 +1,5 @@
 ---
 title: Performance Summary
-has_children: false
 nav_order: 8
 ---
 

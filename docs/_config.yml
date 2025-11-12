@@ -48,16 +48,10 @@ collections:
   api:
     output: true
     permalink: /:collection/:name/
-  pages:
-    output: true
-    permalink: /:name/
 
 # Navigation structure
 just_the_docs:
   collections:
-    pages:
-      name: Documentation
-      nav_fold: true
     api:
       name: API Reference
       nav_fold: false
@@ -111,11 +105,6 @@ timezone: UTC
 defaults:
   - scope:
       path: ""
-    values:
-      layout: "default"
-  - scope:
-      path: ""
-      type: "pages"
     values:
       layout: "default"
   - scope:
