@@ -29,7 +29,7 @@ const configChecks = [
   { name: 'just-the-docs theme', pattern: /remote_theme.*just-the-docs/ },
   { name: 'baseurl configured', pattern: /baseurl:\s*["']["']/ },
   { name: 'url configured', pattern: /url:\s*["']https:\/\/schamane\.github\.io\/node-syslog["']/ },
-  { name: 'API collection', pattern: /collections:\s*\n\s*api:/ },
+  { name: 'just-the-docs navigation', pattern: /just_the_docs:/ },
   { name: 'markdown processor', pattern: /markdown:\s*kramdown/ }
 ]
 
@@ -47,7 +47,7 @@ const requiredPages = [
   'index.md',
   'getting-started.md', 
   'installation.md',
-  'api.md',
+  'api-overview.md',
   'examples.md',
   'migration.md'
 ]

@@ -23,7 +23,7 @@ const expectedUrls = [
   { url: '/', source: 'index.md', description: 'Home page' },
   { url: '/getting-started/', source: 'getting-started.md', description: 'Getting started guide' },
   { url: '/installation/', source: 'installation.md', description: 'Installation guide' },
-  { url: '/api/', source: 'api.md', description: 'API overview' },
+  { url: '/api-overview/', source: 'api-overview.md', description: 'API overview' },
   { url: '/examples/', source: 'examples.md', description: 'Code examples' },
   { url: '/migration/', source: 'migration.md', description: 'Migration guide' },
   { url: '/api/', source: 'api/index.html', description: 'TypeDoc API index' },

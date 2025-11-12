@@ -89,7 +89,7 @@ logger.warning('High memory usage', {
 ## 📚 Documentation
 
 - [Getting Started Guide]({{ site.baseurl }}/getting-started/)
-- [API Reference]({{ site.baseurl }}/api/)
+- [API Reference]({{ site.baseurl }}/api-overview/)
 - [Installation Guide]({{ site.baseurl }}/installation/)
 - [Migration Guide]({{ site.baseurl }}/migration/)
 - [Examples]({{ site.baseurl }}/examples/)

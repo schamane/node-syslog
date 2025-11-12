@@ -44,18 +44,9 @@ aux_links_new_tab: true
 # Google Analytics Tracking (optional)
 ga_tracking: ""
 
-# Collections for documentation structure
-collections:
-  api:
-    output: true
-    permalink: /:collection/:name
-
 # Navigation structure
 just_the_docs:
-  collections:
-    api:
-      name: API Reference
-      nav_fold: false
+  nav_fold: true
   nav_fold: true
   heading_anchors: true
   search_enabled: true
@@ -105,14 +96,4 @@ kramdown:
 # Site timezone
 timezone: UTC
 
-# Default values
-defaults:
-  - scope:
-      path: ""
-    values:
-      layout: "default"
-  - scope:
-      path: ""
-      type: "api"
-    values:
-      layout: "default"
+# Default values - just-the-docs theme handles layouts automatically
