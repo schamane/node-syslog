@@ -1,1 +1,1 @@
-Sitemap: https://schamane.github.io/node-syslog/node-syslog/sitemap.xml
+Sitemap: https://schamane.github.io/node-syslog/sitemap.xml
