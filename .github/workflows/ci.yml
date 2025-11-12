@@ -71,7 +71,7 @@ jobs:
       - name: Build container image with native support
         run: |
           echo "🔨 Building container with native compilation support"
-          docker compose build --target runtime node-syslog-test
+          docker compose build node-syslog-test
           
       - name: Run unit tests
         run: |
@@ -113,7 +113,7 @@ jobs:
       - name: Build container image with native support
         run: |
           echo "🔨 Building container with native compilation support"
-          docker compose build --target runtime node-syslog-test
+          docker compose build node-syslog-test
           
       - name: Run integration tests
         run: |
@@ -199,7 +199,7 @@ jobs:
       - name: Build container image with native support
         run: |
           echo "🔨 Building container with native compilation support"
-          docker compose build --target runtime node-syslog-test
+          docker compose build node-syslog-test
           
       - name: Generate coverage
         run: |
@@ -284,7 +284,7 @@ jobs:
           mkdir -p .docker/node_modules .docker/pnpm-store
           
       - name: Build container for security scanning
-        run: docker compose build --target runtime node-syslog-test
+        run: docker compose build node-syslog-test
           
       - name: Run Trivy scanner
         uses: aquasecurity/trivy-action@master
