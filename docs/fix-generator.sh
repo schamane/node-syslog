@@ -13,7 +13,7 @@ EXPECTED_VERSION="4.4.1"
 echo "🔍 Verifying Jekyll version consistency..."
 
 # Check for incorrect version references
-INCORRECT_VERSIONS=$(find _site -name "*.html" -type f -exec grep -l "Jekyll v" {} \; | xargs grep -v "Jekyll v4.4.1" | wc -l)
+INCORRECT_VERSIONS=$(find _site -name "*.html" -type f -exec grep -l "Jekyll v" {} \; | xargs grep -v "Jekyll v4.4.1" 2>/dev/null | wc -l)
 if [ "$INCORRECT_VERSIONS" -gt 0 ]; then
     echo "⚠️  Found $INCORRECT_VERSIONS files with incorrect Jekyll version references"
 else

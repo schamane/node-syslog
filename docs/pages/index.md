@@ -1,6 +1,8 @@
 ---
 title: node-syslog
-layout: default
+has_children: false
+parent: Documentation
+nav_order: 1
 ---
 
 # node-syslog

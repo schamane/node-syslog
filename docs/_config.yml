@@ -4,20 +4,6 @@ description: Modern Node.js syslog library with fluent TypeScript API
 url: "https://schamane.github.io/node-syslog"
 baseurl: "/node-syslog"
 
-# Custom meta information
-meta:
-  generator: "Jekyll v4.4.1"
-
-# Ensure custom layouts are used
-layouts_dir: _layouts
-includes_dir: _includes
-
-# Override default plugin behavior
-plugins:
-  - jekyll-feed
-  - jekyll-sitemap
-  - jekyll-seo-tag
-
 # SEO plugin configuration
 twitter:
   username: schamane
@@ -54,9 +40,6 @@ aux_links:
 # Makes Aux links open in a new tab
 aux_links_new_tab: true
 
-# Footer content
-footer_content: "Copyright &copy; 2025 node-syslog. Distributed by MIT License."
-
 # Google Analytics Tracking (optional)
 ga_tracking: ""
 
@@ -75,6 +58,9 @@ just_the_docs:
     pages:
       name: Documentation
       nav_fold: true
+    api:
+      name: API Reference
+      nav_fold: false
 
 # Exclude from processing
 exclude:
@@ -106,8 +92,6 @@ exclude:
 
 # Include for processing
 include:
-  - _data
-  - _layouts
   - _includes
   - _sass
   - assets

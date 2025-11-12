@@ -1,3 +1,10 @@
+---
+title: Debugging Guide
+has_children: false
+parent: Documentation
+nav_order: 7
+---
+
 # Containerized Testing Debugging Guide
 
 This guide provides comprehensive instructions for debugging containerized tests in the node-syslog project using VS Code.
