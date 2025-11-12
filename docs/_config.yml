@@ -52,7 +52,20 @@ navigation:
   - title: "Examples"
     url: "/examples/"
   - title: "API Reference"
-    url: "/api/"
+    url: "/_api/"
+    children:
+      - title: "Overview"
+        url: "/_api/"
+      - title: "Classes"
+        url: "/_api/classes/"
+      - title: "Interfaces"
+        url: "/_api/interfaces/"
+      - title: "Functions"
+        url: "/_api/functions/"
+      - title: "Types"
+        url: "/_api/types/"
+      - title: "Variables"
+        url: "/_api/variables/"
   - title: "Migration Guide"
     url: "/migration/"
   - title: "Debugging"
@@ -88,7 +101,7 @@ exclude:
   - "../CONTRIBUTING.md"
   - "../LICENSE.md"
   - "../openspec/"
-  - "api/*.md"  # Exclude markdown files in api directory to prevent conflicts with TypeDoc HTML
+  - "api/"  # Exclude original TypeDoc HTML directory
   - "_layouts_backup/"
   - "_includes_backup/"
 
@@ -98,7 +111,7 @@ include:
   - _layouts
   - _sass
   - assets
-  - api
+  - _api
 
 # Kramdown settings
 kramdown:

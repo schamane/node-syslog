@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 
 // Paths
 const apiDir = path.join(__dirname, '../docs/api')
-const docsDir = path.join(__dirname, '../docs')
+const jekyllApiDir = path.join(__dirname, '../docs/_api')
 
 // Ensure API directory exists
 if (!fs.existsSync(apiDir)) {
@@ -22,10 +22,83 @@ if (!fs.existsSync(apiDir)) {
   process.exit(1)
 }
 
-// Create Jekyll-compatible index for API docs
+// Clean and recreate Jekyll API directory
+if (fs.existsSync(jekyllApiDir)) {
+  fs.rmSync(jekyllApiDir, { recursive: true, force: true })
+}
+fs.mkdirSync(jekyllApiDir, { recursive: true })
+
+// Extract content from TypeDoc HTML and convert to Jekyll pages
+function convertTypeDocToJekyll(htmlFilePath, outputPath, title) {
+  const htmlContent = fs.readFileSync(htmlFilePath, 'utf8')
+  
+  // Extract the main content from TypeDoc HTML
+  const bodyMatch = htmlContent.match(/<body[^>]*>([\s\S]*?)<\/body>/)
+  if (!bodyMatch) {
+    console.warn(`Could not extract body content from ${htmlFilePath}`)
+    return
+  }
+  
+  let bodyContent = bodyMatch[1]
+  
+  // Remove TypeDoc-specific elements
+  bodyContent = bodyContent.replace(/<script[^>]*>[\s\S]*?<\/script>/g, '')
+  bodyContent = bodyContent.replace(/<header[^>]*>[\s\S]*?<\/header>/g, '')
+  bodyContent = bodyContent.replace(/<nav[^>]*>[\s\S]*?<\/nav>/g, '')
+  bodyContent = bodyContent.replace(/<footer[^>]*>[\s\S]*?<\/footer>/g, '')
+  
+  // Extract the main content container
+  const contentMatch = bodyContent.match(/<div[^>]*class="[^"]*container[^"]*"[^>]*>([\s\S]*?)<\/div>/)
+  if (contentMatch) {
+    bodyContent = contentMatch[1]
+  }
+  
+  // Clean up HTML
+  bodyContent = bodyContent.replace(/<script[^>]*>[\s\S]*?<\/script>/g, '')
+  bodyContent = bodyContent.replace(/<style[^>]*>[\s\S]*?<\/style>/g, '')
+  
+  // Create Jekyll frontmatter
+  const frontmatter = `---
+title: "${title}"
+layout: api
+parent: API Reference
+nav_order: auto
+---
+
+`
+  
+  // Write Jekyll page
+  const jekyllContent = frontmatter + bodyContent
+  fs.writeFileSync(outputPath, jekyllContent)
+}
+
+// Process TypeDoc HTML files
+function processTypeDocFiles(sourceDir, targetDir, parentPath = '') {
+  const files = fs.readdirSync(sourceDir)
+  
+  for (const file of files) {
+    const sourcePath = path.join(sourceDir, file)
+    const stat = fs.statSync(sourcePath)
+    
+    if (stat.isDirectory()) {
+      const targetSubDir = path.join(targetDir, file)
+      fs.mkdirSync(targetSubDir, { recursive: true })
+      processTypeDocFiles(sourcePath, targetSubDir, `${parentPath}/${file}`)
+    } else if (file.endsWith('.html')) {
+      const fileName = path.basename(file, '.html')
+      const title = fileName.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+      const outputPath = path.join(targetDir, `${fileName}.html`)
+      
+      convertTypeDocToJekyll(sourcePath, outputPath, title)
+      console.log(`✅ Converted ${file} → ${path.relative(jekyllApiDir, outputPath)}`)
+    }
+  }
+}
+
+// Create API index page
 const apiIndex = `---
-title: API Reference
-layout: default
+title: "API Reference"
+layout: api
 parent: Documentation
 nav_order: 4
 has_children: true
@@ -37,7 +110,7 @@ Complete API documentation for the node-syslog library.
 
 ## Core Classes
 
-### [Syslog]({{ site.baseurl }}/api/classes/Syslog.html)
+### [Syslog]({{ site.baseurl }}/_api/classes/Syslog.html)
 
 The main class for syslog functionality.
 
@@ -53,75 +126,69 @@ const logger = new Syslog({
 
 ## Types and Constants
 
-### [SyslogFacility]({{ site.baseurl }}/api/variables/SyslogFacility.html)
+### [SyslogFacility]({{ site.baseurl }}/_api/variables/SyslogFacility.html)
 
 Syslog facility constants.
 
-### [SyslogLevel]({{ site.baseurl }}/api/variables/SyslogLevel.html)
+### [SyslogLevel]({{ site.baseurl }}/_api/variables/SyslogLevel.html)
 
 Log level constants.
 
-### [SyslogOption]({{ site.baseurl }}/api/variables/SyslogOption.html)
+### [SyslogOption]({{ site.baseurl }}/_api/variables/SyslogOption.html)
 
 Syslog option constants.
 
 ## Interfaces
 
-### [SyslogOptions]({{ site.baseurl }}/api/interfaces/SyslogOptions.html)
+### [SyslogOptions]({{ site.baseurl }}/_api/interfaces/SyslogOptions.html)
 
 Configuration options for creating a Syslog instance.
+
+## Functions
+
+### [createSyslog]({{ site.baseurl }}/_api/functions/createSyslog.html)
+
+Create a new syslog instance with the specified options.
+
+### [alert]({{ site.baseurl }}/_api/functions/alert.html)
+### [critical]({{ site.baseurl }}/_api/functions/critical.html)
+### [debug]({{ site.baseurl }}/_api/functions/debug.html)
+### [emergency]({{ site.baseurl }}/_api/functions/emergency.html)
+### [error]({{ site.baseurl }}/_api/functions/error.html)
+### [info]({{ site.baseurl }}/_api/functions/info.html)
+### [notice]({{ site.baseurl }}/_api/functions/notice.html)
+### [warning]({{ site.baseurl }}/_api/functions/warning.html)
+
+Convenience functions for different log levels.
 
 ---
 
 *This documentation is automatically generated from TypeScript source code.*
 `
 
-// Write API index (commented out to prevent conflict with TypeDoc index.html)
-// fs.writeFileSync(path.join(apiDir, 'index.md'), apiIndex)
-console.log('ℹ️  Skipping API index.md generation to prevent conflict with TypeDoc index.html')
+fs.writeFileSync(path.join(jekyllApiDir, 'index.html'), apiIndex)
 
-// Add frontmatter to all generated markdown files
-function addFrontmatter(filePath) {
-  const content = fs.readFileSync(filePath, 'utf8')
-  
-  // Skip if already has frontmatter
-  if (content.startsWith('---')) {
-    return
+// Process all TypeDoc files
+processTypeDocFiles(apiDir, jekyllApiDir)
+
+// Copy TypeDoc assets to Jekyll assets
+const assetsSourceDir = path.join(apiDir, 'assets')
+const assetsTargetDir = path.join(__dirname, '../docs/assets/api')
+
+if (fs.existsSync(assetsSourceDir)) {
+  if (fs.existsSync(assetsTargetDir)) {
+    fs.rmSync(assetsTargetDir, { recursive: true, force: true })
   }
+  fs.mkdirSync(assetsTargetDir, { recursive: true })
   
-  const fileName = path.basename(filePath, '.md')
-  const title = fileName.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-  
-  const frontmatter = `---
-title: ${title}
-layout: default
-parent: API Reference
-nav_order: auto
----
-
-`
-  
-  fs.writeFileSync(filePath, frontmatter + content)
+  const assetFiles = fs.readdirSync(assetsSourceDir)
+  for (const file of assetFiles) {
+    const sourcePath = path.join(assetsSourceDir, file)
+    const targetPath = path.join(assetsTargetDir, file)
+    fs.copyFileSync(sourcePath, targetPath)
+  }
+  console.log('✅ Copied TypeDoc assets to Jekyll assets')
 }
 
-// Process all markdown files in API directory
-function processApiDocs(dir) {
-  const files = fs.readdirSync(dir)
-  
-  for (const file of files) {
-    const filePath = path.join(dir, file)
-    const stat = fs.statSync(filePath)
-    
-    if (stat.isDirectory()) {
-      processApiDocs(filePath)
-    } else if (file.endsWith('.md') && file !== 'README.md') {
-      addFrontmatter(filePath)
-    }
-  }
-}
-
-// Process API documentation
-processApiDocs(apiDir)
-
-console.log('✅ API documentation integrated with Jekyll')
-console.log('📁 Generated files in:', apiDir)
+console.log('✅ API documentation converted to Jekyll format')
+console.log('📁 Generated files in:', jekyllApiDir)

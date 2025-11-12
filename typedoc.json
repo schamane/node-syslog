@@ -10,5 +10,11 @@
   "excludeInternal": true,
   "hideGenerator": true,
   "sort": ["source-order"],
-  "githubPages": false
+  "githubPages": false,
+  "theme": "default",
+  "name": "node-syslog API",
+  "includeVersion": false,
+  "disableSources": false,
+  "sourceLinkTemplate": "https://github.com/schamane/node-syslog/blob/main/{path}#L{line}",
+  "gitRevision": "main"
 }
