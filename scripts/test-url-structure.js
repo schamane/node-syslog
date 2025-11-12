@@ -16,7 +16,7 @@ const docsDir = path.join(__dirname, '../docs')
 
 console.log('🌐 Testing expected URL structure...\n')
 
-const baseurl = '/node-syslog'
+const baseurl = ''
 
 // Expected URLs and their corresponding source files
 const expectedUrls = [
@@ -30,7 +30,7 @@ const expectedUrls = [
   { url: '/api/classes/Syslog.html', source: 'api/classes/Syslog.html', description: 'Syslog class documentation' }
 ]
 
-console.log('Expected URL structure with baseurl', baseurl, ':')
+console.log('Expected URL structure:')
 console.log('='.repeat(50))
 
 expectedUrls.forEach(expected => {

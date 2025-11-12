@@ -93,7 +93,7 @@ jobs:
       working-directory: docs
         
     - name: Build Jekyll site
-      run: bundle exec jekyll build --baseurl="/node-syslog"
+      run: bundle exec jekyll build --baseurl=""
       working-directory: docs
         
     - name: Add .nojekyll to build output
@@ -113,11 +113,11 @@ jobs:
         
         # Show expected URL structure
         echo "🌐 Expected URL structure:"
-        echo "  /node-syslog/ (index.html)"
-        echo "  /node-syslog/getting-started/"
-        echo "  /node-syslog/installation/"
-        echo "  /node-syslog/api/ (TypeDoc collection)"
-        echo "  /node-syslog/examples/"
+        echo "  / (index.html)"
+        echo "  /getting-started/"
+        echo "  /installation/"
+        echo "  /api/ (TypeDoc collection)"
+        echo "  /examples/"
         
         # Check essential files exist
         REQUIRED_FILES=("index.html" "api/index.html" ".nojekyll")

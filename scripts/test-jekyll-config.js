@@ -27,7 +27,7 @@ if (!fs.existsSync(configPath)) {
 const config = fs.readFileSync(configPath, 'utf8')
 const configChecks = [
   { name: 'just-the-docs theme', pattern: /remote_theme.*just-the-docs/ },
-  { name: 'baseurl configured', pattern: /baseurl:\s*["']\/node-syslog["']/ },
+  { name: 'baseurl configured', pattern: /baseurl:\s*["']["']/ },
   { name: 'url configured', pattern: /url:\s*["']https:\/\/schamane\.github\.io\/node-syslog["']/ },
   { name: 'API collection', pattern: /collections:\s*\n\s*api:/ },
   { name: 'markdown processor', pattern: /markdown:\s*kramdown/ }
