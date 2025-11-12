@@ -111,6 +111,14 @@ jobs:
         echo "📁 Generated HTML files:"
         find _site -name "*.html" -type f | sort
         
+        # Show expected URL structure
+        echo "🌐 Expected URL structure:"
+        echo "  /node-syslog/ (index.html)"
+        echo "  /node-syslog/getting-started/"
+        echo "  /node-syslog/installation/"
+        echo "  /node-syslog/api/ (TypeDoc collection)"
+        echo "  /node-syslog/examples/"
+        
         # Check essential files exist
         REQUIRED_FILES=("index.html" "api/index.html" ".nojekyll")
         for file in "${REQUIRED_FILES[@]}"; do
