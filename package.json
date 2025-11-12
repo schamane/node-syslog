@@ -31,7 +31,8 @@
   "author": "Nazar Kulyk <schamane@myeburg.net>",
   "license": "MIT",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.0.0",
+    "pnpm": ">=10.20.0"
   },
   "os": [
     "linux"
