@@ -76,13 +76,7 @@ jobs:
       - name: Run unit tests
         run: |
           echo "🧪 Running unit tests in CI environment"
-          docker compose run --rm \
-            --env FORCE_COLOR=1 \
-            --env GITHUB_ACTIONS=true \
-            --env GITHUB_REF=${{ github.ref }} \
-            --env GITHUB_SHA=${{ github.sha }} \
-            node-syslog-test \
-            pnpm test
+          pnpm test
 
   run-integration-tests:
     name: Run Integration Tests
@@ -118,11 +112,7 @@ jobs:
       - name: Run integration tests
         run: |
           echo "🧪 Running integration tests in CI environment"
-          docker compose run --rm \
-            --env FORCE_COLOR=1 \
-            --env GITHUB_ACTIONS=true \
-            node-syslog-test \
-            pnpm test:integration || echo "No integration tests found, skipping"
+          pnpm test:integration || echo "No integration tests found, skipping"
 
   run-container-tests:
     name: Run Container Tests
@@ -203,13 +193,9 @@ jobs:
           
       - name: Generate coverage
         run: |
-          echo "📊 Running containerized coverage in CI environment"
+          echo "📊 Running coverage in CI environment"
           mkdir -p coverage
-          docker compose run --rm \
-            --env FORCE_COLOR=1 \
-            --volume $(pwd)/coverage:/app/coverage \
-            node-syslog-test \
-            pnpm test:coverage
+          pnpm test:coverage
             
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4

@@ -14,7 +14,6 @@ RUN apk add --no-cache \
     paxctl \
     curl \
     bash \
-    node-gyp \
     && rm -rf /var/cache/apk/*
 
 # Install pnpm globally
@@ -40,10 +39,8 @@ RUN npm config set cache /app/.npm --global
 RUN pnpm install --frozen-lockfile --ignore-scripts --prefer-frozen-lockfile \
     && pnpm store prune
 
-# Build native module
-RUN echo "🔨 Building native module in container..." \
-    && pnpm run build:native \
-    && echo "✅ Native module built successfully"
+# Skip native build in container - it's built in CI
+RUN echo "⏭️  Skipping native build in container - built in CI"
 
 # Production stage - minimal runtime
 FROM base AS runtime
@@ -54,6 +51,7 @@ COPY --from=dependencies --chown=node:node /app/.npm ./.npm
 
 # Copy built native module if it exists
 COPY --from=dependencies --chown=node:node /app/lib ./lib 2>/dev/null || true
+COPY --from=dependencies --chown=node:node /app/build ./build 2>/dev/null || true
 
 # Copy application code
 COPY --chown=node:node package.json pnpm-lock.yaml ./
