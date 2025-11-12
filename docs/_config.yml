@@ -14,8 +14,8 @@ social:
   links:
     - https://github.com/schamane/node-syslog
 
-# Theme
-theme: just-the-docs
+# Theme - using custom theme instead of just-the-docs
+# theme: just-the-docs
 
 # Build settings
 markdown: kramdown
@@ -26,10 +26,9 @@ plugins:
   - jekyll-seo-tag
 permalink: pretty
 
-# Just the Docs configuration
+# Custom theme configuration
 color_scheme: light
 search_enabled: true
-search_tokenizer_separator: /[\s/]+/
 heading_anchors: true
 permalink: pretty
 
@@ -45,11 +44,23 @@ aux_links_new_tab: true
 ga_tracking: ""
 
 # Navigation structure
-just_the_docs:
-  nav_fold: true
-  nav_fold: true
-  heading_anchors: true
-  search_enabled: true
+navigation:
+  - title: "Getting Started"
+    url: "/getting-started/"
+  - title: "Installation"
+    url: "/installation/"
+  - title: "Examples"
+    url: "/examples/"
+  - title: "API Reference"
+    url: "/api/"
+  - title: "Migration Guide"
+    url: "/migration/"
+  - title: "Debugging"
+    url: "/debugging-guide/"
+  - title: "Performance"
+    url: "/performance-summary/"
+  - title: "TypeScript"
+    url: "/typescript-configuration/"
 
 # Exclude from processing
 exclude:
@@ -78,12 +89,16 @@ exclude:
   - "../LICENSE.md"
   - "../openspec/"
   - "api/*.md"  # Exclude markdown files in api directory to prevent conflicts with TypeDoc HTML
+  - "_layouts_backup/"
+  - "_includes_backup/"
 
 # Include for processing
 include:
   - _includes
+  - _layouts
   - _sass
   - assets
+  - api
 
 # Kramdown settings
 kramdown:

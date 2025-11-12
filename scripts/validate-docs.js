@@ -19,7 +19,7 @@ const requiredFiles = [
   'index.md',
   'getting-started.md',
   'installation.md',
-  'api.md',
+  'api-overview.md',
   'examples.md',
   'migration.md'
 ]

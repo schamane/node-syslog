@@ -1,0 +1,276 @@
+/* Basic styling for the documentation site */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #24292e;
+  background-color: #fff;
+}
+
+.wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background-color: #f6f8fa;
+  border-right: 1px solid #e1e4e8;
+  padding: 20px;
+  position: fixed;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  margin-bottom: 20px;
+}
+
+.sidebar-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #24292e;
+  text-decoration: none;
+}
+
+.sidebar-nav .nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-nav .nav-item {
+  margin-bottom: 8px;
+}
+
+.sidebar-nav .nav-link {
+  display: block;
+  padding: 8px 12px;
+  color: #586069;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.sidebar-nav .nav-link:hover,
+.sidebar-nav .nav-link.active {
+  background-color: #e1e4e8;
+  color: #24292e;
+}
+
+/* Main content */
+.main {
+  flex: 1;
+  margin-left: 250px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.site-header {
+  background-color: #fff;
+  border-bottom: 1px solid #e1e4e8;
+  padding: 16px 0;
+}
+
+.site-header .wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.site-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #24292e;
+  text-decoration: none;
+}
+
+.site-nav .trigger {
+  display: flex;
+  gap: 16px;
+}
+
+.site-nav .page-link {
+  color: #586069;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.site-nav .page-link:hover,
+.site-nav .page-link.active {
+  color: #0366d6;
+}
+
+/* Page content */
+.page-content {
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.post {
+  max-width: 800px;
+}
+
+.post-header {
+  margin-bottom: 32px;
+}
+
+.post-title {
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #24292e;
+  margin: 0;
+}
+
+.post-content {
+  line-height: 1.6;
+}
+
+.post-content h1,
+.post-content h2,
+.post-content h3,
+.post-content h4,
+.post-content h5,
+.post-content h6 {
+  margin-top: 32px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.post-content h1 {
+  font-size: 32px;
+  border-bottom: 1px solid #e1e4e8;
+  padding-bottom: 8px;
+}
+
+.post-content h2 {
+  font-size: 24px;
+  border-bottom: 1px solid #e1e4e8;
+  padding-bottom: 8px;
+}
+
+.post-content h3 {
+  font-size: 20px;
+}
+
+.post-content p {
+  margin-bottom: 16px;
+}
+
+.post-content ul,
+.post-content ol {
+  margin-bottom: 16px;
+  padding-left: 32px;
+}
+
+.post-content li {
+  margin-bottom: 4px;
+}
+
+.post-content code {
+  background-color: #f6f8fa;
+  border-radius: 3px;
+  font-size: 85%;
+  padding: 2px 4px;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.post-content pre {
+  background-color: #f6f8fa;
+  border-radius: 6px;
+  padding: 16px;
+  overflow: auto;
+  margin-bottom: 16px;
+}
+
+.post-content pre code {
+  background-color: transparent;
+  padding: 0;
+  font-size: 100%;
+}
+
+.post-content blockquote {
+  border-left: 4px solid #dfe2e5;
+  padding-left: 16px;
+  margin: 0 0 16px 0;
+  color: #6a737d;
+}
+
+.post-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.post-content th,
+.post-content td {
+  border: 1px solid #dfe2e5;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.post-content th {
+  background-color: #f6f8fa;
+  font-weight: 600;
+}
+
+/* Footer */
+.site-footer {
+  background-color: #f6f8fa;
+  border-top: 1px solid #e1e4e8;
+  padding: 32px 0;
+  margin-top: auto;
+}
+
+.site-footer .wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.footer-col-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+  }
+  
+  .main {
+    margin-left: 0;
+  }
+  
+  .wrapper {
+    flex-direction: column;
+  }
+  
+  .site-nav .trigger {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .nav-trigger {
+    display: block;
+  }
+}
