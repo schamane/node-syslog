@@ -1,7 +1,6 @@
 ---
 title: node-syslog
-has_children: false
-parent: Documentation
+has_children: true
 nav_order: 1
 ---
 

@@ -111,6 +111,10 @@ timezone: UTC
 defaults:
   - scope:
       path: ""
+    values:
+      layout: "default"
+  - scope:
+      path: ""
       type: "pages"
     values:
       layout: "default"

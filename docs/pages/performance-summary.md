@@ -1,7 +1,6 @@
 ---
 title: Performance Summary
 has_children: false
-parent: Documentation
 nav_order: 8
 ---
 

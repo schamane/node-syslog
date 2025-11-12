@@ -1,7 +1,6 @@
 ---
 title: API Reference
 has_children: true
-parent: Documentation
 nav_order: 4
 ---
 

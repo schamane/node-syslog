@@ -1,7 +1,6 @@
 ---
 title: Test Generator Tag
 has_children: false
-parent: Documentation
 nav_order: 9
 ---
 

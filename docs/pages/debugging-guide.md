@@ -1,7 +1,6 @@
 ---
 title: Debugging Guide
 has_children: false
-parent: Documentation
 nav_order: 7
 ---
 
