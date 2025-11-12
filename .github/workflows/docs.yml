@@ -133,5 +133,12 @@ jobs:
         publish_dir: ./docs/_site
         publish_branch: gh-pages
         keep_files: false
+        
+    - name: List deployed files
+      if: github.ref == 'refs/heads/main'
+      run: |
+        echo "📁 Files deployed to gh-pages:"
+        # This would show what's actually on the gh-pages branch
+        echo "Check deployed files at: https://schamane.github.io/node-syslog/"
 
   
