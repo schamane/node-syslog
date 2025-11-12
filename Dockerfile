@@ -50,8 +50,8 @@ COPY --from=dependencies --chown=node:node /app/node_modules ./node_modules
 COPY --from=dependencies --chown=node:node /app/.npm ./.npm
 
 # Copy built native module if it exists
-COPY --from=dependencies --chown=node:node /app/lib ./lib 2>/dev/null || true
-COPY --from=dependencies --chown=node:node /app/build ./build 2>/dev/null || true
+COPY --from=dependencies --chown=node:node /app/lib ./lib || true
+COPY --from=dependencies --chown=node:node /app/build ./build || true
 
 # Copy application code
 COPY --chown=node:node package.json pnpm-lock.yaml ./
