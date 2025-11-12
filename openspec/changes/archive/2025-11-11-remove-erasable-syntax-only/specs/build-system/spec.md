@@ -1,5 +1,5 @@
 ## MODIFIED Requirements
-### Requirement: TypeScript Compiler Configuration
+### Requirement: TypeScript Compilation
 The build system SHALL use simplified TypeScript configuration without erasableSyntaxOnly while maintaining allowSyntheticDefaultImports.
 
 #### Scenario: Simplified configuration

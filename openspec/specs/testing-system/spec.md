@@ -4,6 +4,10 @@
 **Version**: 1.0  
 **OpenSpec ID**: `testing-system`
 
+## Purpose
+
+The testing system provides comprehensive validation of both native C++ and TypeScript components with environment consistency guarantees, supporting local development, containerized testing, and CI/CD integration.
+
 ## Overview
 
 The node-syslog testing system provides comprehensive validation of both native C++ and TypeScript components. It supports local development, containerized testing, and CI/CD integration with environment consistency guarantees.
@@ -124,9 +128,21 @@ npm run test:performance     # Performance benchmarking
 
 ### Requirement: Test Environment Consistency
 The testing system MUST ensure 100% test parity between local and CI environments.
-- **Scenario**: Local macOS development vs Linux container testing
-- **Scenario**: GitHub Actions CI environment validation
-- **Scenario**: Cross-platform test result verification
+
+#### Scenario: Local macOS development vs Linux container testing
+- **WHEN** running tests locally on macOS
+- **THEN** system SHALL ensure identical results to Linux container tests
+- **AND** maintain 100% test parity across environments
+
+#### Scenario: GitHub Actions CI environment validation
+- **WHEN** running tests in GitHub Actions
+- **THEN** system SHALL validate environment consistency
+- **AND** ensure identical behavior to local development
+
+#### Scenario: Cross-platform test result verification
+- **WHEN** comparing test results across platforms
+- **THEN** system SHALL verify result consistency
+- **AND** identify any platform-specific discrepancies
 
 ### Requirement: Containerized Testing
 The testing system SHALL support containerized test execution for Linux consistency.
@@ -154,21 +170,57 @@ The testing system SHALL support containerized test execution for Linux consiste
 
 ### Requirement: Native Module Testing
 The testing system SHALL validate native C++ module functionality and integration.
-- **Scenario**: Native module compilation and loading tests
-- **Scenario**: Native API interface validation
-- **Scenario**: Native module mock fallback testing
+
+#### Scenario: Native module compilation and loading tests
+- **WHEN** testing native module functionality
+- **THEN** system SHALL validate successful compilation
+- **AND** verify proper module loading and initialization
+
+#### Scenario: Native API interface validation
+- **WHEN** testing native API interfaces
+- **THEN** system SHALL validate all exported functions
+- **AND** verify parameter handling and return values
+
+#### Scenario: Native module mock fallback testing
+- **WHEN** native module is unavailable
+- **THEN** system SHALL test mock fallback functionality
+- **AND** ensure mock provides identical API behavior
 
 ### Requirement: Performance Validation
 The testing system MUST validate performance characteristics across environments.
-- **Scenario**: Test execution time benchmarking
-- **Scenario**: Container performance overhead measurement
-- **Scenario**: Memory usage validation
+
+#### Scenario: Test execution time benchmarking
+- **WHEN** measuring test performance
+- **THEN** system SHALL benchmark test execution times
+- **AND** ensure consistent performance across environments
+
+#### Scenario: Container performance overhead measurement
+- **WHEN** testing in containers
+- **THEN** system SHALL measure container performance overhead
+- **AND** ensure overhead remains within acceptable limits
+
+#### Scenario: Memory usage validation
+- **WHEN** monitoring memory consumption
+- **THEN** system SHALL validate memory usage patterns
+- **AND** detect memory leaks or excessive consumption
 
 ### Requirement: Test Coverage Requirements
 The testing system SHALL maintain 80%+ code coverage across all modules.
-- **Scenario**: TypeScript API layer coverage validation
-- **Scenario**: Native module integration coverage
-- **Scenario**: Error handling and edge case coverage
+
+#### Scenario: TypeScript API layer coverage validation
+- **WHEN** measuring TypeScript coverage
+- **THEN** system SHALL validate 80%+ line coverage
+- **AND** ensure all public APIs are tested
+
+#### Scenario: Native module integration coverage
+- **WHEN** testing native module integration
+- **THEN** system SHALL validate native code coverage
+- **AND** ensure all native interfaces are exercised
+
+#### Scenario: Error handling and edge case coverage
+- **WHEN** validating error scenarios
+- **THEN** system SHALL test all error paths
+- **AND** ensure edge cases are properly covered
 
 ### Requirement: Failure Recovery Testing
 The testing system SHALL validate resilience under various failure conditions.

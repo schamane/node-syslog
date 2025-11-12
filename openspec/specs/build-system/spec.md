@@ -4,6 +4,10 @@
 **Version**: 1.0  
 **OpenSpec ID**: `build-system`
 
+## Purpose
+
+The build system provides comprehensive compilation, packaging, and distribution capabilities for the node-syslog library, supporting both native C++ module compilation and TypeScript processing across local development and containerized environments.
+
 ## Overview
 
 The node-syslog build system handles native C++ module compilation, TypeScript compilation, and package distribution. It supports both local development and containerized environments.
@@ -92,20 +96,33 @@ npm run build:container   # Build in container environment
 - Containerized build verification
 - Multi-platform CI testing
 - Binary compatibility checks
-
 ## Requirements
-
 ### Requirement: Native Module Compilation
 The build system SHALL successfully compile native C++ modules for target platforms.
-- **Scenario**: macOS development environment compilation
-- **Scenario**: Linux container environment compilation
-- **Scenario**: Windows WSL2 environment compilation
+
+#### Scenario: macOS development environment compilation
+- **WHEN** building on macOS development environment
+- **THEN** system SHALL compile native C++ modules successfully
+- **AND** support both Intel and Apple Silicon architectures
+
+#### Scenario: Linux container environment compilation
+- **WHEN** building in Linux container environment
+- **THEN** system SHALL compile native C++ modules successfully
+- **AND** use container-provided toolchain
+
+#### Scenario: Windows WSL2 environment compilation
+- **WHEN** building in Windows WSL2 environment
+- **THEN** system SHALL compile native C++ modules successfully
+- **AND** use Linux-compatible toolchain
 
 ### Requirement: TypeScript Compilation
-The build system SHALL compile TypeScript source code to JavaScript with proper type checking.
-- **Scenario**: Development build with source maps
-- **Scenario**: Production build with optimization
-- **Scenario**: API documentation generation
+The build system SHALL use simplified TypeScript configuration without erasableSyntaxOnly while maintaining allowSyntheticDefaultImports.
+
+#### Scenario: Simplified configuration
+- **WHEN** TypeScript compilation is performed
+- **THEN** erasableSyntaxOnly SHALL NOT be specified
+- **AND** allowSyntheticDefaultImports SHALL remain as true
+- **AND** modern TypeScript defaults SHALL be used
 
 ### Requirement: Containerized Build Support
 The build system SHALL support containerized builds for environment consistency.
@@ -133,15 +150,62 @@ The build system SHALL support containerized builds for environment consistency.
 
 ### Requirement: Platform-Specific Builds
 The build system SHALL generate platform-specific binaries for distribution.
-- **Scenario**: Node.js 18.x, 20.x, 22.x compatibility builds
-- **Scenario**: Intel and Apple Silicon macOS builds
-- **Scenario**: Linux x64 and ARM64 builds
+
+#### Scenario: Node.js version compatibility builds
+- **WHEN** building for distribution
+- **THEN** system SHALL generate binaries for Node.js 18.x, 20.x, 22.x
+- **AND** ensure ABI compatibility across versions
+
+#### Scenario: macOS architecture builds
+- **WHEN** building for macOS
+- **THEN** system SHALL generate Intel and Apple Silicon binaries
+- **AND** support universal binary creation
+
+#### Scenario: Linux architecture builds
+- **WHEN** building for Linux
+- **THEN** system SHALL generate x64 and ARM64 binaries
+- **AND** support container-optimized builds
 
 ### Requirement: Build Performance Optimization
 The build system SHALL optimize build times through caching and parallelization.
-- **Scenario**: Native module object caching
-- **Scenario**: TypeScript incremental compilation
-- **Scenario**: Docker layer caching for containers
+
+#### Scenario: Native module object caching
+- **WHEN** compiling native modules
+- **THEN** system SHALL cache compiled object files
+- **AND** reuse cached artifacts for subsequent builds
+
+#### Scenario: TypeScript incremental compilation
+- **WHEN** compiling TypeScript
+- **THEN** system SHALL use incremental compilation
+- **AND** only recompile changed source files
+
+#### Scenario: Docker layer caching for containers
+- **WHEN** building in containers
+- **THEN** system SHALL optimize Docker layer caching
+- **AND** minimize rebuild times for containerized builds
+
+### Requirement: TypeScript Triple Base Configuration Extensions
+The build system SHALL extend from three community-maintained TypeScript base configurations providing comprehensive best practices, Node.js LTS optimization, and modern TypeScript features.
+
+#### Scenario: Successful triple configuration extension
+- **WHEN** tsconfig.json extends from @tsconfig/recommended, @tsconfig/lts, and @tsconfig/node-ts
+- **THEN** project inherits TypeScript team recommended settings
+- **AND** optimized compiler settings for Node.js LTS are applied
+- **AND** TypeScript 5.8+ specific features are automatically enabled
+- **AND** configuration precedence follows proper inheritance order
+
+#### Scenario: Dependency installation
+- **WHEN** pnpm install is run with new devDependencies
+- **THEN** @tsconfig/recommended, @tsconfig/lts and @tsconfig/node-ts packages are resolved
+- **AND** all three base configurations are available for tsconfig.json extension
+- **AND** TypeScript 5.9.3 version is maintained without downgrade
+
+#### Scenario: Enhanced module system
+- **WHEN** TypeScript compilation uses new configuration
+- **THEN** nodenext module resolution is enabled
+- **AND** verbatimModuleSyntax is applied
+- **AND** rewriteRelativeImportExtensions is available
+- **AND** erasableSyntaxOnly optimization is enabled
 
 ## REMOVED Requirements
 
