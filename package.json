@@ -70,7 +70,8 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "@mapbox/node-pre-gyp"
+      "@mapbox/node-pre-gyp",
+      "esbuild"
     ]
   }
 }
