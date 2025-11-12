@@ -8,6 +8,8 @@
   "scripts": {
     "build": "tsc",
     "build:native": "node-gyp rebuild",
+    "build:native:package": "node-pre-gyp package",
+    "build:native:publish": "node-pre-gyp publish",
     "test": "node scripts/container-test.js test",
     "test:coverage": "node scripts/container-test.js test:coverage",
     "test:watch": "node scripts/container-test.js test:watch",
@@ -15,6 +17,7 @@
     "lint": "eslint src --ext .ts",
     "prepublishOnly": "pnpm run build && npm run build:native",
     "install": "node scripts/install.js",
+    "install:native": "node scripts/install.js",
     "docs:build": "typedoc && node scripts/build-docs.js",
     "docs:serve": "bundle exec jekyll serve --livereload",
     "docs:deploy": "pnpm run docs:build && bundle exec jekyll build",
@@ -66,7 +69,8 @@
     "module_path": "./lib/binding/{node_abi}-{platform}-{arch}/",
     "remote_path": "./{module_name}/v{version}/",
     "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{arch}.tar.gz",
-    "host": "https://github.com/schamane/node-syslog/releases/download"
+    "host": "https://github.com/schamane/node-syslog/releases/download",
+    "accept_prerelease": false
   },
   "pnpm": {
     "onlyBuiltDependencies": [

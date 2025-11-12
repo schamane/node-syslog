@@ -68,6 +68,11 @@ jobs:
           echo "🐳 Setting up Docker Compose environment"
           mkdir -p .docker/node_modules .docker/pnpm-store
           
+      - name: Build container image with native support
+        run: |
+          echo "🔨 Building container with native compilation support"
+          docker compose build --target runtime node-syslog-test
+          
       - name: Run unit tests
         run: |
           echo "🧪 Running unit tests in CI environment"
@@ -104,6 +109,11 @@ jobs:
         run: |
           echo "🐳 Setting up Docker Compose environment"
           mkdir -p .docker/node_modules .docker/pnpm-store
+          
+      - name: Build container image with native support
+        run: |
+          echo "🔨 Building container with native compilation support"
+          docker compose build --target runtime node-syslog-test
           
       - name: Run integration tests
         run: |
@@ -185,6 +195,11 @@ jobs:
         run: |
           echo "🐳 Setting up Docker Compose environment"
           mkdir -p .docker/node_modules .docker/pnpm-store
+          
+      - name: Build container image with native support
+        run: |
+          echo "🔨 Building container with native compilation support"
+          docker compose build --target runtime node-syslog-test
           
       - name: Generate coverage
         run: |

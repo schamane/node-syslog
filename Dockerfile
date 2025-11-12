@@ -14,6 +14,7 @@ RUN apk add --no-cache \
     paxctl \
     curl \
     bash \
+    node-gyp \
     && rm -rf /var/cache/apk/*
 
 # Install pnpm globally
@@ -29,6 +30,8 @@ FROM base AS dependencies
 # Copy only package files for optimal layer caching
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 COPY --chown=node:node scripts/ ./scripts/
+COPY --chown=node:node binding.gyp ./
+COPY --chown=node:node src/ ./src/
 
 # Configure npm for performance
 RUN npm config set cache /app/.npm --global
@@ -37,6 +40,11 @@ RUN npm config set cache /app/.npm --global
 RUN pnpm install --frozen-lockfile --ignore-scripts --prefer-frozen-lockfile \
     && pnpm store prune
 
+# Build native module
+RUN echo "🔨 Building native module in container..." \
+    && pnpm run build:native \
+    && echo "✅ Native module built successfully"
+
 # Production stage - minimal runtime
 FROM base AS runtime
 
@@ -44,12 +52,26 @@ FROM base AS runtime
 COPY --from=dependencies --chown=node:node /app/node_modules ./node_modules
 COPY --from=dependencies --chown=node:node /app/.npm ./.npm
 
+# Copy built native module if it exists
+COPY --from=dependencies --chown=node:node /app/lib ./lib 2>/dev/null || true
+
 # Copy application code
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 COPY --chown=node:node scripts/ ./scripts/
 COPY --chown=node:node src/ ./src/
 COPY --chown=node:node test/ ./test/
 COPY --chown=node:node tsconfig.json vitest.config.ts ./
+COPY --chown=node:node binding.gyp ./
+
+# Validate native module installation
+RUN echo "🔍 Validating native module installation..." \
+    && if [ -d "lib/binding" ]; then \
+        echo "✅ Native module directory found"; \
+        find lib/binding -name "*.node" -exec echo "Found: {}" \; \
+        || echo "⚠️  No .node files found in lib/binding"; \
+    else \
+        echo "⚠️  Native module directory not found, will build on demand"; \
+    fi
 
 # Switch to non-root user
 USER node

@@ -78,12 +78,40 @@ runs:
           export npm_config_target_arch=arm64
         fi
         
-        npx node-pre-gyp package
+        # Ensure the binary was built successfully
+        if [ ! -d "lib/binding" ]; then
+          echo "❌ No lib/binding directory found - build may have failed"
+          exit 1
+        fi
+        
+        # List available binaries for debugging
+        echo "🔍 Available binaries:"
+        find lib/binding -name "*.node" -exec echo "  {}" \; || echo "  No .node files found"
+        
+        pnpm run build:native:package
         echo "✅ Binary packaged successfully"
+        
+    - name: Validate packaged binary
+      shell: bash
+      run: |
+        echo "🔍 Validating packaged binary for ${{ inputs.arch }}"
+        
+        # Check if tar.gz was created
+        BINARY_PACKAGE=$(find . -name "*.tar.gz" | head -1)
+        if [ -n "$BINARY_PACKAGE" ]; then
+          echo "✅ Found binary package: $BINARY_PACKAGE"
+          echo "📦 Package contents:"
+          tar -tzf "$BINARY_PACKAGE" | head -10
+        else
+          echo "❌ No binary package found"
+          exit 1
+        fi
         
     - name: Upload binary artifacts
       uses: actions/upload-artifact@v4
       with:
         name: binary-${{ inputs.os }}-${{ inputs.arch }}
-        path: lib/binding/
+        path: |
+          lib/binding/
+          *.tar.gz
         retention-days: 30

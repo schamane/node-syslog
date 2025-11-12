@@ -28,6 +28,10 @@ runs:
         cache: ${{ inputs.cache }}
         registry-url: ${{ inputs.registry-url }}
         
-    - name: Install dependencies
+    - name: Install dependencies (skip install script)
       shell: bash
-      run: pnpm install
+      run: pnpm install --ignore-scripts
+      
+    - name: Build native module
+      shell: bash
+      run: pnpm run build:native
