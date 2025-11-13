@@ -40,9 +40,6 @@
 <loc>https://schamane.github.io/node-syslog/node-syslog/api-overview/</loc>
 </url>
 <url>
-<loc>https://schamane.github.io/node-syslog/node-syslog/_layouts/api/</loc>
-</url>
-<url>
 <loc>https://schamane.github.io/node-syslog/node-syslog/_api/functions/createSyslog/</loc>
 </url>
 <url>
@@ -92,6 +89,9 @@
 </url>
 <url>
 <loc>https://schamane.github.io/node-syslog/node-syslog/performance-summary/</loc>
+</url>
+<url>
+<loc>https://schamane.github.io/node-syslog/node-syslog/typescript-configuration/</loc>
 </url>
 <url>
 <loc>https://schamane.github.io/node-syslog/node-syslog/_api/functions/warning/</loc>

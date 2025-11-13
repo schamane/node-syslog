@@ -1,0 +1,130 @@
+<h1 id="typescript-configuration">TypeScript Configuration</h1>
+
+<p>This project uses a comprehensive triple-base TypeScript configuration to provide optimal development experience, modern Node.js LTS support, and latest TypeScript features.</p>
+
+<h2 id="base-configuration-stack">Base Configuration Stack</h2>
+
+<p>The <code class="language-plaintext highlighter-rouge">tsconfig.json</code> extends from three community-maintained base configurations:</p>
+
+<h3 id="1-tsconfigrecommended">1. @tsconfig/recommended</h3>
+<ul>
+  <li><strong>Purpose</strong>: TypeScript team recommended best practices</li>
+  <li><strong>Provides</strong>: Foundation settings with strict mode enabled</li>
+  <li><strong>Version</strong>: ^1.0.11</li>
+</ul>
+
+<h3 id="2-tsconfignode22">2. @tsconfig/node22</h3>
+<ul>
+  <li><strong>Purpose</strong>: Node.js 22 LTS optimized settings</li>
+  <li><strong>Provides</strong>: Modern module resolution and ES2024 libraries</li>
+  <li><strong>Version</strong>: ^22.0.2</li>
+</ul>
+
+<h3 id="3-tsconfignode-ts">3. @tsconfig/node-ts</h3>
+<ul>
+  <li><strong>Purpose</strong>: TypeScript 5.8+ specific features</li>
+  <li><strong>Provides</strong>: Latest TypeScript language features</li>
+  <li><strong>Version</strong>: ^23.6.1</li>
+  <li><strong>Requirement</strong>: TypeScript 5.8+ (satisfied by 5.9.3)</li>
+</ul>
+
+<h2 id="configuration-inheritance">Configuration Inheritance</h2>
+
+<p>The configurations are applied in this order (later configs override earlier ones):</p>
+
+<ol>
+  <li><strong>@tsconfig/recommended</strong> (foundation)</li>
+  <li><strong>@tsconfig/node22</strong> (Node.js LTS overrides)</li>
+  <li><strong>@tsconfig/node-ts</strong> (TypeScript 5.8+ features)</li>
+  <li><strong>Project overrides</strong> (final layer)</li>
+</ol>
+
+<h2 id="key-features-enabled">Key Features Enabled</h2>
+
+<h3 id="module-system">Module System</h3>
+<ul>
+  <li><strong><code class="language-plaintext highlighter-rouge">nodenext</code></strong>: Modern ES modules with Node.js compatibility</li>
+  <li><strong><code class="language-plaintext highlighter-rouge">verbatimModuleSyntax</code></strong>: Strict import/export syntax checking</li>
+  <li><strong><code class="language-plaintext highlighter-rouge">rewriteRelativeImportExtensions</code></strong>: Automatically adds <code class="language-plaintext highlighter-rouge">.js</code> extensions to imports</li>
+</ul>
+
+<h3 id="const-object-support">Const Object Support</h3>
+<ul>
+  <li><strong><code class="language-plaintext highlighter-rouge">erasableSyntaxOnly: false</code></strong>: Explicitly disabled (though not needed for const objects)</li>
+  <li><strong>Rationale</strong>: Previously maintained enum compatibility, now using <code class="language-plaintext highlighter-rouge">as const</code> objects</li>
+  <li><strong>Current Approach</strong>: Const objects with derived union types provide better type safety</li>
+  <li><strong>Override</strong>: Maintained for consistency with base configuration</li>
+</ul>
+
+<h3 id="type-checking">Type Checking</h3>
+<ul>
+  <li><strong>Enhanced strictness</strong> from all three base configs</li>
+  <li><strong>Community best practices</strong> enforced</li>
+  <li><strong>Future-proof settings</strong> for TypeScript evolution</li>
+</ul>
+
+<h3 id="build-output">Build Output</h3>
+<ul>
+  <li><strong>ES2022 target</strong> for modern JavaScript features</li>
+  <li><strong>ES2024 + ESNext libraries</strong> for latest APIs</li>
+  <li><strong>Source maps</strong> and <strong>declaration files</strong> for debugging</li>
+</ul>
+
+<h2 id="development-guidelines">Development Guidelines</h2>
+
+<h3 id="import-syntax">Import Syntax</h3>
+<p>Due to <code class="language-plaintext highlighter-rouge">verbatimModuleSyntax</code> and <code class="language-plaintext highlighter-rouge">nodenext</code>:</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// ✅ Correct - explicit file extensions</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">Syslog</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./syslog.js</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="c1">// ✅ Correct - type-only imports</span>
+<span class="k">import</span> <span class="kd">type</span> <span class="p">{</span> <span class="nx">SyslogOptions</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./types/index.js</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="c1">// ❌ Incorrect - missing extensions</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">Syslog</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./syslog</span><span class="dl">'</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h3 id="typescript-version">TypeScript Version</h3>
+<ul>
+  <li><strong>Current</strong>: TypeScript 5.9.3</li>
+  <li><strong>Minimum</strong>: TypeScript 5.8+ (required for @tsconfig/node-ts)</li>
+  <li><strong>Policy</strong>: No automatic downgrades, version explicitly maintained</li>
+</ul>
+
+<h3 id="common-migration-issues">Common Migration Issues</h3>
+
+<h4 id="1-missing-file-extensions">1. Missing File Extensions</h4>
+<p><strong>Error</strong>: <code class="language-plaintext highlighter-rouge">Relative import paths need explicit file extensions</code>
+<strong>Solution</strong>: Add <code class="language-plaintext highlighter-rouge">.js</code> extensions to all relative imports</p>
+
+<h4 id="2-type-only-imports">2. Type-Only Imports</h4>
+<p><strong>Error</strong>: <code class="language-plaintext highlighter-rouge">'X' is a type and must be imported using a type-only import</code>
+<strong>Solution</strong>: Use <code class="language-plaintext highlighter-rouge">import type</code> for type-only imports</p>
+
+<h4 id="3-module-resolution">3. Module Resolution</h4>
+<p><strong>Error</strong>: <code class="language-plaintext highlighter-rouge">Cannot find module 'X' or its corresponding type declarations</code>
+<strong>Solution</strong>: Ensure proper extension usage and module resolution</p>
+
+<h4 id="4-const-object-usage">4. Const Object Usage</h4>
+<p><strong>Error</strong>: <code class="language-plaintext highlighter-rouge">Property 'X' does not exist on type 'typeof Y'</code>
+<strong>Solution</strong>: Use correct property names with <code class="language-plaintext highlighter-rouge">LOG_</code> prefix (e.g., <code class="language-plaintext highlighter-rouge">SyslogFacility.LOG_USER</code>)</p>
+
+<h2 id="benefits">Benefits</h2>
+
+<ol>
+  <li><strong>Community Standards</strong>: Follows TypeScript team recommendations</li>
+  <li><strong>Node.js LTS Ready</strong>: Optimized for current Node.js versions</li>
+  <li><strong>Future-Proof</strong>: Automatic updates with base config improvements</li>
+  <li><strong>Enhanced Type Safety</strong>: Stricter checking from multiple sources</li>
+  <li><strong>Modern Module System</strong>: ESM with proper extension handling</li>
+</ol>
+
+<h2 id="maintenance">Maintenance</h2>
+
+<ul>
+  <li>Base configurations are automatically updated via npm</li>
+  <li>Project-specific overrides are preserved in local tsconfig.json</li>
+  <li>TypeScript version is explicitly maintained at 5.9.3</li>
+  <li>Configuration inheritance verified with <code class="language-plaintext highlighter-rouge">tsc --showConfig</code></li>
+</ul>
