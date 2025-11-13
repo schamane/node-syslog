@@ -69,27 +69,37 @@ try {
       });
     }
     
-    // Pre-create the build directory structure to avoid make errors
-    const baseDir = path.dirname(__dirname);
-    const buildReleaseDir = path.join(baseDir, 'build/Release');
-    const buildObjDir = path.join(baseDir, 'build/Release/obj.target/syslog_native/src/native');
-    
-    console.log('📁 Creating build directory structure...');
-    mkdirSync(buildReleaseDir, { recursive: true });
-    mkdirSync(buildObjDir, { recursive: true });
-    console.log('✅ Build directory structure created');
-    
-    // Use node-gyp directly to build
+    // Use node-gyp directly to build with verbose output for debugging
     const { execSync } = require('child_process');
+    const baseDir = path.dirname(__dirname);
+    
     try {
-      execSync('npx node-gyp rebuild', { 
+      console.log('🔨 Running node-gyp rebuild with verbose output...');
+      execSync('npx node-gyp rebuild --verbose', { 
         cwd: baseDir,
-        stdio: 'inherit'
+        stdio: 'inherit',
+        env: {
+          ...process.env,
+          // Ensure make creates directories as needed
+          MAKEFLAGS: '--no-builtin-rules'
+        }
       });
       console.log('✅ node-gyp rebuild completed successfully');
     } catch (gypError) {
       console.error('❌ node-gyp rebuild failed:', gypError.message);
-      throw gypError;
+      
+      // Try alternative approach with make directory creation
+      console.log('🔄 Trying alternative build approach...');
+      try {
+        execSync('npx node-gyp configure && npx node-gyp build', { 
+          cwd: baseDir,
+          stdio: 'inherit'
+        });
+        console.log('✅ Alternative build approach completed successfully');
+      } catch (altError) {
+        console.error('❌ Alternative build approach also failed:', altError.message);
+        throw gypError; // Throw original error
+      }
     }
     
     // Get the target path from node-pre-gyp
