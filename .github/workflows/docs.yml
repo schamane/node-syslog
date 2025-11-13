@@ -210,20 +210,20 @@ jobs:
       - name: Verify build output
         run: |
           echo "📁 Generated files:"
-          find docs/_site -type f | head -20
+          find _site -type f | head -20
           echo ""
-          echo "📁 Total files: $(find docs/_site -type f | wc -l)"
-          echo "📁 Total directories: $(find docs/_site -type d | wc -l)"
+          echo "📁 Total files: $(find _site -type f | wc -l)"
+          echo "📁 Total directories: $(find _site -type d | wc -l)"
           
           # Check for essential files
-          if [ -f "docs/_site/index.html" ]; then
+          if [ -f "_site/index.html" ]; then
             echo "✅ Main index.html found"
           else
             echo "❌ Main index.html missing"
             exit 1
           fi
           
-          if [ -f "docs/_site/_api/index.html" ]; then
+          if [ -f "_site/_api/index.html" ]; then
             echo "✅ API documentation found"
           else
             echo "⚠️  API documentation not found"
