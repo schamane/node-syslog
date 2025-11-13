@@ -34,6 +34,9 @@ runs:
           export npm_config_arch=arm64
           export npm_config_target_arch=arm64
         fi
+        # Set up pnpm environment for direct build
+        corepack enable
+        corepack use pnpm@latest
         pnpm run install:native
         
     - name: Build native module (Container)
