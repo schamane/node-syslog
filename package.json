@@ -20,8 +20,7 @@
     "install:native": "node scripts/install.js",
     "docs:build": "typedoc && node scripts/build-docs.js",
     "docs:serve": "bundle exec jekyll serve --livereload",
-    "docs:deploy": "pnpm run docs:build && bundle exec jekyll build",
-
+    "docs:deploy": "pnpm run docs:build && bundle exec jekyll build"
   },
   "keywords": [
     "syslog",
