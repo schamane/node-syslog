@@ -173,34 +173,6 @@ jobs:
 
 
   # === BUILD STAGE ===
-  build-native-binaries:
-    name: Build Native Binaries
-    runs-on: ubuntu-latest
-    needs: [generate-coverage, run-performance-benchmarks]
-    permissions:
-      contents: read
-      packages: write
-    strategy:
-      matrix:
-        os: [ubuntu-22.04]
-        arch: [x64, arm64]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        
-      - name: Setup Docker Compose for native compilation
-        run: |
-          echo "🐳 Setting up Docker Compose for native compilation"
-          mkdir -p .docker/node_modules .docker/pnpm-store
-          
-      - name: Build native binaries
-        uses: ./.github/actions/build-native-binaries
-        with:
-          os: ${{ matrix.os }}
-          arch: ${{ matrix.arch }}
-          use-container: 'true'
-          container-image: 'localhost/node-syslog-test:latest'
-
   build-container-image:
     name: Build Container Image
     runs-on: ubuntu-latest
@@ -208,10 +180,12 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      image-tag: ${{ steps.tag.outputs.primary-tag }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+         
       - name: Setup Docker Buildx for release
         uses: docker/setup-buildx-action@v3
         with:
@@ -234,6 +208,15 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
+            type=ref,event=branch,suffix=-{{sha}}
+            type=ref,event=pr,suffix=-{{pr}}
+            
+      - name: Extract primary tag
+        id: tag
+        run: |
+          PRIMARY_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n1)
+          echo "primary-tag=$PRIMARY_TAG" >> $GITHUB_OUTPUT
+          echo "Using primary tag: $PRIMARY_TAG"
             
       - name: Build and push image
         uses: docker/build-push-action@v5
@@ -247,6 +230,36 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
+
+  build-native-binaries:
+    name: Build Native Binaries
+    runs-on: ubuntu-latest
+    needs: [build-container-image]
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+        arch: [x64, arm64]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+         
+      - name: Setup Docker Compose for native compilation
+        run: |
+          echo "🐳 Setting up Docker Compose for native compilation"
+          mkdir -p .docker/node_modules .docker/pnpm-store
+          
+      - name: Build native binaries
+        uses: ./.github/actions/build-native-binaries
+        with:
+          os: ${{ matrix.os }}
+          arch: ${{ matrix.arch }}
+          use-container: 'true'
+          container-image: ${{ needs.build-container-image.outputs.image-tag }}
+
+
 
   # === DEPLOY STAGE ===
   create-release:
