@@ -55,13 +55,21 @@ try {
   console.log('📝 Error details:', error.message);
   
   try {
-    // Fallback to building from source using node-pre-gyp
+    // Fallback to building from source using node-gyp directly
     console.log('🔨 Building native addon from source...');
-    const runner = new npg.Run({ package_json_path });
-    runner.parseArgv(['rebuild']);
     
- // Use node-pre-gyp to install the binary to the correct location
-    console.log('📦 Installing built binary to target location...');
+    // Use node-gyp directly to build
+    const { execSync } = require('child_process');
+    try {
+      execSync('npx node-gyp rebuild', { 
+        cwd: path.dirname(__dirname),
+        stdio: 'inherit'
+      });
+      console.log('✅ node-gyp rebuild completed successfully');
+    } catch (gypError) {
+      console.error('❌ node-gyp rebuild failed:', gypError.message);
+      throw gypError;
+    }
     
     // Get the target path from node-pre-gyp
     const targetPath = npg.find(package_json_path);
@@ -72,6 +80,11 @@ try {
     
     // Copy the binary from build directory
     const builtBinary = path.join(__dirname, '../build/Release/syslog_native.node');
+    
+    if (!existsSync(builtBinary)) {
+      throw new Error(`Built binary not found at ${builtBinary}`);
+    }
+    
     copyFileSync(builtBinary, targetPath);
     console.log('✅ Copied binary to:', targetPath);
     
