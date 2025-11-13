@@ -1,20 +1,19 @@
 # Multi-stage build for optimized containerized testing
-FROM node:22-alpine3.19 AS base
+FROM node:22-bookworm-slim AS base
 
 # Install build dependencies in a single layer with minimal packages
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     make \
     g++ \
     gcc \
-    musl-dev \
-    linux-headers \
-    libgcc \
-    libstdc++ \
-    paxctl \
+    linux-libc-dev \
+    libc6-dev \
+    libgcc-s1 \
+    libstdc++6 \
     curl \
     bash \
-    && rm -rf /var/cache/apk/*
+    && rm -rf /var/lib/apt/lists/*
 
 # Install pnpm globally
 RUN npm install -g pnpm --no-audit --no-fund
