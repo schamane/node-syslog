@@ -170,13 +170,41 @@ jobs:
           working-directory: docs
         
       - name: Build Jekyll site
-        run: bundle exec jekyll build --baseurl="/node-syslog"
+        run: |
+          echo "🔨 Building Jekyll site..."
+          echo "Current directory: $(pwd)"
+          echo "Jekyll config:"
+          bundle exec jekyll doctor
+          echo ""
+          echo "Starting Jekyll build..."
+          bundle exec jekyll build --baseurl="/node-syslog" --verbose --trace
+          echo "✅ Jekyll build completed"
+          echo "Build output directory contents:"
+          ls -la _site/ || echo "_site directory not found"
         working-directory: docs
         
       - name: Add .nojekyll
         run: |
-          touch docs/_site/.nojekyll
-          rm -f docs/_site/api/.nojekyll
+          echo "📁 Adding .nojekyll file..."
+          echo "Current directory: $(pwd)"
+          echo "_site directory contents:"
+          ls -la _site/ || echo "_site directory not found"
+          
+          if [ ! -d "_site" ]; then
+            echo "❌ _site directory does not exist. Jekyll build may have failed."
+            echo "Creating _site directory manually..."
+            mkdir -p _site
+          fi
+          
+          touch _site/.nojekyll
+          echo "✅ Created _site/.nojekyll"
+          
+          # Remove any conflicting .nojekyll in api directory
+          rm -f _site/api/.nojekyll
+          echo "✅ Cleaned up api/.nojekyll"
+          
+          echo "Final _site directory contents:"
+          ls -la _site/
         working-directory: docs
         
       - name: Verify build output
