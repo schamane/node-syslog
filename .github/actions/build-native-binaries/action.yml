@@ -56,6 +56,7 @@ runs:
         docker run --rm $PLATFORM_FLAG \
           -v $(pwd):/app \
           -w /app \
+          --user root \
           --env NODE_ENV=production \
           --env CC=$CC \
           --env CXX=$CXX \
@@ -64,12 +65,13 @@ runs:
           --env TMPDIR=/app/tmp \
           ${{ inputs.container-image }} \
           sh -c "
-            # Create writable temp directory in working directory
+            # Fix ownership and create temp directory
+            chown -R node:node /app &&
             mkdir -p /app/tmp &&
-            # Set npm cache to writable location
-            npm config set cache /app/tmp/.npm --global &&
-            pnpm install --frozen-lockfile &&
-            pnpm run build:native &&
+            # Switch to node user for build
+            sudo -u node npm config set cache /app/tmp/.npm --global &&
+            sudo -u node pnpm install --frozen-lockfile &&
+            sudo -u node pnpm run build:native &&
             echo '✅ Native module compiled successfully'
           "
           
