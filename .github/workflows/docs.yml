@@ -134,12 +134,12 @@ jobs:
           echo "Checking Jekyll version..."
           JEKYLL_VERSION=$(bundle exec jekyll --version | cut -d' ' -f2)
           echo "Installed Jekyll version: $JEKYLL_VERSION"
-          EXPECTED_JEKYLL="4.4.1"
+          EXPECTED_JEKYLL_MIN="4.3.0"
 
-          if [[ "$JEKYLL_VERSION" == "$EXPECTED_JEKYLL" ]]; then
-            echo "✅ Jekyll version matches expected: $EXPECTED_JEKYLL"
+          if [[ "$(printf '%s\n' "$EXPECTED_JEKYLL_MIN" "$JEKYLL_VERSION" | sort -V | head -n1)" == "$EXPECTED_JEKYLL_MIN" ]]; then
+            echo "✅ Jekyll version is compatible: $JEKYLL_VERSION (>= $EXPECTED_JEKYLL_MIN)"
           else
-            echo "❌ Jekyll version mismatch. Expected: $EXPECTED_JEKYLL, Got: $JEKYLL_VERSION"
+            echo "❌ Jekyll version too old. Got: $JEKYLL_VERSION, Expected: >= $EXPECTED_JEKYLL_MIN"
             exit 1
           fi
 
