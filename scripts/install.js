@@ -58,11 +58,32 @@ try {
     // Fallback to building from source using node-gyp directly
     console.log('🔨 Building native addon from source...');
     
+    // Clean any existing build to ensure fresh state
+    const buildDir = path.join(__dirname, '../build');
+    if (existsSync(buildDir)) {
+      console.log('🧹 Cleaning existing build directory...');
+      const { execSync } = require('child_process');
+      execSync('rm -rf build', { 
+        cwd: path.dirname(__dirname),
+        stdio: 'inherit'
+      });
+    }
+    
+    // Pre-create the build directory structure to avoid make errors
+    const baseDir = path.dirname(__dirname);
+    const buildReleaseDir = path.join(baseDir, 'build/Release');
+    const buildObjDir = path.join(baseDir, 'build/Release/obj.target/syslog_native/src/native');
+    
+    console.log('📁 Creating build directory structure...');
+    mkdirSync(buildReleaseDir, { recursive: true });
+    mkdirSync(buildObjDir, { recursive: true });
+    console.log('✅ Build directory structure created');
+    
     // Use node-gyp directly to build
     const { execSync } = require('child_process');
     try {
       execSync('npx node-gyp rebuild', { 
-        cwd: path.dirname(__dirname),
+        cwd: baseDir,
         stdio: 'inherit'
       });
       console.log('✅ node-gyp rebuild completed successfully');
