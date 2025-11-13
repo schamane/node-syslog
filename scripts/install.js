@@ -81,24 +81,43 @@ try {
         env: {
           ...process.env,
           // Ensure make creates directories as needed
-          MAKEFLAGS: '--no-builtin-rules'
+          MAKEFLAGS: '--no-builtin-rules',
+          // Force shell to be bash
+          SHELL: '/bin/bash'
         }
       });
       console.log('✅ node-gyp rebuild completed successfully');
     } catch (gypError) {
       console.error('❌ node-gyp rebuild failed:', gypError.message);
       
-      // Try alternative approach with make directory creation
-      console.log('🔄 Trying alternative build approach...');
+      // Try alternative approach with explicit make path
+      console.log('🔄 Trying alternative build approach with explicit make...');
       try {
-        execSync('npx node-gyp configure && npx node-gyp build', { 
+        execSync('npx node-gyp configure && /usr/bin/make BUILDTYPE=Release -C build', { 
           cwd: baseDir,
           stdio: 'inherit'
         });
         console.log('✅ Alternative build approach completed successfully');
       } catch (altError) {
         console.error('❌ Alternative build approach also failed:', altError.message);
-        throw gypError; // Throw original error
+        
+        // Try one more approach with manual directory creation
+        console.log('🔄 Trying manual compilation approach...');
+        try {
+          // Create directories manually
+          const objDir = path.join(baseDir, 'build/Release/obj.target/syslog_native/src/native');
+          mkdirSync(objDir, { recursive: true });
+          
+          // Try building again
+          execSync('npx node-gyp build', { 
+            cwd: baseDir,
+            stdio: 'inherit'
+          });
+          console.log('✅ Manual compilation approach completed successfully');
+        } catch (manualError) {
+          console.error('❌ Manual compilation approach also failed:', manualError.message);
+          throw gypError; // Throw original error
+        }
       }
     }
     
