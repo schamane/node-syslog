@@ -75,7 +75,7 @@ try {
     
     try {
       console.log('🔨 Running node-gyp rebuild with verbose output...');
-      execSync('npx node-gyp rebuild --verbose', { 
+      execSync('node-gyp rebuild --verbose', { 
         cwd: baseDir,
         stdio: 'inherit',
         env: {
@@ -93,7 +93,7 @@ try {
       // Try alternative approach with explicit make path
       console.log('🔄 Trying alternative build approach with explicit make...');
       try {
-        execSync('npx node-gyp configure && /usr/bin/make BUILDTYPE=Release -C build', { 
+        execSync('node-gyp configure && /usr/bin/make BUILDTYPE=Release -C build', { 
           cwd: baseDir,
           stdio: 'inherit'
         });
@@ -109,7 +109,7 @@ try {
           mkdirSync(objDir, { recursive: true });
           
           // Try building again
-          execSync('npx node-gyp build', { 
+          execSync('node-gyp build', { 
             cwd: baseDir,
             stdio: 'inherit'
           });
