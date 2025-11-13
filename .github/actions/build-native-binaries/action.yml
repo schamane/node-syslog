@@ -63,6 +63,10 @@ runs:
           --env npm_config_target_arch=$npm_config_target_arch \
           ${{ inputs.container-image }} \
           sh -c "
+            # Ensure npm can write to temp directories
+            mkdir -p /tmp && chmod 777 /tmp &&
+            # Set npm cache to writable location
+            npm config set cache /tmp/.npm --global &&
             pnpm install --frozen-lockfile &&
             pnpm run build:native &&
             echo '✅ Native module compiled successfully'
