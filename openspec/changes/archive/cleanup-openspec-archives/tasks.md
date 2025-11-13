@@ -73,10 +73,10 @@
 - [x] 3.5 Check that all archived changes have corresponding spec updates
 
 ## 4. Archive Structure Optimization
-- [ ] 4.1 Ensure all archived changes follow consistent naming pattern
-- [ ] 4.2 Add README.md to archive directory explaining organization
-- [ ] 4.3 Create archive index documentation for navigation
-- [ ] 4.4 Verify all archived changes have proper proposal/tasks/design files
+- [x] 4.1 Ensure all archived changes follow consistent naming pattern
+- [x] 4.2 Add README.md to archive directory explaining organization
+- [x] 4.3 Create archive index documentation for navigation
+- [x] 4.4 Verify all archived changes have proper proposal/tasks/design files
 
 ## 5. Validation and Final Verification
 - [x] 5.1 Run `openspec validate --specs` to ensure no spec corruption

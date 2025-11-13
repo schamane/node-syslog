@@ -250,7 +250,22 @@ describe('Syslog', () => {
 ## AI Agent Development Guidelines
 
 ### Containerization Best Practices
-The system SHALL prioritize containerization for native binary builds using the following hierarchy:
+The system SHALL prioritize containerization for native binary builds using Chainguard Wolfi OS containers with the following hierarchy:
+
+#### Requirement: Container Base Image Mandate
+When building container images for node-syslog, AI Agents SHALL use Chainguard containers exclusively:
+
+**WHEN** building container images for node-syslog  
+**THEN** system SHALL use cgr.dev/chainguard/node images exclusively  
+**AND** use -dev variant for build stages (builder image)  
+**AND** use non-dev variant for runtime stages (distroless)  
+**AND** leverage Wolfi OS package management (apk)  
+**AND** follow Chainguard security best practices
+
+**WHEN** selecting base image tags  
+**THEN** system SHALL use latest stable tags  
+**AND** avoid version pinning without security review  
+**AND** utilize multi-stage builds for optimization
 
 #### Requirement: Container Tool Preference Hierarchy
 When building native binaries, AI Agents SHALL follow this container tool preference:
@@ -265,6 +280,24 @@ When building native binaries, AI Agents SHALL follow this container tool prefer
 **AND** prefer Podman if available and functional  
 **AND** fall back to Docker if Podman unavailable  
 **AND** log runtime selection for debugging purposes
+
+#### Requirement: Containerized Build Support
+The build system SHALL support containerized builds using Chainguard Wolfi OS for environment consistency and security.
+
+#### Scenario: Multi-stage Chainguard Build Architecture
+When building in containerized environment:
+- **THEN** system SHALL use Chainguard dev image for build stage
+- **AND** use Chainguard runtime image for final stage
+- **AND** copy only compiled artifacts to runtime stage
+- **AND** ensure build tools excluded from production image
+- **AND** support both Docker and Podman runtimes
+
+#### Scenario: Native Module Compilation with Wolfi
+When compiling native C++ modules:
+- **THEN** system SHALL use Wolfi OS build toolchain
+- **AND** provide all necessary build dependencies via apk
+- **AND** support node-gyp compilation in Chainguard environment
+- **AND** ensure N-API compatibility across Node.js versions
 
 ### GitHub Actions and Debugging Guidelines
 The system SHALL use GitHub Actions workflows with proper debugging and tracing support:

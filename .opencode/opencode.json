@@ -1,0 +1,11 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "plan": {
+      "model": "openrouter/moonshotai/kimi-k2-thinking"
+    },
+    "build": {
+      "model": "zai-coding-plan/glm-4.6"
+    }
+  }
+}

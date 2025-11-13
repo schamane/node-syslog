@@ -24,8 +24,8 @@ services:
         consistency: cached
       # Cache node_modules for faster restarts
       - node_modules_cache:/app/node_modules
-      # Cache pnpm store
-      - pnpm_store:/root/.local/share/pnpm/store
+      # Cache pnpm store (Chainguard uses /home/node)
+      - pnpm_store:/home/node/.local/share/pnpm/store
     environment:
       - NODE_ENV=test
       - CI=true

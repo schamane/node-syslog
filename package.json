@@ -10,9 +10,12 @@
     "build:native": "node-gyp rebuild",
     "build:native:prebuild": "prebuildify --target 22.0.0 --target 24.0.0 --target 25.0.0 --strip --napi",
     "build:native:package": "prebuildify --target 22.0.0 --target 24.0.0 --target 25.0.0 --strip",
-    "test": "node scripts/container-test.js test",
-    "test:coverage": "node scripts/container-test.js test:coverage",
-    "test:watch": "node scripts/container-test.js test:watch",
+    "test": "pnpm run test",
+    "test:coverage": "pnpm run test:coverage",
+    "test:watch": "pnpm run test:watch",
+    "test:run": "vitest run",
+    "test:run:coverage": "vitest run --coverage",
+    "test:run:watch": "vitest",
     "dev": "tsc --watch",
     "lint": "eslint src --ext .ts",
     "prepublishOnly": "pnpm run build && npm run build:native && npm run build:native:prebuild",
@@ -79,7 +82,8 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "esbuild"
+      "esbuild",
+      "vitest"
     ]
   }
 }

@@ -211,7 +211,9 @@ class ContainerTestRunner {
     const actualCommand = scriptMap[testCommand] || testCommand;
     
     return new Promise((resolve, reject) => {
-      const child = spawn('pnpm', actualCommand.split(' '), {
+      // Use npm in distroless runtime, pnpm in dev
+      const packageManager = process.env.CONTAINERIZED === 'true' ? 'npm' : 'pnpm';
+      const child = spawn(packageManager, actualCommand.split(' '), {
         stdio: 'inherit',
         cwd: this.projectRoot,
         env: {
