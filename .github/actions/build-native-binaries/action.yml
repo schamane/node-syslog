@@ -70,7 +70,6 @@ runs:
             mkdir -p /app/tmp &&
             # Configure npm for root user
             npm config set cache /app/tmp/.npm --global &&
-            npm config set unsafe-perm true --global &&
             # Install and build as root (required in container)
             pnpm install --frozen-lockfile &&
             pnpm run build:native &&
