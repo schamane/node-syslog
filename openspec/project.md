@@ -247,6 +247,94 @@ describe('Syslog', () => {
 - **Native Safety**: Pass Valgrind/ASAN/ThreadSanitizer
 - **Package Management**: pnpm for development, npm for distribution
 
+## AI Agent Development Guidelines
+
+### Containerization Best Practices
+The system SHALL prioritize containerization for native binary builds using the following hierarchy:
+
+#### Requirement: Container Tool Preference Hierarchy
+When building native binaries, AI Agents SHALL follow this container tool preference:
+
+**WHEN** native binary compilation is required  
+**THEN** system SHALL attempt Podman first, then Docker as fallback  
+**AND** provide rootless container support when available  
+**AND** ensure container environment consistency across all build stages
+
+**WHEN** container runtime selection is needed  
+**THEN** system SHALL detect available container runtimes  
+**AND** prefer Podman if available and functional  
+**AND** fall back to Docker if Podman unavailable  
+**AND** log runtime selection for debugging purposes
+
+### GitHub Actions and Debugging Guidelines
+The system SHALL use GitHub Actions workflows with proper debugging and tracing support:
+
+#### Requirement: GitHub Token Usage for Remote Debugging
+WHEN debugging documentation generation or GitHub Actions pipelines  
+THEN system SHALL use GH_TOKEN from @.env file for remote access  
+AND enable detailed logging and tracing in GitHub Actions  
+AND provide step-by-step debugging information in workflow outputs  
+AND ensure proper secret management and security practices
+
+#### Requirement: Documentation Build Debugging
+WHEN troubleshooting documentation generation issues  
+THEN system SHALL enable verbose logging in documentation build process  
+AND capture build artifacts for analysis  
+AND provide clear error messages with actionable steps  
+AND maintain build environment isolation for reproducible debugging
+
+### GitHub Actions Pipeline Design
+The system SHALL follow minimalistic, job-based GitHub Actions pipeline design:
+
+#### Requirement: Job-Based Pipeline Architecture
+WHEN designing GitHub Actions workflows  
+THEN system SHALL organize pipelines by logical job groups  
+AND create separate jobs for distinct concerns (build, test, deploy)  
+AND avoid shell script generation when possible  
+AND use GitHub Actions marketplace actions for common tasks  
+AND ensure job dependencies are clearly defined
+
+#### Requirement: Binary Artifact Management
+WHEN workflows need to share native binaries  
+THEN system SHALL use GitHub Actions artifacts for binary transfer  
+AND ensure artifact naming includes platform and version information  
+AND validate artifact integrity before use in subsequent jobs  
+AND provide artifact cleanup mechanisms to prevent storage bloat
+
+### Documentation System Guidelines
+The system SHALL follow documentation generation best practices:
+
+#### Requirement: Jekyll Standalone Build
+WHEN building documentation  
+THEN system SHALL treat Jekyll as standalone documentation builder  
+AND use just-the-docs theme for professional presentation  
+AND build complete documentation site without GitHub Pages defaults  
+AND deploy to gh-pages branch via special workflow
+
+#### Requirement: Self-Contained Documentation
+WHEN generating documentation  
+THEN system SHALL build entire documentation site from source  
+AND avoid GitHub Pages automatic processing  
+AND use custom Jekyll configuration with theme  
+AND ensure all assets are properly included in build output
+
+### Node.js Native Module Best Practices
+The system SHALL follow established patterns from well-known Node.js native modules:
+
+#### Requirement: Best Practice Compliance
+WHEN implementing native module features  
+THEN system SHALL reference similar established Node.js native modules  
+AND follow their patterns for error handling, memory management, and API design  
+AND ensure compatibility with Node.js N-API standards  
+AND validate against common native module testing patterns
+
+#### Requirement: Cross-Platform Considerations
+WHEN designing native module interfaces  
+THEN system SHALL consider platform-specific requirements  
+AND provide clear error messages for unsupported platforms  
+AND ensure graceful degradation when features are unavailable  
+AND document platform-specific behavior and limitations
+
 ## External Dependencies
 
 ### System Dependencies (Runtime)
