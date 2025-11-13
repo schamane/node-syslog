@@ -256,7 +256,7 @@ jobs:
         with:
           os: ${{ matrix.os }}
           arch: ${{ matrix.arch }}
-          use-container: 'true'
+          use-container: 'false'
           container-image: ${{ needs.build-container-image.outputs.image-tag }}
 
 
