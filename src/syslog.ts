@@ -21,12 +21,24 @@ function loadNativeModule() {
 
   // Use node-gyp-build (handles path resolution automatically)
   try {
-    return require('node-gyp-build')(__dirname);
+    const nativeBinding = require('node-gyp-build')(__dirname);
+    // Create an instance to get access to the methods
+    const SyslogNative = nativeBinding.SyslogNative || nativeBinding;
+    return new SyslogNative();
   } catch (error) {
+    // Fallback to direct binary loading for development
+    try {
+      const path = require('path');
+      const builtBinary = path.join(__dirname, '../build/Release/syslog_native.node');
+      const nativeBinding = require(builtBinary);
+      const SyslogNative = nativeBinding.SyslogNative || nativeBinding;
+      return new SyslogNative();
+    } catch (fallbackError) {
     throw new Error(
       `Failed to load native syslog module. This package only supports Linux x64/ARM64.\n` +
       `Error: ${error instanceof Error ? error.message : String(error)}`
     );
+    }
   }
 }
 
@@ -86,7 +98,20 @@ export class Syslog {
 
   private initialize(): void {
     if (!this.initialized) {
-      this.native.openlog(this.ident, this.options, this.facility);
+      // Convert string facility to number if needed
+      let facility: number = this.facility as number;
+      if (typeof this.facility === 'string') {
+        const facilityMap: Record<string, number> = {
+          'kern': 0, 'user': 8, 'mail': 16, 'daemon': 24, 'auth': 32,
+          'syslog': 40, 'lpr': 48, 'news': 56, 'uucp': 64, 'cron': 72,
+          'authpriv': 80, 'ftp': 88, 'local0': 128, 'local1': 136,
+          'local2': 144, 'local3': 152, 'local4': 160, 'local5': 168,
+          'local6': 176, 'local7': 184
+        };
+        facility = facilityMap[this.facility] || 8; // Default to LOG_USER
+      }
+      
+      this.native.openlog(this.ident, this.options, facility);
       this.initialized = true;
     }
   }

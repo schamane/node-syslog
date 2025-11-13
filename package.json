@@ -8,14 +8,14 @@
   "scripts": {
     "build": "tsc",
     "build:native": "node-gyp rebuild",
-    "build:native:package": "node-pre-gyp package",
-    "build:native:publish": "node-pre-gyp publish",
+    "build:native:prebuild": "prebuildify --target 22.0.0 --target 24.0.0 --target 25.0.0 --strip --napi",
+    "build:native:package": "prebuildify --target 22.0.0 --target 24.0.0 --target 25.0.0 --strip",
     "test": "node scripts/container-test.js test",
     "test:coverage": "node scripts/container-test.js test:coverage",
     "test:watch": "node scripts/container-test.js test:watch",
     "dev": "tsc --watch",
     "lint": "eslint src --ext .ts",
-    "prepublishOnly": "pnpm run build && npm run build:native",
+    "prepublishOnly": "pnpm run build && npm run build:native && npm run build:native:prebuild",
     "install": "node scripts/install.js",
     "install:native": "node scripts/install.js",
     "docs:build": "typedoc && node scripts/build-docs.js",
@@ -44,36 +44,41 @@
     "arm64"
   ],
   "dependencies": {
-    "@mapbox/node-pre-gyp": "^2.0.0",
     "node-addon-api": "^8.5.0",
     "node-gyp-build": "^4.8.4"
   },
+  "optionalDependencies": {
+    "node-gyp": "^12.1.0"
+  },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@tsconfig/recommended": "^1.0.12",
-    "@tsconfig/node22": "^22.0.2",
-    "@tsconfig/node-ts": "^23.6.1",
-    "@types/node": "^24.10.0",
+    "@tsconfig/recommended": "^1.0.13",
+    "@tsconfig/node22": "^22.0.3",
+    "@tsconfig/node-ts": "^23.6.2",
+    "@types/node": "^24.10.1",
     "@typescript-eslint/eslint-plugin": "^8.46.4",
     "@typescript-eslint/parser": "^8.46.4",
     "@vitest/coverage-v8": "^4.0.8",
     "eslint": "^9.39.1",
-    "node-gyp": "^12.0.0",
+    "prebuildify": "^6.0.1",
     "typedoc": "^0.28.14",
     "typescript": "^5.9.3",
     "vitest": "^4.0.8"
   },
-  "binary": {
-    "module_name": "syslog_native",
-    "module_path": "./lib/binding/{node_abi}-{platform}-{arch}/",
-    "remote_path": "./{module_name}/v{version}/",
-    "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{arch}.tar.gz",
-    "host": "https://github.com/schamane/node-syslog/releases/download",
-    "accept_prerelease": false
+  "prebuildify": {
+    "targets": [
+      "node@22-linux-x64",
+      "node@22-linux-arm64",
+      "node@24-linux-x64",
+      "node@24-linux-arm64",
+      "node@25-linux-x64",
+      "node@25-linux-arm64"
+    ],
+    "strip": true,
+    "quiet": false
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "@mapbox/node-pre-gyp",
       "esbuild"
     ]
   }

@@ -1,5 +1,5 @@
 services:
-  node-syslog-test:
+  test:
     build:
       context: .
       dockerfile: Dockerfile

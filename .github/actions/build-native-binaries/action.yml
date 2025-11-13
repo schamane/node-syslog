@@ -79,7 +79,7 @@ runs:
             echo '✅ Native module compiled successfully'
           "
           
-    - name: Package binary with node-pre-gyp
+    - name: Package binary with prebuildify
       shell: bash
       run: |
         echo "📦 Packaging binary for ${{ inputs.arch }}"
@@ -90,16 +90,16 @@ runs:
         fi
         
         # Ensure the binary was built successfully
-        if [ ! -d "lib/binding" ]; then
-          echo "❌ No lib/binding directory found - build may have failed"
+        if [ ! -d "build/Release" ]; then
+          echo "❌ No build/Release directory found - build may have failed"
           exit 1
         fi
         
         # List available binaries for debugging
         echo "🔍 Available binaries:"
-        find lib/binding -name "*.node" -exec echo "  {}" \; || echo "  No .node files found"
+        find build/Release -name "*.node" -exec echo "  {}" \; || echo "  No .node files found"
         
-        pnpm run build:native:package
+        pnpm run build:native:prebuild
         echo "✅ Binary packaged successfully"
         
     - name: Validate packaged binary
@@ -107,14 +107,14 @@ runs:
       run: |
         echo "🔍 Validating packaged binary for ${{ inputs.arch }}"
         
-        # Check if tar.gz was created
-        BINARY_PACKAGE=$(find . -name "*.tar.gz" | head -1)
-        if [ -n "$BINARY_PACKAGE" ]; then
-          echo "✅ Found binary package: $BINARY_PACKAGE"
-          echo "📦 Package contents:"
-          tar -tzf "$BINARY_PACKAGE" | head -10
+        # Check if prebuildify created binaries
+        PREBUILT_BINARIES=$(find . -name "prebuilds" -type d)
+        if [ -n "$PREBUILT_BINARIES" ]; then
+          echo "✅ Found prebuildify directory: $PREBUILT_BINARIES"
+          echo "📦 Prebuilt binaries:"
+          find "$PREBUILT_BINARIES" -name "*.node" -exec echo "  {}" \; || echo "  No .node files found"
         else
-          echo "❌ No binary package found"
+          echo "❌ No prebuildify directory found"
           exit 1
         fi
         
@@ -123,6 +123,6 @@ runs:
       with:
         name: binary-${{ inputs.os }}-${{ inputs.arch }}
         path: |
-          lib/binding/
-          *.tar.gz
+          prebuilds/
+          build/Release/
         retention-days: 30
