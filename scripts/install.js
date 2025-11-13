@@ -34,44 +34,54 @@ try {
   console.log('🔍 Looking for pre-built binary...');
   const binding_path = npg.find(package_json_path);
   console.log('✅ Found pre-built binary:', binding_path);
-  global.binding = require(binding_path);
-  console.log('✅ Native addon loaded successfully from pre-built binary');
+  
+  // Verify the binary can be loaded (but don't assign to global)
+  try {
+    require(binding_path);
+    console.log('✅ Pre-built binary verified successfully');
+  } catch (loadError) {
+    console.log('⚠️  Pre-built binary found but failed to load, rebuilding from source...');
+    throw loadError; // This will trigger the fallback build
+  }
 } catch (error) {
-  console.log('⚠️  Pre-built binary not found, building from source...');
-  console.log('📝 Build error details:', error.message);
+  console.log('⚠️  Pre-built binary not available, building from source...');
+  console.log('📝 Error details:', error.message);
   
   try {
-    // Fallback to building from source
+    // Fallback to building from source using node-pre-gyp
     console.log('🔨 Building native addon from source...');
     const runner = new npg.Run({ package_json_path });
     runner.parseArgv(['rebuild']);
     
-    // Copy the built binary to the expected location
-    // Find the built binary
-    const buildDir = path.join(__dirname, '../build/Release');
-    const builtBinary = path.join(buildDir, 'syslog_native.node');
+ // Use node-pre-gyp to install the binary to the correct location
+    console.log('📦 Installing built binary to target location...');
     
-    if (existsSync(builtBinary)) {
-      // Get the target path from node-pre-gyp
-      const targetPath = npg.find(package_json_path);
-      const targetDir = path.dirname(targetPath);
-      
-      // Ensure target directory exists
-      mkdirSync(targetDir, { recursive: true });
-      
-      // Copy the binary
-      copyFileSync(builtBinary, targetPath);
-      console.log('✅ Copied built binary to:', targetPath);
-      
-      global.binding = require(targetPath);
-      console.log('✅ Native addon loaded successfully from source build');
-    } else {
-      throw new Error(`Built binary not found at ${builtBinary}`);
-    }
+    // Get the target path from node-pre-gyp
+    const targetPath = npg.find(package_json_path);
+    const targetDir = path.dirname(targetPath);
+    
+    // Ensure target directory exists
+    mkdirSync(targetDir, { recursive: true });
+    
+    // Copy the binary from build directory
+    const builtBinary = path.join(__dirname, '../build/Release/syslog_native.node');
+    copyFileSync(builtBinary, targetPath);
+    console.log('✅ Copied binary to:', targetPath);
+    
+    // After install, verify the binary was placed correctly
+    const binding_path = npg.find(package_json_path);
+    console.log('✅ Native addon built and available at:', binding_path);
+    
+    // Test that it can be loaded
+    require(binding_path);
+    console.log('✅ Native addon loaded successfully from source build');
+    
   } catch (buildError) {
     console.error('❌ Failed to build native addon from source:');
     console.error('   Error:', buildError.message);
-    console.error('   Stack:', buildError.stack);
+    if (buildError.stack) {
+      console.error('   Stack:', buildError.stack);
+    }
     
     // Provide helpful debugging information
     console.error('\n🔍 Debugging information:');
@@ -86,6 +96,16 @@ try {
       console.error('   node-gyp: Available');
     } catch (e) {
       console.error('   node-gyp: Not available');
+    }
+    
+    // Check build directory
+    const buildDir = path.join(__dirname, '../build/Release');
+    if (existsSync(buildDir)) {
+      console.error('   Build directory exists:', buildDir);
+      const files = require('fs').readdirSync(buildDir);
+      console.error('   Build directory contents:', files);
+    } else {
+      console.error('   Build directory does not exist:', buildDir);
     }
     
     console.error('\n💡 Possible solutions:');

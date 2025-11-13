@@ -34,7 +34,7 @@ runs:
           export npm_config_arch=arm64
           export npm_config_target_arch=arm64
         fi
-        pnpm run build:native
+        pnpm run install:native
         
     - name: Build native module (Container)
       if: inputs.use-container == 'true'
@@ -72,7 +72,7 @@ runs:
             npm config set cache /app/tmp/.npm --global &&
             # Install and build as root (required in container)
             pnpm install --frozen-lockfile &&
-            pnpm run build:native &&
+            pnpm run install:native &&
             echo '✅ Native module compiled successfully'
           "
           
