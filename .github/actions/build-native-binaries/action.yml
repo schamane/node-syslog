@@ -63,15 +63,17 @@ runs:
           --env npm_config_arch=$npm_config_arch \
           --env npm_config_target_arch=$npm_config_target_arch \
           --env TMPDIR=/app/tmp \
+          --env HOME=/app \
           ${{ inputs.container-image }} \
           sh -c "
-            # Fix ownership and create temp directory
-            chown -R node:node /app &&
+            # Create temp directory and set up environment
             mkdir -p /app/tmp &&
-            # Switch to node user for build
-            sudo -u node npm config set cache /app/tmp/.npm --global &&
-            sudo -u node pnpm install --frozen-lockfile &&
-            sudo -u node pnpm run build:native &&
+            # Configure npm for root user
+            npm config set cache /app/tmp/.npm --global &&
+            npm config set unsafe-perm true --global &&
+            # Install and build as root (required in container)
+            pnpm install --frozen-lockfile &&
+            pnpm run build:native &&
             echo '✅ Native module compiled successfully'
           "
           
