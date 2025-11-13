@@ -1,3 +1,10 @@
+---
+title: TypeScript Configuration
+parent: Home
+nav_order: 9
+has_children: false
+---
+
 # TypeScript Configuration
 
 This project uses a comprehensive triple-base TypeScript configuration to provide optimal development experience, modern Node.js LTS support, and latest TypeScript features.

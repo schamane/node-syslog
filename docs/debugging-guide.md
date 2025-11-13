@@ -1,5 +1,6 @@
 ---
 title: Debugging Guide
+parent: Home
 nav_order: 7
 has_children: false
 ---

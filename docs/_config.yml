@@ -26,7 +26,7 @@ plugins:
   - jekyll-seo-tag
 permalink: pretty
 
-# Custom theme configuration
+# Just the Docs theme configuration
 color_scheme: light
 search_enabled: true
 heading_anchors: true
@@ -43,67 +43,9 @@ aux_links_new_tab: true
 # Google Analytics Tracking (optional)
 ga_tracking: ""
 
-# Navigation structure
-navigation:
-  - title: "Getting Started"
-    url: "/getting-started/"
-  - title: "Installation"
-    url: "/installation/"
-  - title: "Examples"
-    url: "/examples/"
-  - title: "API Reference"
-    url: "/_api/"
-    children:
-      - title: "Overview"
-        url: "/_api/"
-      - title: "Classes"
-        url: "/_api/classes/"
-      - title: "Interfaces"
-        url: "/_api/interfaces/"
-      - title: "Functions"
-        url: "/_api/functions/"
-      - title: "Types"
-        url: "/_api/types/"
-      - title: "Variables"
-        url: "/_api/variables/"
-  - title: "Migration Guide"
-    url: "/migration/"
-  - title: "Debugging"
-    url: "/debugging-guide/"
-  - title: "Performance"
-    url: "/performance-summary/"
-  - title: "TypeScript"
-    url: "/typescript-configuration/"
-
-# Exclude from processing
-exclude:
-  - Gemfile
-  - Gemfile.lock
-  - node_modules/
-  - vendor/bundle/
-  - vendor/cache/
-  - vendor/gems/
-  - vendor/ruby/
-  - "../src/"
-  - "../test/"
-  - "../scripts/"
-  - "../binding.gyp"
-  - "../.git/"
-  - "../.gitignore"
-  - "../README.md"
-  - "../package.json"
-  - "../package-lock.json"
-  - "../tsconfig.json"
-  - "../pnpm-lock.yaml"
-  - "../.eslintrc.js"
-  - "../vitest.config.ts"
-  - "../AGENTS.md"
-  - "../CONTRIBUTING.md"
-  - "../LICENSE.md"
-  - "../openspec/"
-  - "api/"  # Exclude original TypeDoc HTML directory
-  - "_layouts_backup/"
-  - "_includes_backup/"
+# Navigation structure - just-the-docs format
+nav_sort: case_insensitive
+exclude: ["Gemfile", "Gemfile.lock", "node_modules", "vendor/bundle/", "vendor/cache/", "vendor/gems/", "vendor/ruby/", "src/", "test/", "scripts/", "binding.gyp", ".git/", ".gitignore", "README.md", "package.json", "package-lock.json", "tsconfig.json", "pnpm-lock.yaml", ".eslintrc.js", "vitest.config.ts", "AGENTS.md", "CONTRIBUTING.md", "LICENSE.md", "openspec/", "api/"]
 
 # Include for processing
 include:

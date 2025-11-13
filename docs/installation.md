@@ -1,5 +1,6 @@
 ---
 title: Installation Guide
+parent: Home
 nav_order: 3
 has_children: false
 ---

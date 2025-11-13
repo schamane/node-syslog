@@ -1,5 +1,6 @@
 ---
 title: Migration Guide
+parent: Home
 nav_order: 5
 has_children: false
 ---
