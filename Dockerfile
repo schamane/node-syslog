@@ -49,9 +49,7 @@ FROM base AS runtime
 COPY --from=dependencies --chown=node:node /app/node_modules ./node_modules
 COPY --from=dependencies --chown=node:node /app/.npm ./.npm
 
-# Copy built native module if it exists
-COPY --from=dependencies --chown=node:node /app/lib ./lib || true
-COPY --from=dependencies --chown=node:node /app/build ./build || true
+# Note: Native modules are built separately in CI and not included in container
 
 # Copy application code
 COPY --chown=node:node package.json pnpm-lock.yaml ./
@@ -61,15 +59,8 @@ COPY --chown=node:node test/ ./test/
 COPY --chown=node:node tsconfig.json vitest.config.ts ./
 COPY --chown=node:node binding.gyp ./
 
-# Validate native module installation
-RUN echo "🔍 Validating native module installation..." \
-    && if [ -d "lib/binding" ]; then \
-        echo "✅ Native module directory found"; \
-        find lib/binding -name "*.node" -exec echo "Found: {}" \; \
-        || echo "⚠️  No .node files found in lib/binding"; \
-    else \
-        echo "⚠️  Native module directory not found, will build on demand"; \
-    fi
+# Note: Native modules will be built on-demand or mounted from CI artifacts
+RUN echo "📝 Container ready for native module compilation"
 
 # Switch to non-root user
 USER node
