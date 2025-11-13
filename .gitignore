@@ -10,3 +10,4 @@
 /build/
 Gemfile.lock
 /docs/api/
+/lib/binding/
