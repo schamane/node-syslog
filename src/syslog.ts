@@ -1,40 +1,32 @@
 import type { SyslogOptions, SyslogFacilityType, SyslogLevelType, SyslogOptionType } from './types/index.js';
 import { SyslogFacility, SyslogLevel, SyslogOption } from './types/index.js';
+import { createRequire } from 'module';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 /**
  * Native module loader with fallback
  * @internal
  */
-declare const require: (id: string) => any;
-declare const __dirname: string;
+const require = createRequire(import.meta.url);
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 function loadNativeModule() {
-  // Check if we're in a test environment and mock is available
+  // Return mock in test environment
   if (typeof process !== 'undefined' && (process.env.NODE_ENV === 'test' || process.env.VITEST === 'true')) {
-    try {
-      // Try to load the mock from the global test setup
-      if ((globalThis as any).__MOCK_SYSLOG__) {
-        return (globalThis as any).__MOCK_SYSLOG__;
-      }
-    } catch {
-      // Continue with normal loading if mock not available
+    if ((globalThis as any).__MOCK_SYSLOG__) {
+      return (globalThis as any).__MOCK_SYSLOG__;
     }
   }
 
+  // Use node-gyp-build (handles path resolution automatically)
   try {
-    // Try to load the precompiled binary first
-    return require('../lib/binding/syslog_native.node');
+    return require('node-gyp-build')(__dirname);
   } catch (error) {
-    try {
-      // Fallback to the source module
-      return require('node-gyp-build')(__dirname);
-    } catch (fallbackError) {
-      throw new Error(
-        `Failed to load native syslog module. This package only supports Linux x64/ARM64.\n` +
-        `Original error: ${error instanceof Error ? error.message : String(error)}\n` +
-        `Fallback error: ${fallbackError instanceof Error ? fallbackError.message : String(fallbackError)}`
-      );
-    }
+    throw new Error(
+      `Failed to load native syslog module. This package only supports Linux x64/ARM64.\n` +
+      `Error: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }
 
@@ -85,7 +77,7 @@ export class Syslog {
    */
   constructor(options: SyslogOptions = {}) {
     this.native = loadNativeModule();
-    this.ident = options.ident || (typeof require !== 'undefined' && (require as any).main?.filename) || 'node';
+    this.ident = options.ident || (typeof process !== 'undefined' && process.argv[1]) || 'node';
     this.facility = options.facility ?? SyslogFacility.LOG_USER;
     this.options = options.options ?? SyslogOption.LOG_PID;
     
