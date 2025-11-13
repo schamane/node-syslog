@@ -21,7 +21,7 @@
     "docs:build": "typedoc && node scripts/build-docs.js",
     "docs:serve": "bundle exec jekyll serve --livereload",
     "docs:deploy": "pnpm run docs:build && bundle exec jekyll build",
-    "docs:validate": "node scripts/validate-docs.js"
+
   },
   "keywords": [
     "syslog",

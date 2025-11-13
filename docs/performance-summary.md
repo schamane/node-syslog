@@ -98,37 +98,28 @@ deploy:
 
 ### 🛠️ Usage Instructions
 
-#### Standard Optimized Run
+#### Standard Test Run
 ```bash
-node scripts/performance-container-test.js test --optimized
+node scripts/container-test.js test
 ```
 
-#### Performance Benchmarking
+#### Test with Coverage
 ```bash
-node scripts/performance-container-test.js test --optimized --benchmark
-```
-
-#### Monitoring Mode
-```bash
-node scripts/performance-container-test.js test --optimized --monitor
+node scripts/container-test.js test:coverage
 ```
 
 ### 📁 File Structure
 
 ```
 scripts/
-├── performance-container-test.js  # Optimized runner
-├── container-test.js              # Original runner
-└── debug-container-test.js        # Debug runner
+├── container-test.js              # Container test runner
+├── build-docs.js                 # Documentation builder
+└── install.js                    # Native module installer
 
 .docker/
 ├── node_modules/                  # Persistent cache
 ├── pnpm-store/                   # pnpm cache
-├── cache/                        # Build cache
-└── benchmark.json               # Performance data
-
-Dockerfile.optimized              # Multi-stage build
-docker-compose.optimized.yml      # Optimized compose config
+└── cache/                        # Build cache
 ```
 
 ### 🎯 Performance Targets Met

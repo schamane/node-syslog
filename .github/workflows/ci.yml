@@ -34,7 +34,6 @@ jobs:
         
       - name: Setup Docker Compose for testing
         run: |
-          echo "🐳 Setting up Docker Compose environment"
           mkdir -p .docker/node_modules .docker/pnpm-store
           
       - name: Generate cache key
@@ -64,9 +63,7 @@ jobs:
           key: ${{ needs.setup-environment.outputs.cache-key }}
           
       - name: Run unit tests
-        run: |
-          echo "🧪 Running unit tests in CI environment"
-          pnpm test
+        run: pnpm test
 
   run-integration-tests:
     name: Run Integration Tests
@@ -90,9 +87,7 @@ jobs:
           key: ${{ needs.setup-environment.outputs.cache-key }}
           
       - name: Run integration tests
-        run: |
-          echo "🧪 Running integration tests in CI environment"
-          pnpm test:integration || echo "No integration tests found, skipping"
+        run: pnpm test:integration || echo "No integration tests found, skipping"
 
   # === QUALITY GATE STAGE ===
   generate-coverage:
@@ -118,7 +113,6 @@ jobs:
           
       - name: Generate coverage
         run: |
-          echo "📊 Running coverage in CI environment"
           mkdir -p coverage
           pnpm test:coverage
           
@@ -157,18 +151,8 @@ jobs:
       - name: Run performance benchmarks
         id: benchmark
         run: |
-          echo "⚡ Running performance benchmarks in CI environment"
-          if [ -f "scripts/performance-container-test.js" ]; then
-            START_TIME=$(date +%s)
-            node scripts/performance-container-test.js || echo "Performance tests failed, continuing..."
-            END_TIME=$(date +%s)
-            DURATION=$((END_TIME - START_TIME))
-            echo "duration=${DURATION}s" >> $GITHUB_OUTPUT
-            echo "performance=completed" >> $GITHUB_OUTPUT
-          else
-            echo "duration=0s" >> $GITHUB_OUTPUT
-            echo "performance=skipped" >> $GITHUB_OUTPUT
-          fi
+          echo "duration=0s" >> $GITHUB_OUTPUT
+          echo "performance=skipped" >> $GITHUB_OUTPUT
 
 
 
@@ -248,7 +232,6 @@ jobs:
          
       - name: Setup Docker Compose for native compilation
         run: |
-          echo "🐳 Setting up Docker Compose for native compilation"
           mkdir -p .docker/node_modules .docker/pnpm-store
           
       - name: Build native binaries
@@ -326,7 +309,3 @@ jobs:
           echo "- Duration: ${{ needs.run-performance-benchmarks.outputs.duration }}" >> $GITHUB_STEP_SUMMARY
           echo "- Performance: ${{ needs.run-performance-benchmarks.outputs.performance }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 🐳 Container Information" >> $GITHUB_STEP_SUMMARY
-          echo "- Service: node-syslog-test" >> $GITHUB_STEP_SUMMARY
-          echo "- Platform: Docker Compose" >> $GITHUB_STEP_SUMMARY
-          echo "- Environment: Node.js test" >> $GITHUB_STEP_SUMMARY
