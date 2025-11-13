@@ -2,9 +2,9 @@ name: Build and Deploy Documentation
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -26,19 +26,19 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
           version: latest
-          
+
       - name: Setup Node.js
         id: node
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'pnpm'
-          
+          node-version: "22"
+          cache: "pnpm"
+
       - name: Generate cache key
         id: cache
         run: echo "key=deps-$(node -v)-$(pnpm -v)-${{ hashFiles('pnpm-lock.yaml') }}" >> $GITHUB_OUTPUT
@@ -50,19 +50,19 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js and pnpm
         uses: ./.github/actions/setup-node-pnpm
-        
+
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
           key: ${{ needs.setup-build-environment.outputs.cache-key }}
-          
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
-        
+
       - name: Build TypeScript
         run: pnpm run build
 
@@ -73,19 +73,19 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js and pnpm
         uses: ./.github/actions/setup-node-pnpm
-        
+
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
           key: ${{ needs.setup-build-environment.outputs.cache-key }}
-          
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
-        
+
       - name: Generate API docs
         run: pnpm run docs:build
 
@@ -96,26 +96,26 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.2'
+          ruby-version: "3.2"
           bundler-cache: true
           working-directory: docs
-          
+
       - name: Validate Build Environment
         run: |
           echo "🔍 Validating build environment..."
-          
+
           # Check Ruby version
           RUBY_VERSION=$(ruby -e 'puts RUBY_VERSION')
           echo "Ruby version: $RUBY_VERSION"
-          
+
           # Check Bundler version
           BUNDLER_VERSION=$(bundle --version)
           echo "Bundler version: $BUNDLER_VERSION"
-          
+
           # Verify all gems are installed
           if bundle check; then
             echo "✅ All dependencies satisfied"
@@ -124,25 +124,25 @@ jobs:
             exit 1
           fi
         working-directory: docs
-        
+
       - name: Update just-the-docs
         run: bundle update just-the-docs
         working-directory: docs
-        
+
       - name: Verify Jekyll and just-the-docs versions
         run: |
           echo "Checking Jekyll version..."
           JEKYLL_VERSION=$(bundle exec jekyll --version | cut -d' ' -f2)
           echo "Installed Jekyll version: $JEKYLL_VERSION"
           EXPECTED_JEKYLL="4.4.1"
-          
+
           if [[ "$JEKYLL_VERSION" == "$EXPECTED_JEKYLL" ]]; then
             echo "✅ Jekyll version matches expected: $EXPECTED_JEKYLL"
           else
             echo "❌ Jekyll version mismatch. Expected: $EXPECTED_JEKYLL, Got: $JEKYLL_VERSION"
             exit 1
           fi
-          
+
           echo "Checking just-the-docs version..."
           JTD_VERSION=$(bundle list | grep just-the-docs | awk '{print $2}')
           echo "Installed just-the-docs version: $JTD_VERSION"
@@ -161,14 +161,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.2'
+          ruby-version: "3.2"
           bundler-cache: true
           working-directory: docs
-        
+
       - name: Build Jekyll site
         run: |
           echo "🔨 Building Jekyll site..."
@@ -182,31 +182,31 @@ jobs:
           echo "Build output directory contents:"
           ls -la _site/ || echo "_site directory not found"
         working-directory: docs
-        
+
       - name: Add .nojekyll
         run: |
           echo "📁 Adding .nojekyll file..."
           echo "Current directory: $(pwd)"
           echo "_site directory contents:"
           ls -la _site/ || echo "_site directory not found"
-          
+
           if [ ! -d "_site" ]; then
             echo "❌ _site directory does not exist. Jekyll build may have failed."
             echo "Creating _site directory manually..."
             mkdir -p _site
           fi
-          
+
           touch _site/.nojekyll
           echo "✅ Created _site/.nojekyll"
-          
+
           # Remove any conflicting .nojekyll in api directory
           rm -f _site/api/.nojekyll
           echo "✅ Cleaned up api/.nojekyll"
-          
+
           echo "Final _site directory contents:"
           ls -la _site/
         working-directory: docs
-        
+
       - name: Verify build output
         run: |
           echo "📁 Generated files:"
@@ -214,7 +214,7 @@ jobs:
           echo ""
           echo "📁 Total files: $(find _site -type f | wc -l)"
           echo "📁 Total directories: $(find _site -type d | wc -l)"
-          
+
           # Check for essential files
           if [ -f "_site/index.html" ]; then
             echo "✅ Main index.html found"
@@ -222,14 +222,14 @@ jobs:
             echo "❌ Main index.html missing"
             exit 1
           fi
-          
+
           if [ -f "_site/_api/index.html" ]; then
             echo "✅ API documentation found"
           else
             echo "⚠️  API documentation not found"
           fi
         working-directory: docs
-        
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: peaceiris/actions-gh-pages@v3
@@ -238,14 +238,14 @@ jobs:
           publish_dir: ./docs/_site
           publish_branch: gh-pages
           keep_files: false
-          cname: node-syslog.schamane.de
-          
+          # cname: node-syslog.schamane.de
+
       - name: List deployed files (requires GH_TOKEN)
         if: env.GH_TOKEN != ''
         run: |
           echo "📁 Files deployed to gh-pages:"
           gh api repos/:owner/:repo/pages/build/latest | jq -r '.artifacts[].name' 2>/dev/null || echo "Using fallback listing..."
-          
+
           # Fallback listing
           echo "📁 Available files in _site:"
           find docs/_site -name "*.html" -o -name "*.css" -o -name "*.js" -o -name "*.svg" | sort | head -10
@@ -255,7 +255,7 @@ jobs:
           echo "Total JS files: $(find docs/_site -name "*.js" | wc -l)"
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          
+
       - name: List deployed files (fallback)
         if: env.GH_TOKEN == ''
         run: |
@@ -268,6 +268,3 @@ jobs:
           echo "Total JS files: $(find docs/_site -name "*.js" | wc -l)"
           echo ""
           echo "📖 Documentation available at: https://schamane.github.io/node-syslog/"
-          echo "📖 Custom domain: https://node-syslog.schamane.de/"
-
-  
