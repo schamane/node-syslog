@@ -33,15 +33,22 @@ try {
 try {
   console.log('🔍 Looking for pre-built binary...');
   const binding_path = npg.find(package_json_path);
-  console.log('✅ Found pre-built binary:', binding_path);
+  console.log('✅ Found pre-built binary path:', binding_path);
   
-  // Verify the binary can be loaded (but don't assign to global)
-  try {
-    require(binding_path);
-    console.log('✅ Pre-built binary verified successfully');
-  } catch (loadError) {
-    console.log('⚠️  Pre-built binary found but failed to load, rebuilding from source...');
-    throw loadError; // This will trigger the fallback build
+  // Check if the binary file actually exists before trying to load it
+  if (existsSync(binding_path)) {
+    // Verify the binary can be loaded (but don't assign to global)
+    try {
+      require(binding_path);
+      console.log('✅ Pre-built binary verified successfully');
+      process.exit(0); // Success, exit early
+    } catch (loadError) {
+      console.log('⚠️  Pre-built binary found but failed to load, rebuilding from source...');
+      throw loadError; // This will trigger the fallback build
+    }
+  } else {
+    console.log('⚠️  Pre-built binary path found but file does not exist, building from source...');
+    throw new Error(`Pre-built binary not found at ${binding_path}`);
   }
 } catch (error) {
   console.log('⚠️  Pre-built binary not available, building from source...');
