@@ -98,7 +98,7 @@ jobs:
   generate-coverage:
     name: Generate Coverage Reports
     runs-on: ubuntu-latest
-    needs: [run-unit-tests, run-integration-tests]
+    needs: [setup-environment, run-unit-tests, run-integration-tests]
     permissions:
       contents: read
       packages: write
@@ -133,7 +133,7 @@ jobs:
   run-performance-benchmarks:
     name: Run Performance Benchmarks
     runs-on: ubuntu-latest
-    needs: [run-unit-tests, run-integration-tests]
+    needs: [setup-environment, run-unit-tests, run-integration-tests]
     permissions:
       contents: read
       packages: write
