@@ -169,18 +169,87 @@ jobs:
           bundler-cache: true
           working-directory: docs
 
-      - name: Build Jekyll site
+      - name: Trace Jekyll Build Process
         run: |
-          echo "🔨 Building Jekyll site..."
-          echo "Current directory: $(pwd)"
-          echo "Jekyll config:"
-          bundle exec jekyll doctor
-          echo ""
-          echo "Starting Jekyll build..."
-          bundle exec jekyll build --baseurl="/node-syslog" --verbose --trace
-          echo "✅ Jekyll build completed"
-          echo "Build output directory contents:"
-          ls -la _site/ || echo "_site directory not found"
+          echo "=== Jekyll Environment ==="
+          bundle exec jekyll --version
+          bundle list | grep -E "(jekyll|just-the-docs|sass)"
+          
+          echo "=== Jekyll Doctor Diagnosis ==="
+          bundle exec jekyll doctor --trace
+          
+          echo "=== Build Configuration ==="
+          echo "Theme config:"
+          grep -E "^(theme|remote_theme)" _config.yml
+          echo "Baseurl config:"
+          grep -E "^baseurl" _config.yml
+          
+          echo "=== Starting Verbose Build ==="
+          bundle exec jekyll build --baseurl="/node-syslog" --verbose --trace 2>&1 | tee build.log
+          
+          echo "=== Build Log Analysis ==="
+          echo "Theme-related messages:"
+          grep -i "theme\|layout\|sass" build.log || echo "No theme messages found"
+          
+          echo "=== Generated Site Structure ==="
+          find _site -type f -name "*.html" | wc -l
+          find _site -type f -name "*.css" | wc -l
+          find _site -type f -name "*.js" | wc -l
+          
+          echo "=== Critical Files Check ==="
+          for file in index.html _api/index.html; do
+            if [ -f "_site/$file" ]; then
+              echo "✅ _site/$file exists"
+              echo "First 50 lines:"
+              head -50 "_site/$file"
+              echo "---"
+            else
+              echo "❌ _site/$file missing"
+            fi
+          done
+        working-directory: docs
+
+      - name: Analyze HTML Structure
+        run: |
+          echo "=== HTML Structure Validation ==="
+          for html_file in $(find _site -name "*.html" -type f | head -5); do
+            echo "=== Analyzing: $html_file ==="
+            echo "Has DOCTYPE:"
+            head -1 "$html_file" | grep -i "<!DOCTYPE" && echo "✅" || echo "❌"
+            echo "Has <html>:"
+            grep -q "<html" "$html_file" && echo "✅" || echo "❌"
+            echo "Has <head>:"
+            grep -q "<head" "$html_file" && echo "✅" || echo "❌"
+            echo "Has <body>:"
+            grep -q "<body" "$html_file" && echo "✅" || echo "❌"
+            echo "Has <nav>:"
+            grep -q "<nav" "$html_file" && echo "✅" || echo "❌"
+            echo "Has theme CSS link:"
+            grep -q "just-the-docs.*css\|main.*css" "$html_file" && echo "✅" || echo "❌"
+            echo "---"
+          done
+        working-directory: docs
+
+      - name: Check Theme Asset Generation
+        run: |
+          echo "=== Theme Assets Investigation ==="
+          echo "CSS files in _site:"
+          find _site -name "*.css" -type f | sort
+          
+          echo "JS files in _site:"
+          find _site -name "*.js" -type f | sort
+          
+          echo "SASS processing check:"
+          if find _site -name "*.css" | grep -q "just-the-docs"; then
+            echo "✅ just-the-docs CSS found"
+          else
+            echo "❌ just-the-docs CSS missing"
+            echo "All CSS files:"
+            find _site -name "*.css" -exec ls -la {} \;
+          fi
+          
+          echo "Asset directory structure:"
+          find _site/assets -type f 2>/dev/null | head -20 || echo "No assets directory"
         working-directory: docs
 
       - name: Add .nojekyll
@@ -240,31 +309,51 @@ jobs:
           keep_files: false
           # cname: node-syslog.schamane.de
 
-      - name: List deployed files (requires GH_TOKEN)
-        if: env.GH_TOKEN != ''
-        run: |
-          echo "📁 Files deployed to gh-pages:"
-          gh api repos/:owner/:repo/pages/build/latest | jq -r '.artifacts[].name' 2>/dev/null || echo "Using fallback listing..."
-
-          # Fallback listing
-          echo "📁 Available files in _site:"
-          find docs/_site -name "*.html" -o -name "*.css" -o -name "*.js" -o -name "*.svg" | sort | head -10
-          echo "..."
-          echo "Total HTML files: $(find docs/_site -name "*.html" | wc -l)"
-          echo "Total CSS files: $(find docs/_site -name "*.css" | wc -l)"
-          echo "Total JS files: $(find docs/_site -name "*.js" | wc -l)"
+      - name: Verify Deployment via GitHub API
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
-      - name: List deployed files (fallback)
-        if: env.GH_TOKEN == ''
         run: |
-          echo "📁 Files deployed to gh-pages:"
-          echo "📁 Available files in _site:"
-          find docs/_site -name "*.html" -o -name "*.css" -o -name "*.js" -o -name "*.svg" | sort | head -10
-          echo "..."
-          echo "Total HTML files: $(find docs/_site -name "*.html" | wc -l)"
-          echo "Total CSS files: $(find docs/_site -name "*.css" | wc -l)"
-          echo "Total JS files: $(find docs/_site -name "*.js" | wc -l)"
-          echo ""
-          echo "📖 Documentation available at: https://schamane.github.io/node-syslog/"
+          echo "=== Checking gh-pages branch ==="
+          gh api repos/${{ github.repository }}/git/refs/heads/gh-pages || echo "gh-pages branch not found"
+          
+          echo "=== Latest deployment commit ==="
+          gh api repos/${{ github.repository }}/commits?sha=gh-pages&per_page=1 | jq -r '.[0].commit.message'
+          
+          echo "=== Checking deployed files via API ==="
+          gh api repos/${{ github.repository }}/git/trees/gh-pages?recursive=1 | jq -r '.tree[] | select(.type == "blob") | .path' | grep -E "\\.(html|css|js)$" | head -20
+          
+          echo "=== Fetching and analyzing deployed index.html ==="
+          gh api repos/${{ github.repository }}/contents/index.html?ref=gh-pages | jq -r '.content' | base64 -d | head -50
+          
+          echo "=== Checking for theme assets in deployment ==="
+          gh api repos/${{ github.repository }}/git/trees/gh-pages?recursive=1 | jq -r '.tree[] | .path' | grep -E "(just-the-docs|main|style).*\\.(css|js)" || echo "No theme assets found"
+
+      - name: Live Site Validation
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          echo "=== Waiting for deployment to propagate ==="
+          sleep 15
+          
+          echo "=== Testing live site ==="
+          SITE_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+          echo "Testing URL: $SITE_URL"
+          
+          echo "=== Fetching live site HTML ==="
+          curl -s "$SITE_URL" | head -100 | tee live-site.html
+          
+          echo "=== Analyzing live site structure ==="
+          echo "Has DOCTYPE:"
+          grep -i "<!DOCTYPE" live-site.html && echo "✅" || echo "❌"
+          
+          echo "Has <nav> element:"
+          grep "<nav" live-site.html && echo "✅" || echo "❌"
+          
+          echo "Has theme CSS:"
+          grep -E "just-the-docs.*css|main.*css" live-site.html && echo "✅" || echo "❌"
+          
+          echo "Title tag:"
+          grep "<title>" live-site.html || echo "No title found"
+          
+          echo "=== Checking HTTP headers ==="
+          curl -I "$SITE_URL"

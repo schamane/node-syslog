@@ -1,0 +1,68 @@
+name: Debug Documentation Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      debug_level:
+        description: 'Debug level (1-3)'
+        required: true
+        default: '2'
+        type: choice
+        options:
+          - '1'
+          - '2'
+          - '3'
+
+permissions:
+  contents: read
+
+jobs:
+  debug-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+          working-directory: docs
+
+      - name: Debug Jekyll Build
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          DEBUG_LEVEL: ${{ github.event.inputs.debug_level }}
+        run: |
+          echo "=== Debug Level: $DEBUG_LEVEL ==="
+          
+          # Level 1: Basic info
+          bundle exec jekyll --version
+          bundle list | grep -E "(jekyll|just-the-docs|sass)"
+          
+          echo "=== Configuration ==="
+          grep -E "^(theme|remote_theme|baseurl)" _config.yml
+          
+          # Level 2: Build with trace
+          if [ "$DEBUG_LEVEL" -ge 2 ]; then
+            echo "=== Building with verbose output ==="
+            bundle exec jekyll build --baseurl="/node-syslog" --verbose --trace
+          fi
+          
+          # Level 3: Full analysis
+          if [ "$DEBUG_LEVEL" -ge 3 ]; then
+            echo "=== Full site analysis ==="
+            find _site -type f -name "*.html" -exec echo "=== {} ===" \; -exec head -30 {} \;
+            
+            echo "=== Asset analysis ==="
+            find _site -name "*.css" -o -name "*.js" | head -20
+            
+            echo "=== Theme check ==="
+            if [ -f "_site/assets/css/just-the-docs.css" ]; then
+              echo "✅ Theme CSS found"
+            else
+              echo "❌ Theme CSS missing"
+            fi
+          fi
+        working-directory: docs

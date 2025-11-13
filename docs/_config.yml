@@ -15,7 +15,7 @@ social:
     - https://github.com/schamane/node-syslog
 
 # Theme - using just-the-docs for better documentation presentation
-remote_theme: just-the-docs/just-the-docs@v0.8.2
+theme: just-the-docs
 
 # Build settings
 markdown: kramdown
@@ -65,5 +65,24 @@ kramdown:
 
 # Site timezone
 timezone: UTC
+
+# Collections for better organization
+collections:
+  api:
+    output: true
+    permalink: /:collection/:name/
+
+# Defaults for all pages
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "default"
+  - scope:
+      path: "_api"
+    values:
+      layout: "default"
+      nav_exclude: false
+      parent: "API Reference"
 
 # Default values - just-the-docs theme handles layouts automatically
