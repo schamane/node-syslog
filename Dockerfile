@@ -1,7 +1,7 @@
 # Multi-stage build for optimized containerized testing using Chainguard Wolfi OS
 FROM cgr.dev/chainguard/node:latest-dev AS base
 
-# Install build dependencies using Wolfi OS package manager
+# Install build dependencies and setup environment in single root block
 USER root
 RUN apk update && apk add --no-cache \
     python3 \
@@ -10,38 +10,30 @@ RUN apk update && apk add --no-cache \
     glibc-dev \
     linux-headers \
     curl \
-    bash
+    bash && \
+    mkdir -p /app/node_modules /app/.npm && \
+    chown -R 65532:65532 /app
 
-# Enable pnpm using corepack (no root permissions needed)
-USER root
-RUN corepack enable pnpm
-USER 65532:65532
-
-# Create app directory with proper permissions (Chainguard uses /app by default)
-USER root
+# Set working directory and switch to non-root user
 WORKDIR /app
-RUN mkdir -p /app/node_modules /app/.npm && chown -R 65532:65532 /app
 USER 65532:65532
 
 # Dependencies stage - optimized for caching
 FROM base AS dependencies
 
-# Copy only package files for optimal layer caching
+# Copy only package files first for optimal layer caching
 COPY --chown=65532:65532 package.json pnpm-lock.yaml ./
+
+# Install dependencies before copying source code
+RUN pnpm install --frozen-lockfile --ignore-scripts --prefer-frozen-lockfile \
+    && pnpm store prune
+
+# Copy source files after dependencies are installed
 COPY --chown=65532:65532 scripts/ ./scripts/
 COPY --chown=65532:65532 binding.gyp ./
 COPY --chown=65532:65532 src/ ./src/
 COPY --chown=65532:65532 test/ ./test/
 COPY --chown=65532:65532 tsconfig.json vitest.config.ts ./
-
-# Configure npm for performance (keep for compatibility)
-USER root
-RUN npm config set cache /app/.npm --global
-USER 65532:65532
-
-# Install dependencies with optimizations
-RUN pnpm install --frozen-lockfile --ignore-scripts --prefer-frozen-lockfile \
-    && pnpm store prune
 
 # Skip native build in container - it's built in CI
 RUN echo "⏭️  Skipping native build in container - built in CI"
@@ -51,10 +43,6 @@ FROM cgr.dev/chainguard/node:latest AS runtime
 
 # Copy installed dependencies from dependencies stage
 COPY --from=dependencies --chown=65532:65532 /app/node_modules ./node_modules
-COPY --from=dependencies --chown=65532:65532 /app/.npm ./.npm
-
-# Use npm instead of pnpm in distroless runtime (npm is available)
-# pnpm dependencies are already installed in node_modules
 
 # Note: Native modules are built separately in CI and not included in container
 RUN echo "📝 Container ready for native module compilation"
@@ -64,9 +52,7 @@ USER 65532:65532
 
 # Set environment variables for optimized testing
 ENV NODE_ENV=test \
-    CI=true \
-    npm_config_cache=/app/.npm \
-    PNPM_HOME=/app/.npm
+    CI=true
 
 # Expose debugging port
 EXPOSE 9229
@@ -78,5 +64,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 # Use dumb-init for proper signal handling in distroless environment
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
-# Default command optimized for speed (use npm for test execution in distroless)
-CMD ["npm", "run", "test"]
+# Default command optimized for speed
+CMD ["pnpm", "test"]

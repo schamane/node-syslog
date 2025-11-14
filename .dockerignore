@@ -40,6 +40,9 @@ Thumbs.db
 # Documentation
 docs/
 .jekyll-cache
+_site/
+Gemfile
+Gemfile.lock
 
 # Logs
 logs
@@ -103,3 +106,6 @@ jspm_packages/
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
+
+# OpenSpec directories
+openspec/
