@@ -26,19 +26,10 @@ function loadNativeModule() {
     const SyslogNative = nativeBinding.SyslogNative || nativeBinding;
     return new SyslogNative();
   } catch (error) {
-    // Fallback to direct binary loading for development
-    try {
-      const path = require('path');
-      const builtBinary = path.join(__dirname, '../build/Release/syslog_native.node');
-      const nativeBinding = require(builtBinary);
-      const SyslogNative = nativeBinding.SyslogNative || nativeBinding;
-      return new SyslogNative();
-    } catch (fallbackError) {
     throw new Error(
       `Failed to load native syslog module. This package only supports Linux x64/ARM64.\n` +
       `Error: ${error instanceof Error ? error.message : String(error)}`
     );
-    }
   }
 }
 

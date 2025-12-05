@@ -19,8 +19,8 @@
     "dev": "tsc --watch",
     "lint": "eslint src --ext .ts",
     "prepublishOnly": "pnpm run build && pnpm run build:native && pnpm run build:native:prebuild",
-    "install": "node scripts/install.js",
-    "install:native": "node scripts/install.js",
+    "install": "node-gyp-build",
+    "install:native": "node-gyp-build",
     "docs:build": "typedoc && node scripts/build-docs.js",
     "docs:serve": "bundle exec jekyll serve --livereload",
     "docs:deploy": "pnpm run docs:build && bundle exec jekyll build"
